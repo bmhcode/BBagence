@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Accueil - BBcars {% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        /* background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://pbs.twimg.com/media/F_uAdHGWgAE-r5_.jpg'); */
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/static/images/logo.png');
+ 
+        background-size: cover;
+        background-position: center;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgb(255, 255, 255);
+        text-align: center;
+        border-radius: 15px;
+        margin-bottom: 3rem;
+    }
+    .promotion-card {
+        background-color: #ffeef6;
+        border-left: 5px solid #d63384;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    
+    <header class="hero-section">
+        <div>
+            <h1 class="display-4 mb-3">Expérience d'achat de voitures</h1>
+            <p class="lead mb-4">Découvrez les meilleures marques de voitures et des offres exclusives .</p>
+            <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
+        </div>
+    </header>
+
+    <!-- Promotions en vedette -->
+    {% if promotions_actives %}
+    <section class="mb-5">
+        <h2 class="mb-4">Offres Spéciales</h2>
+        <div class="row g-4">
+            {% for promo in promotions_actives %}
+            <div class="col-md-4">
+                <div class="card h-100 promotion-card">
+                    <div class="card-body">
+                        <span class="badge bg-danger mb-2">PROMO</span>
+                        <h5 class="card-title">{{ promo.titre }}</h5>
+                        <p class="card-text text-truncate">{{ promo.description }}</p>
+                        <p class="small text-muted mb-0">Valable jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- agences en vedette -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>agences à la Une</h2>
+            <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for agence in agences_vedette %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    {% if agence.image %}
+                    <img src="{{ agence.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-store fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">{{ agence.nom }}</h5>
+                        <!-- <span class="badge bg-light text-dark">{{ agence.get_categorie_display }}</span> -->
+                        <a href="{{ agence.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
+
+                        </div>
+                        <p class="card-text text-muted">{{ agence.description|truncatechars:30 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-map-marker-alt"></i> {{agence.ville}} - {{agence.commune}} </span>
+                            <span><i class="fas fa-clock"></i> 09:00 - 22:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">
+                <p>Aucune agence mise en vedette pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Événements à venir -->
+    <section class="mb-5">
+        <h2 class="mb-4">Événements Prochains</h2>
+        <div class="row g-4">
+            {% for evenement in evenements_prochains %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            {% if evenement.image %}
+                            <img src="{{ evenement.image.url }}" class="img-fluid rounded-start h-100" alt="{{ evenement.titre }}" style="object-fit: cover;">
+                            {% else %}
+                            <div class="h-100 bg-secondary rounded-start d-flex align-items-center justify-content-center text-white">
+                                <i class="fas fa-calendar-star fa-2x"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h6 class="card-title mb-1">{{ evenement.titre }}</h6>
+                                <p class="small text-danger mb-1"><i class="far fa-calendar-alt me-1"></i> {{ evenement.date|date:"d F" }}</p>
+                                <p class="card-text small text-muted">{{ evenement.lieu }}</p>
+                                <a href="{{ evenement.get_absolute_url }}" class="btn btn-link btn-sm p-0 text-decoration-none">Détails <i class="fas fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">
+                <p>Aucun événement prévu pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+{% endblock %}

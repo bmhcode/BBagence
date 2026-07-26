@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gérer la Présentation : {{ supermarket.name }} — BB Shopping{% endblock %}
+
+{% block content %}
+
+<!-- Custom Styles for Management Panel -->
+<style>
+    /* Dashboard Layout */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    @media (max-width: 991px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Cards */
+    .manage-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
+        padding: 30px;
+        margin-bottom: 30px;
+        transition: box-shadow var(--transition);
+    }
+    
+    .manage-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+    .manage-card h3 {
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--color-primary);
+        margin-top: 0;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .manage-card h3 i {
+        color: var(--color-pink);
+    }
+
+    .manage-card .card-desc {
+        color: var(--color-muted);
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin-bottom: 24px;
+    }
+
+    /* Form styling */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--color-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-input, .form-file, input[type="text"], input[type="url"], textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background-color: #f8fafc;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        color: var(--color-text);
+        transition: all var(--transition);
+    }
+
+    .form-control:focus, .form-input:focus, .form-file:focus, input[type="text"]:focus, input[type="url"]:focus, textarea:focus {
+        background-color: #fff;
+        border-color: var(--color-pink);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(233, 30, 140, 0.1);
+    }
+
+    /* Collapsible forms */
+    .collapsible-form {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+        background: #f8fafc;
+        border-radius: var(--radius-md);
+        border: 1.5px dashed var(--color-border);
+        padding: 0 25px;
+        margin-bottom: 0;
+        opacity: 0;
+    }
+
+    .collapsible-form.show {
+        max-height: 500px;
+        padding: 25px;
+        margin-bottom: 30px;
+        opacity: 1;
+        border-color: var(--color-pink);
+    }
+
+    /* Media Grids */
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+    }
+
+    .media-item {
+        position: relative;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        background: #fff;
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .media-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .media-item img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+    }
+
+    .media-item .media-info {
+        padding: 12px 15px;
+        background: #fff;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .media-item .media-info p {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .delete-btn-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+    }
+
+    .delete-btn-overlay button {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition);
+    }
+
+    .delete-btn-overlay button:hover {
+        background: rgb(239, 68, 68);
+        transform: scale(1.1);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Maps preview */
+    .map-preview-container {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
+        background: #fafafa;
+    }
+
+    .map-preview-container iframe {
+        width: 100%;
+        height: 220px;
+        border: 0;
+        display: block;
+    }
+</style>
+
+<!-- Page Hero -->
+<section class="abc-page-hero" style="padding: 80px 0 40px; background: #000;color: var(--color-primary);">
+    <div class="abc-container">
+        <p class="abc-eyebrow"><i class="fas fa-cog"></i> Administration</p>
+        <h1 class="abc-section-title" style="color: #fff; font-family: var(--font-display);">Gérer la Présentation</h1>
+        <p class="abc-section-subtitle" style="color: rgba(255,255,255,0.7);">Mettez à jour les photos, les vidéos et la localisation de <strong>{{ agence.name }}</strong>.</p>
+    </div>
+</section>
+
+<section class="abc-section abc-section--gray" style="padding: 60px 0;">
+    <div class="abc-container">
+        
+        <div class="dashboard-grid">
+
+            <!-- ================= SIDEBAR (LEFT) ================= -->
+            <div>
+                <!-- Google Map Card -->
+                <div class="manage-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> Google Maps Embed</h3>
+                    <p class="card-desc">Collez le lien URL d'intégration Google Maps pour afficher la carte de localisation sur le portail.</p>
+                    
+                    {% if agence.google_map %}
+                        <div class="map-preview-container">
+                            <iframe 
+                                src="{{ agence.google_map }}" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    {% else %}
+                        <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 30px; text-align: center; color: var(--color-muted); border: 1.5px dashed var(--color-border); margin-bottom: 20px;">
+                            <i class="fas fa-map-signs fa-2x" style="margin-bottom: 10px;"></i>
+                            <p style="font-size: 0.85rem; margin: 0;">Aucune carte configurée.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_google_map">URL de la carte (iframe src)</label>
+                            {{ map_form.google_map }}
+                        </div>
+                        <button type="submit" name="update_map" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Back Link -->
+                <a href="{% url 'agence_detail' agence.slug %}" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; border-color: var(--color-border); color: var(--color-primary); background: #fff; height: 48px;">
+                    <i class="fas fa-arrow-left"></i> Retour à l'agence
+                </a>
+            </div>
+
+            <!-- ================= MAIN CONTENT (RIGHT) ================= -->
+            <div style="display: flex; flex-direction: column; gap: 0;">
+                
+                <!-- Photo Gallery Card -->
+                <div class="manage-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+                        <h2 style="font-weight: 800; font-family: var(--font-body); font-size: 1.4rem; margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-images" style="color: var(--color-pink);"></i> Galerie Photos
+                        </h2>
+                        <button onclick="toggleForm('addImageForm')" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">
+                            <i class="fas fa-plus"></i> Ajouter une photo
+                        </button>
+                    </div>
+
+                    <!-- Add Image Slide Form -->
+                    <div id="addImageForm" class="collapsible-form">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: end;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Sélectionner l'image</label>
+                                    {{ image_form.image }}
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Légende / Titre</label>
+                                    {{ image_form.legende }}
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                                <button type="submit" name="add_image" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">Enregistrer la photo</button>
+                                <button type="button" onclick="toggleForm('addImageForm')" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">Annuler</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Images Grid -->
+                    {% if images %}
+                    <div class="media-grid">
+                        {% for img in images %}
+                        <div class="media-item">
+                            <img src="{{ img.image.url }}" alt="{{ img.legende }}">
+                            <div class="media-info">
+                                <p>{{ img.legende|default:"Photo supermarché" }}</p>
+                            </div>
+                            <!-- Delete form -->
+                            <form method="POST" action="{% url 'agence_image_delete' img.pk %}" class="delete-btn-overlay">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('Voulez-vous supprimer cette photo ?')" title="Supprimer la photo">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 40px; color: var(--color-muted); background: #f8fafc; border-radius: var(--radius-md); border: 1.5px dashed var(--color-border);">
+                        <i class="fas fa-images fa-2x" style="margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p style="margin: 0; font-size: 0.9rem;">Aucune photo dans la galerie.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Video tours Card -->
+                <div class="manage-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+                        <h2 style="font-weight: 800; font-family: var(--font-body); font-size: 1.4rem; margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-video" style="color: var(--color-pink);"></i> Visites Vidéo
+                        </h2>
+                        <button onclick="toggleForm('addVideoForm')" class="abc-btn abc-btn--primary abc-btn--sm">
+                            <i class="fas fa-plus"></i> Ajouter une vidéo
+                        </button>
+                    </div>
+
+                    <!-- Add Video Slide Form -->
+                    <div id="addVideoForm" class="collapsible-form">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: end;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Sélectionner le fichier vidéo (MP4)</label>
+                                    {{ video_form.video }}
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Légende / Titre</label>
+                                    {{ video_form.legende }}
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                                <button type="submit" name="add_video" class="ym-btn ym-btn--primary ym-btn--sm">Enregistrer la vidéo</button>
+                                <button type="button" onclick="toggleForm('addVideoForm')" class="ym-btn ym-btn--ghost ym-btn--sm" style="color: var(--color-primary); border-color: var(--color-border);">Annuler</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Videos Grid -->
+                    {% if videos %}
+                    <div class="video-grid">
+                        {% for vid in videos %}
+                        <div class="media-item">
+                            <div style="position: relative; background: #000; height: 140px; display: flex; align-items: center; justify-content: center;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" preload="metadata">
+                                    <source src="{{ vid.video.url }}" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; pointer-events: none; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fas fa-play" style="margin-left: 2px;"></i>
+                                </div>
+                            </div>
+                            <div class="media-info" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                <p style="flex: 1;">{{ vid.legende|default:"Vidéo de présentation" }}</p>
+                                <form method="POST" action="{% url 'agence_video_delete' vid.pk %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" onclick="return confirm('Voulez-vous supprimer cette vidéo ?')" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; display: flex; align-items: center; transition: color var(--transition);" title="Supprimer la vidéo" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#ef4444'">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 40px; color: var(--color-muted); background: #f8fafc; border-radius: var(--radius-md); border: 1.5px dashed var(--color-border);">
+                        <i class="fas fa-film fa-2x" style="margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p style="margin: 0; font-size: 0.9rem;">Aucune vidéo disponible.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Collapsible Form Toggle Script -->
+<script>
+    function toggleForm(formId) {
+        const form = document.getElementById(formId);
+        form.classList.toggle('show');
+    }
+</script>
+
+{% endblock %}

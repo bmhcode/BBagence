@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Événements - Elite Mall{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12 text-center">
+        <h1 class="display-4 mb-3">Événements & Divertissement</h1>
+        <p class="lead text-muted mx-auto col-md-6">Plongez dans l'effervescence de notre centre. Concerts, ateliers, expositions et bien plus encore.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for evenement in evenements %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="position-relative">
+                {% if evenement.image %}
+                <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 250px; object-fit: cover;">
+                {% endif %}
+                <div class="position-absolute top-0 end-0 m-3 bg-white px-3 py-2 rounded-pill shadow-sm">
+                    <span class="fw-bold text-danger">{{ evenement.date|date:"d" }}</span> <span class="text-muted">{{ evenement.date|date:"F" }}</span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <h4 class="card-title mb-2">{{ evenement.titre }}</h4>
+                <div class="d-flex align-items-center mb-3 text-muted">
+                    <i class="fas fa-map-marker-alt me-2 text-primary"></i> <small>{{ evenement.lieu }}</small>
+                    <i class="far fa-clock ms-3 me-2 text-primary"></i> <small>{{ evenement.date|date:"H:i" }}</small>
+                </div>
+                <p class="card-text text-muted">{{ evenement.description|truncatewords:20 }}</p>
+                <a href="{{ evenement.get_absolute_url }}" class="btn btn-outline-primary w-100 rounded-pill mt-auto">Voir les détails</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted">Aucun événement n'est prévu pour le moment. Revenez bientôt !</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

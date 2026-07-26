@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.titre }} - Blog Elite Mall{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <article class="mb-5">
+            <header class="mb-5 text-center">
+                <p class="text-primary fw-bold text-uppercase mb-3">{{ article.date_publication|date:"d F Y" }}</p>
+                <h1 class="display-4 font-bold">{{ article.titre }}</h1>
+            </header>
+
+            {% if article.image %}
+            <div class="mb-5 rounded-5 overflow-hidden shadow-lg">
+                <img src="{{ article.image.url }}" class="img-fluid w-100" alt="{{ article.titre }}">
+            </div>
+            {% endif %}
+
+            <div class="article-content lead text-muted" style="white-space: pre-line;">
+                {{ article.contenu }}
+            </div>
+        </article>
+
+        <hr class="my-5">
+        <div class="text-center pt-3">
+            <a href="{% url 'blog_list' %}" class="btn btn-outline-secondary rounded-pill px-5"><i class="fas fa-arrow-left me-2"></i>Retour aux articles</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

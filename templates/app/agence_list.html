@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Nos Agence - Elite Mall{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12">
+        <h1 class="display-4 text-center mb-4">Nos agences</h1>
+        <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection de boutiques allant de la haute couture à la technologie de pointe.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Filters -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm rounded-3">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Filtrer par marque</h5>
+                {% for code, label in agence.nom %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="agence_nom" id="agence_nom_{{ code }}" 
+                           {% if request.GET.agence_nom == code %}checked{% endif %}
+                           onclick="window.location.href='?agence_nom={{ code }}'">
+                    <label class="form-check-label" for="agence_nom_{{ code }}">
+                        {{ label }}
+                    </label>
+                </div>
+                {% endfor %}
+                <hr>
+                <a href="{% url 'agence_list' %}" class="btn btn-outline-secondary btn-sm w-100">Réinitialiser</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agence List -->
+    <div class="col-lg-9">
+        <div class="row g-4">
+            {% for agence in agences %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card h-100 shadow-sm">
+                    {% if agence.image %}
+                    <img src="{{ agence.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <i class="fas fa-store fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                       <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">{{ agence.nom }}</h5>
+                        <!-- <span class="badge bg-light text-dark">{{ agence.get_categorie_display }}</span> -->
+                                                 <a href="{{ agence.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
+
+                        </div>
+                        <p class="card-text small">{% if agence.description %}{{ agence.description|truncatechars:30 }}{% else %} No description available {% endif %}</p>
+                       <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-map-marker-alt"></i> {{agence.localisation}}</span>
+                            <span><i class="fas fa-clock"></i> 09:00 - 22:00</span>
+                        </div>  
+                        
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aucune agence ne correspond à votre recherche.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>
+                {% endif %}
+                
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

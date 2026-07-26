@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Mon Profil — BB Shopping
+{% endblock title %}
+
+{% block content %}
+
+
+
+<style>
+  .profile-avatar-wrapper:hover .profile-avatar-overlay {
+    opacity: 1;
+  }
+  .profile-avatar-wrapper:hover .profile-avatar-img {
+    filter: brightness(0.7);
+    transform: scale(1.02);
+  }
+  .profile-avatar-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+  }
+  .profile-avatar-overlay i {
+    font-size: 1.5rem;
+  }
+  .profile-avatar-overlay span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Map standard classes to design system for existing form tags if needed */
+  .ym-contact-form input:not([type="file"]) {
+    background: #fff;
+  }
+</style>
+
+
+<!-- ═══════════ PAGE HERO ═══════════ -->
+<section class="ym-page-hero">
+  <div class="ym-container">
+    <p class="ym-eyebrow">Compte Personnel</p>
+    <h1 class="ym-section-title">Gérer mon <em>Profil</em> - {{user.username}}</h1>
+    <p class="ym-section-subtitle">Mettez à jour vos informations personnelles et votre photo de profil.</p>
+    <a href="{% url 'order_list_by_user' user.id %}" class="ym-btn ym-btn--dark" 
+      style="width:100%; justify-content:center; margin-top:24px; margin-bottom:24px;">
+      Mes Commandes <i class="fas fa-arrow-right ym-btn__icon"></i>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════ PROFILE SECTION ═══════════ -->
+<section class="ym-section ym-section--gray">
+  <div class="ym-container">
+    <div class="ym-detail-layout" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;">
+      
+      <div class="ym-detail-card">
+        <form method="POST" enctype="multipart/form-data" class="ym-contact-form">
+          {% csrf_token %}
+
+          <!-- Avatar Section -->
+          <div class="text-center mb-5">
+            <div class="profile-avatar-wrapper" style="position: relative; display: inline-block;">
+                <label for="imageUpload" style="cursor:pointer; display: block;">
+                  {% if user.profile.image %}
+                    <img id="preview" src="{{ user.profile.image.url }}" class="profile-avatar-img shadow-lg" 
+                         style="width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; transition: all 0.3s ease;">
+                  {% else %}
+                    <img id="preview" src="https://ui-avatars.com/api/?name={{ user.username }}&background=1a1a2e&color=e8c547&size=160" 
+                         class="profile-avatar-img shadow-lg" 
+                         style="width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; transition: all 0.3s ease;">
+                  {% endif %}
+                  
+                  <div class="profile-avatar-overlay">
+                    <i class="fas fa-camera"></i>
+                    <span>Changer</span>
+                  </div>
+                </label>
+                {{ p_form.image }}
+            </div>
+            
+            
+            {% if user.is_active %}
+            <span class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2">
+                <i class="fas fa-circle me-1 small"></i> Active
+            </span>
+            {% else %}
+            <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis px-3 py-2">
+                <i class="fas fa-ban me-1"></i> Suspended
+            </span>
+            {% endif %}
+
+
+            {% if user.is_superuser %}
+            <span class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2">
+                <i class="fas fa-circle me-1 small"></i> Super Admin
+            </span>
+            {% endif %}
+
+
+            <p class="mt-3" style="font-size: 0.85rem; color: var(--color-muted); font-weight: 500;">
+              Cliquez pour mettre à jour votre photo
+            </p>
+          </div>
+
+          <!-- End Avatar Section -->
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ p_form.role.id_for_label }}">Rôle</label>
+            {{ p_form.role }}
+            {% if p_form.role.errors %}<span class="ym-form-error">{{ p_form.role.errors.0 }}</span>{% endif %}
+          </div>
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ u_form.username.id_for_label }}">Nom d'utilisateur</label>
+            {{ u_form.username }}
+            {% if u_form.username.errors %}<span class="ym-form-error">{{ u_form.username.errors.0 }}</span>{% endif %}
+          </div>
+          <!-- Basic Info Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ u_form.last_name.id_for_label }}">Nom</label>
+              {{ u_form.last_name }}
+              {% if u_form.last_name.errors %}<span class="ym-form-error">{{ u_form.last_name.errors.0 }}</span>{% endif %}
+            </div>
+            
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ u_form.first_name.id_for_label }}">Prénom</label>
+              {{ u_form.first_name }}
+              {% if u_form.first_name.errors %}<span class="ym-form-error">{{ u_form.first_name.errors.0 }}</span>{% endif %}
+            </div>
+            
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ p_form.phone.id_for_label }}">Téléphone</label>
+              {{ p_form.phone }}
+              {% if p_form.phone.errors %}<span class="ym-form-error">{{ p_form.phone.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ u_form.email.id_for_label }}">Adresse e-mail</label>
+              {{ u_form.email }}
+              {% if u_form.email.errors %}<span class="ym-form-error">{{ u_form.email.errors.0 }}</span>{% endif %}
+            </div>  
+
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ p_form.city.id_for_label }}">City</label>
+              {{ p_form.city }}
+              {% if p_form.city.errors %}<span class="ym-form-error">{{ p_form.city.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="ym-form-group">
+              <label class="ym-form-label" for="{{ p_form.commune.id_for_label }}">Commune</label>
+              {{ p_form.commune }}
+              {% if p_form.commune.errors %}<span class="ym-form-error">{{ p_form.commune.errors.0 }}</span>{% endif %}
+            </div>
+          </div>
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ p_form.commune.id_for_label }}">Adresse</label>
+            {{ p_form.address }}
+            {% if p_form.address.errors %}<span class="ym-form-error">{{ p_form.address.errors.0 }}</span>{% endif %}
+          </div>
+
+          <div style="margin-top: 32px; display: flex; flex-direction: column; gap: 12px;">
+            <button type="submit" class="ym-btn ym-btn--primary" style="width: 100%; justify-content: center;">
+              Enregistrer les modifications <i class="fas fa-save ms-2"></i>
+            </button>
+            
+            <a href="{% url 'password_change' %}" class="ym-btn ym-btn--ghost" style="width: 100%; justify-content: center; color: var(--color-text); border-color: var(--color-border);">
+              <i class="fas fa-lock me-2"></i> Modifier le mot de passe
+            </a>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const imageUpload = document.getElementById("imageUpload");
+    const preview = document.getElementById("preview");
+
+    if (imageUpload) {
+        imageUpload.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                // Add a little pop effect
+                preview.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    preview.style.transform = 'scale(1)';
+                }, 300);
+            }
+        });
+    }
+
+    // --- Dynamic Communes Logic ---
+    const cityNames = [
+        'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa', 'Biskra', 'Béchar', 
+        'Blida', 'Bouira', 'Tamanrasset', 'Tébessa', 'Tlemcen', 'Tiaret', 'Tizi Ouzou', 'Alger', 
+        'Djelfa', 'Jijel', 'Sétif', 'Saïda', 'Skikda', 'Sidi Bel Abbès', 'Annaba', 'Guelma', 
+        'Constantine', 'Médéa', 'Mostaganem', "M'Sila", 'Mascara', 'Ouargla', 'Oran', 'El Bayadh', 
+        'Illizi', 'Bordj Bou Arreridj', 'Boumerdès', 'El Tarf', 'Tindouf', 'Tissemsilt', 'El Oued', 
+        'Khenchela', 'Souk Ahras', 'Tipaza', 'Mila', 'Aïn Defla', 'Naâma', 'Aïn Témouchent', 
+        'Ghardaïa', 'Relizane', 'Timimoun', 'Bordj Badji Mokhtar', 'Ouled Djellal', 'Béni Abbès', 
+        'In Salah', 'In Guezzam', 'Touggourt', 'Djanet', "El M'Ghair", 'El Meniaa'
+    ];
+
+    const citySelect = document.getElementById('{{ p_form.city.id_for_label }}');
+    const communeSelect = document.getElementById('{{ p_form.commune.id_for_label }}');
+    
+    const currentCommune = "{{ p_form.instance.commune|default:'' }}";
+    let communesData = [];
+
+    if (citySelect && communeSelect) {
+        fetch("{% static 'js/algeria_communes.json' %}")
+            .then(response => response.json())
+            .then(data => {
+                communesData = data;
+                if (citySelect.value) {
+                    updateCommunes(citySelect.value, currentCommune);
+                }
+            })
+            .catch(error => console.error('Error loading communes:', error));
+
+        citySelect.addEventListener('change', function() {
+            updateCommunes(this.value, null);
+        });
+    }
+
+    function updateCommunes(selectedCity, preselectedCommune) {
+        communeSelect.innerHTML = '<option value="">---------</option>'; 
+        if (!selectedCity) return;
+        
+        const cityId = (cityNames.indexOf(selectedCity) + 1).toString();
+        const filteredCommunes = communesData.filter(c => c.wilaya_id === cityId);
+        
+        filteredCommunes.forEach(commune => {
+            const option = document.createElement('option');
+            option.value = commune.name;
+            option.textContent = commune.name;
+            if (preselectedCommune === commune.name) {
+                option.selected = true;
+            }
+            communeSelect.appendChild(option);
+        });
+    }
+</script>
+{% endblock %}

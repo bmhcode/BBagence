@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Créer un utilisateur
+{% endblock title %}
+
+{% block content %}
+
+<!-- ═══════════ PAGE HERO ═══════════ -->
+<section class="ym-page-hero">
+  <div class="ym-container">
+    <p class="ym-eyebrow">Administration</p>
+    <h1 class="ym-section-title">Créer un <em>Utilisateur</em></h1>
+    <p class="ym-section-subtitle">
+      Ajoutez un nouveau compte avec ses informations et permissions.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ FORM SECTION ═══════════ -->
+<section class="ym-section ym-section--gray">
+  <div class="ym-container">
+
+    <div class="ym-detail-card" style="max-width: 800px; margin: 0 auto;">
+
+      <form method="POST" class="ym-contact-form">
+        {% csrf_token %}
+
+        <!-- Basic Info Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ form.username.id_for_label }}">
+              Nom d'utilisateur
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <span class="ym-form-error">{{ form.username.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ form.email.id_for_label }}">
+              Adresse e-mail
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <span class="ym-form-error">{{ form.email.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ form.first_name.id_for_label }}">
+              Prénom
+            </label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <span class="ym-form-error">{{ form.first_name.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <div class="ym-form-group">
+            <label class="ym-form-label" for="{{ form.last_name.id_for_label }}">
+              Nom
+            </label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <span class="ym-form-error">{{ form.last_name.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <hr style="margin: 32px 0; border-color: var(--color-border);">
+
+        <!-- Password -->
+        <div class="ym-form-group">
+          <label class="ym-form-label">Mot de passe</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <span class="ym-form-error">{{ form.password1.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="ym-form-group">
+          <label class="ym-form-label">Confirmer le mot de passe</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <span class="ym-form-error">{{ form.password2.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <hr style="margin: 32px 0; border-color: var(--color-border);">
+
+        <!-- Submit -->
+        <div style="margin-top: 32px;">
+          <button type="submit" class="ym-btn ym-btn--primary" style="width: 100%; justify-content: center;">
+            Créer l'utilisateur <i class="fas fa-user-plus ms-2"></i>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

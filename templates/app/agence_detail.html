@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ agence.nom }} - BBCARS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow rounded-3 overflow-hidden mb-4">
+            {% if agence.image %}
+            <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  
+                    <span class="badge bg-primary px-3 py-2 rounded-pill fs-6">{{ agence.get_categorie_display }}</span>
+                </div>
+                <hr class="my-4">
+                <h4 class="mb-3">À propos de nous</h4>
+                <p class="lead text-muted">{{ agence.description }}</p>
+            </div>
+        </div>
+
+
+        <!-- Products Section -->
+        <div class="ym-detail-card" style="margin-top: 40px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 class="ym-detail-section-title" style="margin: 0;">Nos voitures</h2>
+            {% if request.user.is_superuser or agence.manager == request.user %}
+            <a href="" class="ym-btn ym-btn--accent ym-btn--sm">
+              <i class="fas fa-plus"></i> Ajouter une voiture
+            </a>
+            {% endif %}
+          </div>
+          
+          <div class="ym-products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+            {% for car in agence.cars.all %}
+            <div class="ym-product-item" style="background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative;">
+               
+              <!-- Wishlist Toggle Button -->
+                
+                <button onclick="toggleWishlistGrid(this, {{ car.id }})" 
+                        class="wishlist-toggle-btn {% if car.id in user_wishlist_ids %}active{% endif %}"
+                        style="position: absolute; top: 15px; left: 15px; z-index: 10; background: white; border: none; width: 48px; height: 48px; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; color: {% if car.id in user_wishlist_ids %}var(--accent){% else %}var(--text-muted){% endif %}; transition: transform 0.2s;">
+                    <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart fa-lg" style="margin-top: 1px;"></i>
+                </button>
+              
+              <a href="{% url 'car_detail' agence.slug car.id %}" style="text-decoration: none; color: inherit;">
+                <div style="height: 180px; overflow: hidden; background: #f9f9f9;">
+                 
+                  {% if car.main_image %}
+                    <img src="{{ car.main_image.image.url }}" alt="{{ car.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                  {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ddd;">
+                      <i class="fas fa-image fa-2x"></i>
+                    </div>
+                  {% endif %}
+
+                </div>
+                <div style="padding: 15px;">
+                  <h4 style="font-size: 0.85rem; margin-bottom: 5px; font-weight: 600;"> {{ car.marque }} {{ car.modele }} {{ car.annee }}</h4>
+                  <p style="font-size: 0.70rem; color: var(--text-muted); line-height: 0.80; margin-bottom: 32px;">
+                    {{ car.description|slice:35 }}
+                  </p>  
+                  {{ car.nouveau_prix|intcomma }}
+                  {% if car.ancien_prix %}
+                  <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
+                    {{ car.ancien_prix|intcomma }}
+                  </span>
+                  {% endif %}
+                </div>
+              </a>
+
+              {% if request.user.is_superuser or agence.manager == request.user %}
+              
+              <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                <a href="" class="ym-btn ym-btn--dark ym-btn--sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="" class="ym-btn ym-btn--dark ym-btn--sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+              {% endif %}
+            </div>
+
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+              <i class="fas fa-box-open fa-2x" style="margin-bottom: 10px;"></i>
+              <p>Aucune voiture n'a encore été ajoutée.</p>
+            </div>
+             {% endfor %}
+
+          </div>
+        </div>
+
+        {% if agence.promotions.all %}
+        <div class="mb-5">
+            <h3 class="mb-4"><i class="fas fa-tags me-2 text-danger"></i>Offres en cours</h3>
+            <div class="row g-3">
+                {% for promo in agence.promotions.all %}
+                <div class="col-md-6">
+                    <div class="card border-danger h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">{{ promo.titre }}</h5>
+                            <p class="card-text small">{{ promo.description }}</p>
+                            <p class="mb-0 small text-muted"><i class="far fa-clock me-1"></i> Jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm rounded-3 mb-4">
+            <div class="card-body p-4">
+                <!-- <h5 class="mb-4">Informations Pratiques</h5> -->
+                
+                <h3 class="display-5 mb-0">{{ agence.nom }} </h3>
+                <div class="card border-0 shadow-sm rounded-3 mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+
+                            {% if agence.manager.profile.image %}
+                                <img src="{{ agence.manager.profile.imageURL }}"
+                                    alt="{{ agence.manager.username }}"
+                                    class="rounded-circle border shadow-sm me-3"
+                                    style="width:80px; height:80px; object-fit:cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                    style="width:80px; height:80px; font-size:30px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold">
+                                    {{ agence.manager.first_name }} {{ agence.manager.last_name }}
+                                </h6>
+
+                                <small class="text-muted d-block mb-2">
+                                    @{{ agence.manager.username }}
+                                </small>
+
+                                {% if agence.manager.profile.telephone %}
+                                    <div class="small">
+                                        <i class="fas fa-phone-alt text-success me-2"></i>
+                                        {{ agence.manager.profile.telephone }}
+                                    </div>
+                                {% else %}
+                                    <div class="small text-muted">
+                                        <i class="fas fa-phone-alt me-2"></i>
+                                        Non renseigné
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-map-marker-alt text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block uppercase fw-bold">LOCALISATION</small>
+                        <span>{{ agence.localisation }}</span>
+                    </div>
+                </div>
+
+                {% if agence.telephone %}
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-phone text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block uppercase fw-bold">TÉLÉPHONE</small>
+                        <span>{{ agence.telephone }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if agence.heure_ouverture and agence.heure_fermeture %}
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-clock text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block uppercase fw-bold">HORAIRES</small>
+                        <span>{{ agence.get_ouvert_ferme_display }}</span>
+                    </div>
+                </div>
+                {% endif %}
+              
+                {% if agence.email %}
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-envelope text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block uppercase fw-bold">Email</small>
+                        <a href="mailto:{{ agence.email }}" target="_blank" class="text-decoration-none">{{ agence.email }}</a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if agence.site_web %}
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-globe text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block uppercase fw-bold">SITE INTERNET</small>
+                        <a href="{{ agence.site_web }}" target="_blank" class="text-decoration-none">Visiter le site</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
+                    Contacter la boutique
+                </a>
+                <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-outline-secondary w-100 rounded-pill py-2" >
+                    <i class="fas fa-camera me-2"></i> Gerer la presentation
+                </a>
+
+
+
+            </div>
+        </div>
+
+        <!-- <div class="bg-white p-4 shadow-sm rounded-3">
+            <h5 class="mb-3">Partagez l'expérience</h5>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-facebook-f me-2"></i>Partager</button>
+                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-twitter me-2"></i>Tweet</button>
+            </div>
+        </div> -->
+    </div>
+
+
+</div>
+{% endblock %}
