@@ -3,40 +3,32 @@
 {% block title %}Nos Agence - Elite Mall{% endblock %}
 
 {% block content %}
-<div class="row mb-5">
+<div class="row mb-3">
     <div class="col-12">
         <h1 class="display-4 text-center mb-4">Nos agences</h1>
         <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection de boutiques allant de la haute couture à la technologie de pointe.</p>
     </div>
 </div>
 
-<div class="row">
-    <!-- Filters -->
-    <div class="col-lg-3 mb-4">
-        <div class="card shadow-sm rounded-3">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Filtrer par marque</h5>
-                {% for code, label in agence.nom %}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="agence_nom" id="agence_nom_{{ code }}" 
-                           {% if request.GET.agence_nom == code %}checked{% endif %}
-                           onclick="window.location.href='?agence_nom={{ code }}'">
-                    <label class="form-check-label" for="agence_nom_{{ code }}">
-                        {{ label }}
-                    </label>
-                </div>
-                {% endfor %}
-                <hr>
-                <a href="{% url 'agence_list' %}" class="btn btn-outline-secondary btn-sm w-100">Réinitialiser</a>
-            </div>
+
+<!-- Filter by City -->
+
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="citySearch" class="form-control" placeholder="Rechercher une ville...">
         </div>
     </div>
 
-    <!-- Agence List -->
-    <div class="col-lg-9">
+<!-- end filter by city -->
+
+<br>
+<div class="row">
+     <!-- Agence List -->
+    <div class="col-lg-12">
         <div class="row g-4">
             {% for agence in agences %}
-            <div class="col-md-6 col-xl-4">
+           <div class="col-md-6 col-xl-4 agence-card" data-city="{{ agence.ville|lower }}">
                 <div class="card h-100 shadow-sm">
                     {% if agence.image %}
                     <img src="{{ agence.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 180px; object-fit: cover;">
@@ -54,7 +46,7 @@
                         </div>
                         <p class="card-text small">{% if agence.description %}{{ agence.description|truncatechars:30 }}{% else %} No description available {% endif %}</p>
                        <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-map-marker-alt"></i> {{agence.localisation}}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> {{agence.ville}} - {{agence.commune}}</span>
                             <span><i class="fas fa-clock"></i> 09:00 - 22:00</span>
                         </div>  
                         
@@ -87,4 +79,28 @@
         {% endif %}
     </div>
 </div>
+
+
+<script>
+const search = document.getElementById("citySearch");
+const cards = document.querySelectorAll(".agence-card");
+
+search.addEventListener("input", function () {
+
+    const value = this.value.trim().toLowerCase();
+
+    cards.forEach(card => {
+
+        const city = card.dataset.city;
+
+        if (value === "" || city.includes(value)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+});
+</script>
 {% endblock %}

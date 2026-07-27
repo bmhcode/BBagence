@@ -252,7 +252,7 @@
                             <label for="id_google_map">URL de la carte (iframe src)</label>
                             {{ map_form.google_map }}
                         </div>
-                        <button type="submit" name="update_map" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">
+                        <button type="submit" name="update_map" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">
                             <i class="fas fa-save"></i> Enregistrer
                         </button>
                     </form>
@@ -273,9 +273,11 @@
                         <h2 style="font-weight: 800; font-family: var(--font-body); font-size: 1.4rem; margin: 0; display: flex; align-items: center; gap: 10px;">
                             <i class="fas fa-images" style="color: var(--color-pink);"></i> Galerie Photos
                         </h2>
-                        <button onclick="toggleForm('addImageForm')" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">
+                        <button onclick="toggleForm('addImageForm')" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">
                             <i class="fas fa-plus"></i> Ajouter une photo
                         </button>
+
+
                     </div>
 
                     <!-- Add Image Slide Form -->
@@ -293,8 +295,8 @@
                                 </div>
                             </div>
                             <div style="margin-top: 20px; display: flex; gap: 10px;">
-                                <button type="submit" name="add_image" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">Enregistrer la photo</button>
-                                <button type="button" onclick="toggleForm('addImageForm')" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; height: 48px;">Annuler</button>
+                                <button type="submit" name="add_image" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">Enregistrer la photo</button>
+                                <button type="button" onclick="toggleForm('addImageForm')" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">Annuler</button>
                             </div>
                         </form>
                     </div>
@@ -332,7 +334,7 @@
                         <h2 style="font-weight: 800; font-family: var(--font-body); font-size: 1.4rem; margin: 0; display: flex; align-items: center; gap: 10px;">
                             <i class="fas fa-video" style="color: var(--color-pink);"></i> Visites Vidéo
                         </h2>
-                        <button onclick="toggleForm('addVideoForm')" class="abc-btn abc-btn--primary abc-btn--sm">
+                        <button onclick="toggleForm('addVideoForm')" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">
                             <i class="fas fa-plus"></i> Ajouter une vidéo
                         </button>
                     </div>
@@ -352,8 +354,8 @@
                                 </div>
                             </div>
                             <div style="margin-top: 20px; display: flex; gap: 10px;">
-                                <button type="submit" name="add_video" class="ym-btn ym-btn--primary ym-btn--sm">Enregistrer la vidéo</button>
-                                <button type="button" onclick="toggleForm('addVideoForm')" class="ym-btn ym-btn--ghost ym-btn--sm" style="color: var(--color-primary); border-color: var(--color-border);">Annuler</button>
+                                <button type="submit" name="add_video" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">Enregistrer la vidéo</button>
+                                <button type="button" onclick="toggleForm('addVideoForm')" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">Annuler</button>
                             </div>
                         </form>
                     </div>

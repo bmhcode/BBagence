@@ -7,22 +7,34 @@
 <div class="row">
     <div class="col-lg-8">
         <div class="card shadow rounded-3 overflow-hidden mb-4">
+            <h3 class="display-5 mb-0">{{ agence.nom }} </h3>
             {% if agence.image %}
             <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
             {% endif %}
+
             <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  
-                    <span class="badge bg-primary px-3 py-2 rounded-pill fs-6">{{ agence.get_categorie_display }}</span>
-                </div>
                 <hr class="my-4">
-                <h4 class="mb-3">À propos de nous</h4>
-                <p class="lead text-muted">{{ agence.description }}</p>
+
+                <div class="row align-items-center">
+                <!-- Left column -->
+                    <div class="col-md-8">
+                        <h4 class="mb-3">À propos de nous</h4>
+                        <p class="lead text-muted mb-0">
+                            {{ agence.description }}
+                        </p>
+                    </div>
+
+                    <!-- Right column -->
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            <i class="fas fa-camera me-2"></i> Nous Visiter
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-
-        <!-- Products Section -->
+        <!-- Cars Section -->
         <div class="ym-detail-card" style="margin-top: 40px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 class="ym-detail-section-title" style="margin: 0;">Nos voitures</h2>
@@ -112,6 +124,7 @@
             </div>
         </div>
         {% endif %}
+
     </div>
 
     <!-- Sidebar Info -->
@@ -120,7 +133,7 @@
             <div class="card-body p-4">
                 <!-- <h5 class="mb-4">Informations Pratiques</h5> -->
                 
-                <h3 class="display-5 mb-0">{{ agence.nom }} </h3>
+                <!-- <h3 class="display-5 mb-0">{{ agence.nom }} </h3> -->
                 <div class="card border-0 shadow-sm rounded-3 mb-3">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
@@ -220,13 +233,14 @@
                 </div>
                 {% endif %}
 
-                <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
-                    Contacter la boutique
-                </a>
-                <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-outline-secondary w-100 rounded-pill py-2" >
-                    <i class="fas fa-camera me-2"></i> Gerer la presentation
-                </a>
+             <div class="d-flex flex-column flex-md-row gap-2">
+    <a href="{% url 'contact' %}?agence={{ agence.nom }}"
+       class="btn btn-primary rounded-pill py-2 flex-fill">
+        Contacter la boutique
+    </a>
 
+  
+</div>
 
 
             </div>
@@ -240,7 +254,6 @@
             </div>
         </div> -->
     </div>
-
-
+    
 </div>
 {% endblock %}

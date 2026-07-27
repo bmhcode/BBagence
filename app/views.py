@@ -1,3 +1,4 @@
+from django.template import context
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.views.generic import ListView, DetailView, TemplateView, CreateView
@@ -45,6 +46,7 @@ class AgenceListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['noms'] = Agence.nom
+        context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
         return context
 
 class AgenceDetailView(DetailView):
