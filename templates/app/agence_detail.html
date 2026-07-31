@@ -4,42 +4,209 @@
 {% block title %}{{ agence.nom }} - BBCARS{% endblock %}
 
 {% block content %}
+
+   <h3 class="">{{ agence.nom }} </h3>
+
 <div class="row">
     <div class="col-lg-8">
+        <!-- agence -->
         <div class="card shadow rounded-3 overflow-hidden mb-4">
-            <h3 class="display-5 mb-0">{{ agence.nom }} </h3>
-            {% if agence.image %}
-            <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+         
+            {% if agence.main_image %}
+                <img src="{{ agence.main_image.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="fas fa-store fa-3x text-muted"></i>
+                </div>
             {% endif %}
 
             <div class="card-body p-4">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <a href="{% url 'agence_localisation_acces' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        <i class="fas fa-map-marker-alt me-2"></i> Localisation & Accès
+                    </a>
+                    <a href="{% url 'agence_video' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        <i class="fas fa-video me-2"></i> Visites Vidéo
+                    </a>
+                    <a href="{% url 'agence_photos' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        <i class="fas fa-image me-2"></i> Galerie Photos
+                    </a>
+                </div>
                 <hr class="my-4">
-
                 <div class="row align-items-center">
                 <!-- Left column -->
                     <div class="col-md-8">
                         <h4 class="mb-3">À propos de nous</h4>
-                        <p class="lead text-muted mb-0">
-                            {{ agence.description }}
+                        <p class="lead text-muted mb-0 ">
+                            {{ agence.description|truncatewords:20 }}
                         </p>
                     </div>
 
                     <!-- Right column -->
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                        <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                    
+                     
+                        <!-- <a href="{% url 'agence_presentation' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
                             <i class="fas fa-camera me-2"></i> Nous Visiter
-                        </a>
+                        </a> -->
+
                     </div>
                 </div>
             </div>
         </div>
+        <!-- end agence -->
 
-        <!-- Cars Section -->
+     
+    </div>
+    <!-- Agence infos  -->
+    <div class="col-lg-4">
+            <div class="card shadow-sm rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <!-- <h5 class="mb-4">Informations Pratiques</h5> -->
+                    
+                    <!-- <h3 class="display-5 mb-0">{{ agence.nom }} </h3> -->
+                    <div class="card border-0 shadow-sm rounded-3 mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+
+                                {% if agence.manager.profile.image %}
+                                    <img src="{{ agence.manager.profile.imageURL }}"
+                                        alt="{{ agence.manager.username }}"
+                                        class="rounded-circle border shadow-sm me-3"
+                                        style="width:80px; height:80px; object-fit:cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                        style="width:80px; height:80px; font-size:30px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold">
+                                        {{ agence.manager.first_name }} {{ agence.manager.last_name }}
+                                    </h6>
+
+                                    <small class="text-muted d-block mb-2">
+                                        @{{ agence.manager.username }}
+                                    </small>
+
+                                    {% if agence.manager.profile.telephone %}
+                                        <div class="small">
+                                            <i class="fas fa-phone-alt text-success me-2"></i>
+                                            {{ agence.manager.profile.telephone }}
+                                        </div>
+                                    {% else %}
+                                        <div class="small text-muted">
+                                            <i class="fas fa-phone-alt me-2"></i>
+                                            Non renseigné
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">LOCALISATION</small> -->
+                            <a href="{% url 'agence_localisation_acces' agence.slug %}">
+                                <span>{{ agence.ville }} - {{ agence.commune }}</span><br>
+                                {% if agence.adresse %}<span class="text-muted m-0">{{ agence.adresse }}</span>{% endif %}
+                            </a>
+                            
+                        </div>
+                    </div>
+
+                    {% if agence.telephone %}
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-phone text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">TÉLÉPHONE</small> -->
+                            <span>{{ agence.telephone }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if agence.heure_ouverture and agence.heure_fermeture %}
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-clock text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">HORAIRES</small> -->
+                            <span>{{ agence.get_ouvert_ferme_display }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                
+                    {% if agence.email %}
+                    <div class="mb-2 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-envelope text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">Email</small> -->
+                            <a href="mailto:{{ agence.email }}" target="_blank" class="text-decoration-none">{{ agence.email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if agence.site_web %}
+                    <div class="mb-2 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-globe text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">SITE INTERNET</small> -->
+                            <a href="{{ agence.site_web }}" target="_blank" class="text-decoration-none">Visiter le site internet</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'contact' %}?agence={{ agence.nom }}"
+        class="btn btn-primary rounded-pill py-2 flex-fill">
+            Contacter la boutique
+        </a>
+           <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            <i class="fas fa-user-cog me-2"></i> Gérer mon agence
+                        </a>
+
+    
+    </div>
+
+
+                </div>
+            </div>
+
+            <!-- <div class="bg-white p-4 shadow-sm rounded-3">
+                <h5 class="mb-3">Partagez l'expérience</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-facebook-f me-2"></i>Partager</button>
+                    <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-twitter me-2"></i>Tweet</button>
+                </div>
+            </div> -->
+            <!-- end sidebar -->
+    </div>
+    <!-- end Agence infos -->
+</div>
+
+   <!-- Cars Section -->
         <div class="ym-detail-card" style="margin-top: 40px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 class="ym-detail-section-title" style="margin: 0;">Nos voitures</h2>
+
+            <a href="{% url 'cars_agence_list' agence.slug %}" class="btn btn-outline-primary btn-sm">
+              Voir tout <i class="fas fa-arrow-right"></i>
+            </a>
+
             {% if request.user.is_superuser or agence.manager == request.user %}
-            <a href="" class="ym-btn ym-btn--accent ym-btn--sm">
+            <a href="{% url 'car_create' agence.slug %}" class="btn btn-outline-primary btn-sm">
               <i class="fas fa-plus"></i> Ajouter une voiture
             </a>
             {% endif %}
@@ -49,8 +216,7 @@
             {% for car in agence.cars.all %}
             <div class="ym-product-item" style="background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative;">
                
-              <!-- Wishlist Toggle Button -->
-                
+                <!-- Wishlist Toggle Button -->
                 <button onclick="toggleWishlistGrid(this, {{ car.id }})" 
                         class="wishlist-toggle-btn {% if car.id in user_wishlist_ids %}active{% endif %}"
                         style="position: absolute; top: 15px; left: 15px; z-index: 10; background: white; border: none; width: 48px; height: 48px; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; color: {% if car.id in user_wishlist_ids %}var(--accent){% else %}var(--text-muted){% endif %}; transition: transform 0.2s;">
@@ -84,176 +250,236 @@
               </a>
 
               {% if request.user.is_superuser or agence.manager == request.user %}
-              
               <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                <a href="" class="ym-btn ym-btn--dark ym-btn--sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                <a href="" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="" class="ym-btn ym-btn--dark ym-btn--sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                <a href="" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
                   <i class="fas fa-trash"></i>
                 </a>
               </div>
               {% endif %}
+
             </div>
 
             {% empty %}
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
-              <i class="fas fa-box-open fa-2x" style="margin-bottom: 10px;"></i>
-              <p>Aucune voiture n'a encore été ajoutée.</p>
+                <i class="fas fa-box-open fa-2x" style="margin-bottom: 10px;"></i>
+                <p>Aucune voiture n'a encore été ajoutée.</p>
             </div>
-             {% endfor %}
-
-          </div>
+            {% endfor %}
+            
         </div>
+        </div>
+        <!-- end Cars Section -->
 
-        {% if agence.promotions.all %}
-        <div class="mb-5">
-            <h3 class="mb-4"><i class="fas fa-tags me-2 text-danger"></i>Offres en cours</h3>
-            <div class="row g-3">
-                {% for promo in agence.promotions.all %}
-                <div class="col-md-6">
+        <a href="{% url 'cars_agence_list' agence.slug %}" class="text-decoration-none">
+          Voir tout <i class="fas fa-arrow-right"></i>
+        </a>
+
+        <!--  promotions -->
+        <div class="mt-5 mb-5 ">
+            {% if agence.promotions.all %}
+                    <h3 class="mb-4"><i class="fas fa-tags me-2 text-danger"></i>Offres en cours</h3>
                     <div class="card border-danger h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title text-danger">{{ promo.titre }}</h5>
-                            <p class="card-text small">{{ promo.description }}</p>
-                            <p class="mb-0 small text-muted"><i class="far fa-clock me-1"></i> Jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+                        <div class="row g-3">
+                            {% for promo in agence.promotions.all %}
+                                <div class="col-md-6">
+                                        <div class="card-body">
+                                            <span class="badge bg-danger mb-2">PROMO</span>
+                                            <h5 class="card-title text-danger">{{ promo.titre }}</h5>
+                                            <p class="card-text small">{{ promo.description }}</p>
+                                            <p class="mb-0 small text-muted"><i class="far fa-clock me-1"></i> Jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
+                                        </div>
 
-    </div>
-
-    <!-- Sidebar Info -->
-    <div class="col-lg-4">
-        <div class="card shadow-sm rounded-3 mb-4">
-            <div class="card-body p-4">
-                <!-- <h5 class="mb-4">Informations Pratiques</h5> -->
-                
-                <!-- <h3 class="display-5 mb-0">{{ agence.nom }} </h3> -->
-                <div class="card border-0 shadow-sm rounded-3 mb-3">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-
-                            {% if agence.manager.profile.image %}
-                                <img src="{{ agence.manager.profile.imageURL }}"
-                                    alt="{{ agence.manager.username }}"
-                                    class="rounded-circle border shadow-sm me-3"
-                                    style="width:80px; height:80px; object-fit:cover;">
-                            {% else %}
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
-                                    style="width:80px; height:80px; font-size:30px;">
-                                    <i class="fas fa-user"></i>
+                                        {% if promo.image %}
+                                            <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.titre }}" style="height: 200px; object-fit: cover;">
+                                        {% endif %}
+                                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                            PROMO
+                                        </div>
                                 </div>
-                            {% endif %}
-
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fw-bold">
-                                    {{ agence.manager.first_name }} {{ agence.manager.last_name }}
-                                </h6>
-
-                                <small class="text-muted d-block mb-2">
-                                    @{{ agence.manager.username }}
-                                </small>
-
-                                {% if agence.manager.profile.telephone %}
-                                    <div class="small">
-                                        <i class="fas fa-phone-alt text-success me-2"></i>
-                                        {{ agence.manager.profile.telephone }}
+                        
+                                <div class="col-md-6">
+                                    <div class="video-card">
+                                            {% if promo.video %}
+                                                <div class="video-container">
+                                                    <video controls>
+                                                        <source src="{{ promo.video.url }}" type="video/mp4">
+                                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                                    </video>
+                                                </div>
+                                                <div class="video-body">
+                                                    <h4>
+                                                        <i class="fas fa-video"></i>
+                                                        {{ promo.legende|default:"Présentation de la promotion" }}
+                                                    </h4>
+                                                </div>
+                                            {% else %}
+                                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                                    <i class="fas fa-store fa-3x text-muted"></i>
+                                                </div>
+                                            {% endif %}
                                     </div>
-                                {% else %}
-                                    <div class="small text-muted">
-                                        <i class="fas fa-phone-alt me-2"></i>
-                                        Non renseigné
-                                    </div>
-                                {% endif %}
-                            </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
-
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-map-marker-alt text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">LOCALISATION</small>
-                        <span>{{ agence.localisation }}</span>
-                    </div>
-                </div>
-
-                {% if agence.telephone %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-phone text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">TÉLÉPHONE</small>
-                        <span>{{ agence.telephone }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if agence.heure_ouverture and agence.heure_fermeture %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-clock text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">HORAIRES</small>
-                        <span>{{ agence.get_ouvert_ferme_display }}</span>
-                    </div>
-                </div>
-                {% endif %}
-              
-                {% if agence.email %}
-                <div class="mb-4 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-envelope text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">Email</small>
-                        <a href="mailto:{{ agence.email }}" target="_blank" class="text-decoration-none">{{ agence.email }}</a>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if agence.site_web %}
-                <div class="mb-4 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-globe text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">SITE INTERNET</small>
-                        <a href="{{ agence.site_web }}" target="_blank" class="text-decoration-none">Visiter le site</a>
-                    </div>
-                </div>
-                {% endif %}
-
-             <div class="d-flex flex-column flex-md-row gap-2">
-    <a href="{% url 'contact' %}?agence={{ agence.nom }}"
-       class="btn btn-primary rounded-pill py-2 flex-fill">
-        Contacter la boutique
-    </a>
-
-  
-</div>
-
-
-            </div>
+            {% endif %}
         </div>
+        <!-- end  promotions -->
 
-        <!-- <div class="bg-white p-4 shadow-sm rounded-3">
-            <h5 class="mb-3">Partagez l'expérience</h5>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-facebook-f me-2"></i>Partager</button>
-                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-twitter me-2"></i>Tweet</button>
-            </div>
-        </div> -->
-    </div>
+
+
+
+<!-- Custom Styles for Premium Experience -->
+
+
+
+
+
+<style>
     
-</div>
+    /* Video cards styling */
+    .video-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .video-container {
+        position: relative;
+        padding-top: 56.25%;
+        background: #000;
+    }
+
+    .video-container video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    .video-body {
+        padding: 20px 24px;
+    }
+
+    .video-body h4 {
+        margin: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .video-body h4 i {
+        color: var(--color-pink);
+    }
+
+    /* Gallery cards styling */
+    .gallery-card {
+        position: relative;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        aspect-ratio: 4/3;
+        cursor: pointer;
+        background: #f9f9f9;
+    }
+
+    .gallery-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--transition-slow);
+    }
+
+    .gallery-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(26,26,46,0.9) 0%, transparent 70%);
+        display: flex;
+        align-items: flex-end;
+        padding: 24px;
+        opacity: 0;
+        transition: opacity var(--transition);
+    }
+
+    .gallery-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .gallery-card:hover .gallery-overlay {
+        opacity: 1;
+    }
+
+    .gallery-overlay p {
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .gallery-overlay p i {
+        color: var(--color-accent);
+    }
+
+    /* Pulse indicator animations */
+    .pulse-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .pulse-indicator.green {
+        background: #22c55e;
+    }
+    
+    .pulse-indicator.green::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+    
+    .pulse-indicator.red {
+        background: #ef4444;
+    }
+    
+    .pulse-indicator.red::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.7); opacity: 1; }
+        100% { transform: scale(1.6); opacity: 0; }
+    }
+</style>
+
+
 {% endblock %}

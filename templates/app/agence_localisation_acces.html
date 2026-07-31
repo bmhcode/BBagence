@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explorez {{ agence.nom }} — BBcars{% endblock %}
+
+{% block content %}
+
+
+
+
+<!-- Page Hero -->
+<section class="" style="padding: 10px 0 10px; ">
+   
+    <div class="container" style="position: relative; z-index: 2;">
+        <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
+            <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <a href="{{ agence.get_absolute_url }}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence.nom }}</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Localisation & Accès</span>
+        </nav>
+    </div>
+</section>
+
+
+<section class="" style="background-color: var(--color-bg); padding: 10px 0;">
+    <div class="container">
+        <!-- Location Section with Google Map & Info Panel -->
+        {% if agence.google_map %}
+        <div style="margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h2 style="font-family: var(--font-display); font-size: 2.2rem; color: var(--color-primary);">Localisation & Accès</h2>
+                <p style="color: var(--color-muted); font-size: 1.05rem; margin-top: 0px;">Comment vous rendre dans notre agence</p>
+                <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+            </div>
+            
+            <div class="map-info-container">
+                <!-- Interactive Google Map Card -->
+                <div class="map-card-wrapper">
+                    <iframe
+                        src="{{ agence.google_map }}"
+                        style="width: 100%; height: 100%; border: 0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+
+                <!-- Premium Info Details Card -->
+                <div class="info-card-wrapper">
+                    <div>
+                        <span class="" style="color: var(--color-pink); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 8px;">Coordonnées</span>
+                        <h3 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--color-primary); margin-bottom: 12px; font-weight: 700;">{{ agence.nom }}</h3>
+                        <p style="color: var(--color-muted); font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--color-pink); margin-top: 4px; flex-shrink: 0;"></i>
+                            <span>{{ agence.ville|default:"" }}{% if agence.commune %}, {{ agence.commune }}{% endif %}{% if agence.adresse %}, {{ agence.adresse }}{% endif %}</span>
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 20px; border-top: 1px solid var(--color-border);">
+                        {% if agence.telephone %}
+                        <p style="color: var(--color-text); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; font-weight: 500; margin: 0;">
+                            <i class="fas fa-phone-alt" style="color: var(--color-pink); width: 16px; font-size: 1rem;"></i>
+                            <a href="tel:{{ agence.telephone }}" style="color: inherit; text-decoration: none;">{{ agence.telephone }}</a>
+                        </p>
+                        {% endif %}
+                        {% if agence.email %}
+                        <p style="color: var(--color-text); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; font-weight: 500; margin: 0;">
+                            <i class="fas fa-envelope" style="color: var(--color-pink); width: 16px; font-size: 1rem;"></i>
+                            <a href="mailto:{{ agence.email }}" style="color: inherit; text-decoration: none;">{{ agence.email }}</a>
+                        </p>
+                        {% endif %}
+                        <p style="color: var(--color-text); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; font-weight: 500; margin: 0;">
+                            <i class="fas fa-clock" style="color: var(--color-pink); width: 16px; font-size: 1rem;"></i>
+                            <span>Ouvert de {{ agence.heure_ouverture|time:"H:i" }} à {{ agence.heure_fermeture|time:"H:i" }}</span>
+                        </p>
+                    </div>
+                    
+                    <div style="padding-top: 10px;">
+                        {% if agence.est_ouvert_maintenant %}
+                        <span style="display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; color: #166534; font-size: 0.8rem; font-weight: 700; padding: 8px 16px; border-radius: 50px; border: 1px solid #bbf7d0; box-shadow: var(--shadow-sm);">
+                            <span class="pulse-indicator green"></span> Ouvert Actuellement
+                        </span>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 8px; background: #fef2f2; color: #991b1b; font-size: 0.8rem; font-weight: 700; padding: 8px 16px; border-radius: 50px; border: 1px solid #fecaca; box-shadow: var(--shadow-sm);">
+                            <span class="pulse-indicator red"></span> Fermé Actuellement
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="max-width: 600px; margin: 0 auto 60px; text-align: center; padding: 40px; background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+            <i class="fas fa-map-marked-alt fa-3x" style="color: var(--color-muted); margin-bottom: 16px;"></i>
+            <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: var(--color-primary); margin-bottom: 8px;">Aucune carte disponible</h3>
+            <p style="color: var(--color-muted);">L'emplacement géographique n'a pas encore été configuré sur la carte.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+
+<!-- Custom Styles for Premium Experience -->
+<style>
+    .layout-map-img:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Layout styling for Google Map + Coordinates */
+    .map-info-container {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 0;
+        background: #fff;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-border);
+    }
+
+    .info-card-wrapper {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+        order: 2;
+    }
+
+    .map-card-wrapper {
+        height: 450px;
+        background: #e2e8f0;
+        order: 1;
+    }
+
+    @media (max-width: 991px) {
+        .map-info-container {
+            grid-template-columns: 1fr;
+        }
+        .map-card-wrapper {
+            height: 380px;
+            order: 1;
+        }
+        .info-card-wrapper {
+            order: 2;
+        }
+    }
+
+    /* Video cards styling */
+    .video-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .video-container {
+        position: relative;
+        padding-top: 56.25%;
+        background: #000;
+    }
+
+    .video-container video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    .video-body {
+        padding: 20px 24px;
+    }
+
+    .video-body h4 {
+        margin: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .video-body h4 i {
+        color: var(--color-pink);
+    }
+
+    /* Gallery cards styling */
+    .gallery-card {
+        position: relative;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        aspect-ratio: 4/3;
+        cursor: pointer;
+        background: #f9f9f9;
+    }
+
+    .gallery-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--transition-slow);
+    }
+
+    .gallery-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(26,26,46,0.9) 0%, transparent 70%);
+        display: flex;
+        align-items: flex-end;
+        padding: 24px;
+        opacity: 0;
+        transition: opacity var(--transition);
+    }
+
+    .gallery-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .gallery-card:hover .gallery-overlay {
+        opacity: 1;
+    }
+
+    .gallery-overlay p {
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .gallery-overlay p i {
+        color: var(--color-accent);
+    }
+
+    /* Pulse indicator animations */
+    .pulse-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .pulse-indicator.green {
+        background: #22c55e;
+    }
+    
+    .pulse-indicator.green::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+    
+    .pulse-indicator.red {
+        background: #ef4444;
+    }
+    
+    .pulse-indicator.red::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.7); opacity: 1; }
+        100% { transform: scale(1.6); opacity: 0; }
+    }
+</style>
+
+
+
+
+{% endblock %}

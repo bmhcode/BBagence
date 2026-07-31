@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from django.views.generic import ListView, DetailView, TemplateView, CreateView
 from django.db.models import Q
-from .models import Agence, AgenceImages, AgenceVideos, Car,  Evenement, Promotion, ArticleBlog, ContactMessage
+from .models import Agence, AgenceImages, AgenceVideos, Car, CarImages, Evenement, Promotion, ArticleBlog, ContactMessage
 from .forms import ContactForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -54,6 +54,11 @@ class AgenceDetailView(DetailView):
     template_name = 'app/agence_detail.html'
     context_object_name = 'agence'
     slug_url_kwarg = 'agence_slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['videos'] = self.object.videos.all()
+        return context
 
 
 # ================== Start agence views ================== 
@@ -106,6 +111,7 @@ class AgencePresentationManageView(LoginRequiredMixin, TemplateView):
                 messages.success(request, "Video added successfully.")
 
         return redirect('agence_presentation_manage', agence_slug=agence.slug)
+
 class AgenceImageDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         image = get_object_or_404(AgenceImages, pk=pk)
@@ -126,7 +132,57 @@ class AgenceVideoDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Video deleted.")
         return redirect('agence_presentation_manage', agence_slug=agence.slug)
 
+class AgencePresentationView(DetailView):
+    model = Agence
+    template_name = 'app/agence_presentation.html'
+    context_object_name = 'agence'
 
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = self.object.images.all()
+        context['videos'] = self.object.videos.all()
+        return context
+
+class AgenceLocalisationAccesView(DetailView):
+    model = Agence
+    template_name = 'app/agence_localisation_acces.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+
+class AgenceVideoView(DetailView):
+    model = Agence
+    template_name = 'app/agence_visites_video.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['videos'] = self.object.videos.all()
+        return context
+
+class AgencePhotosView(DetailView):
+    model = Agence
+    template_name = 'app/agence_galerie_photos.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = self.object.images.all()
+        return context
 
 
 # ================== Start car views ================== 
@@ -164,10 +220,31 @@ def car_image_set_main(request, agence_slug, car_id, image_id):
     return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
 
 
+class CarsAgenceListView(ListView):
+    model = Car
+    template_name = 'app/cars_agence_list.html'
+    context_object_name = 'cars'
+    ordering = ['-cree_le']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('agence')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['agence'] = Agence.objects.get(slug=self.kwargs.get('agence_slug'))
+        return context
 
 
-
-
+class CarCreateView(LoginRequiredMixin, CreateView):
+    model = Car
+    template_name = 'app/car_create.html'
+    context_object_name = 'car'
+    fields = ['agence', 'marque', 'modele', 'annee', 'prix', 'description', 'image']
+    success_url = reverse_lazy('cars_agence_list')
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('agence')
 
 # ================== End car views ================== 
 

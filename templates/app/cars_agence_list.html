@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Nos voitures - BBcars{% endblock %}
+
+{% block content %}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <h1 class="display-4 text-center mb-4">{{agence.nom}}</h1>
+        <p class="text-center mb-4"><i class="fa fa-map-marker-alt"></i> {{agence.ville}} - {{agence.commune}} - {{agence.adresse}} - <i class="fa fa-phone"></i> {{agence.telephone}} </p>
+        
+        
+        <!-- <div class="card shadow rounded-3 overflow-hidden mb-4">
+            {% if agence.image %}
+            <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+            {% endif %}
+        </div> -->
+        <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection de voitures.</p>
+    </div>
+</div>
+
+<!-- Filter by model -->
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="citySearch" class="form-control" placeholder="Rechercher par ville...">
+        </div>
+    </div>
+<!-- end filter by city -->
+<br>
+<!-- list of cars -->
+<div class="row">
+     <!-- Cars List -->
+    <div class="col-lg-12">
+        <div class="row g-4">
+            {% for car in cars %}
+           <div class="col-md-6 col-xl-4 agence-card" data-city="{{ car.agence.ville|lower }}">
+                <div class="card h-100 shadow-sm">
+                    {% if car.main_image %}
+                    <img src="{{ car.main_image.image.url }}" class="card-img-top" alt="{{ car.nom }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <i class="fas fa-store fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                <!-- Wishlist Toggle Button -->
+                <button onclick="toggleWishlistGrid(this, {{ car.id }})" 
+                        class="wishlist-toggle-btn {% if car.id in user_wishlist_ids %}active{% endif %}"
+                        style="position: absolute; top: 15px; left: 15px; z-index: 10; background: white; border: none; width: 48px; height: 48px; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; color: {% if car.id in user_wishlist_ids %}var(--accent){% else %}var(--text-muted){% endif %}; transition: transform 0.2s;">
+                    <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart fa-lg" style="margin-top: 1px;"></i>
+                </button>
+                
+                    <div class="card-body">
+                       <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">{{ car.marque }} {{ car.modele }}</h5>
+                        <!-- <span class="badge bg-light text-dark">{{ agence.get_categorie_display }}</span> -->
+                        <a href="{% url 'car_detail' car.agence.slug car.id %}" class="btn btn-outline-primary btn-sm">Visiter</a>
+
+                        </div>
+                        <p class="card-text small">{% if car.description %}{{ car.description|truncatechars:60 }}{% else %} No description available {% endif %}</p>
+                       <div class="d-flex justify-content-between align-items-center">
+                            <p class="text-muted"style="">{{ car.nouveau_prix|intcomma }}</p>
+                            {% if car.ancien_prix %}
+                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
+                                {{ car.ancien_prix|intcomma }}
+                            </span>
+                            {% endif %}   
+                            <!-- <span><i class="fas fa-clock"></i> 09:00 - 22:00</span> -->
+                        </div>  
+                        
+                        {% if request.user.is_superuser or agence.manager == request.user %}
+                            <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                                <a href="" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-edit"></i> </a>
+                                <a href="" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-trash"></i> </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aucune agence ne correspond à votre recherche.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>
+                {% endif %}
+                
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+<!-- end liste des agences -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const search = document.getElementById("citySearch");
+const cards = document.querySelectorAll(".agence-card");
+
+search.addEventListener("input", function () {
+
+    const value = this.value.trim().toLowerCase();
+
+    cards.forEach(card => {
+
+        const city = card.dataset.city;
+
+        if (value === "" || city.includes(value)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+});
+</script>
+{% endblock %}

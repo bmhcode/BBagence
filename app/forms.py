@@ -15,19 +15,21 @@ class AgencePresentationForm(forms.ModelForm):
 class AgenceImageForm(forms.ModelForm):
     class Meta:
         model = AgenceImages
-        fields = ['image', 'legende']
+        fields = ['image', 'legende','is_main']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-file'}),
             'legende': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Légende de l\'image'}),
+            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class AgenceVideoForm(forms.ModelForm):
     class Meta:
         model = AgenceVideos
-        fields = ['video', 'legende']
+        fields = ['video', 'legende','is_main']
         widgets = {
             'video': forms.ClearableFileInput(attrs={'class': 'form-file'}),
             'legende': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Légende de la vidéo'}),
+            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 

@@ -139,6 +139,13 @@ class Agence(models.Model):
     def logoURL(self):
         return self.image.url if self.image else ""
 
+    def main_image(self):
+        return self.images.filter(is_main=True).first()
+
+    def main_video(self):
+        return self.videos.filter(is_main=True).first()
+
+
     @property
     def localisation(self):
         if self.ville and self.commune:
@@ -180,6 +187,7 @@ class AgenceImages(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='agence/images/')
     legende = models.CharField(max_length=200, blank=True)
+    is_main = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Image for {self.agence.nom}"
@@ -188,6 +196,7 @@ class AgenceVideos(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='videos')
     video = models.FileField(upload_to='agence/videos/')
     legende = models.CharField(max_length=200, blank=True)
+    is_main = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Video for {self.agence.nom}"    
@@ -226,9 +235,9 @@ class AgenceReview(models.Model): # Agence Review
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    rating = models.IntegerField(default=5)  # من 1 إلى 5
-    comment = models.TextField(blank=True, verbose_name="Comment")
-    created_at = models.DateTimeField(auto_now_add=True)
+    note = models.IntegerField(default=5)  # من 1 إلى 5
+    commentaire = models.TextField(blank=True, verbose_name="Commentaire")
+    cree_le = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together = ('agence', 'user')  # user يقيّم مرة واحدة فقط
  
@@ -329,11 +338,11 @@ class Car(models.Model):
     est_en_vedette = models.BooleanField(default=False)
     est_disponible = models.BooleanField(default=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+    modifie_le = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-cree_le"]
         verbose_name = "Car"
         verbose_name_plural = "Cars"
 
@@ -341,10 +350,7 @@ class Car(models.Model):
         return f"{self.marque} {self.modele} ({self.annee})"
 
     def get_absolute_url(self):
-        return reverse(
-            "car_detail",
-            kwargs={"slug": self.slug}
-        )
+        return reverse("car_detail", kwargs={"slug": self.slug})
 
     # def save(self, *args, **kwargs):
     #     if not self.slug:
@@ -357,7 +363,7 @@ class Car(models.Model):
 
     @property
     def is_new(self):
-        return timezone.now() - self.created_at <= timedelta(days=7)
+        return timezone.now() - self.cree_le <= timedelta(days=7)
 
     @property
     def discount_amount(self):
@@ -404,7 +410,7 @@ class CarImages(models.Model):
     image = models.ImageField(upload_to="cars/gallery/")
     caption = models.CharField(max_length=200, blank=True)
     is_main = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
 
     # 👇 لترتيب الصور (الأهم أولاً)
     order = models.PositiveIntegerField(default=0)
@@ -480,7 +486,6 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"Wishlist de {self.user.username}"
 
-
 class ContactMessage(models.Model):
     nom = models.CharField(max_length=100)
     email = models.EmailField()
@@ -490,7 +495,6 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message de {self.nom} - {self.sujet}"
-
 
 class ArticleBlog(models.Model):
     titre = models.CharField(max_length=200)
@@ -535,7 +539,7 @@ class Profile(models.Model):
     adresse = models.TextField(blank=True, verbose_name="Adresse")
     image = models.ImageField(upload_to='profiles/', default='profiles/default.png')
     
-    created_at = models.DateTimeField(auto_now_add=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username + ' : ' + self.role

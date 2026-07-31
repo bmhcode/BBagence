@@ -51,8 +51,17 @@
                         <p class="card-text text-truncate">{{ promo.description }}</p>
                         <p class="small text-muted mb-0">Valable jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
                     </div>
+
+                    {% if promo.image %}
+                    <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.titre }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                        PROMO
+                    </div>
                 </div>
+                <p class="small text-muted mb-0 text-right">{{ promo.agence.nom }} | {{promo.agence.ville}}</p>
             </div>
+
             {% endfor %}
         </div>
     </section>

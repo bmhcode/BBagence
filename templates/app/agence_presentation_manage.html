@@ -293,6 +293,10 @@
                                     <label>Légende / Titre</label>
                                     {{ image_form.legende }}
                                 </div>
+                                <div class="form-check" style="margin: 0;">
+                                    <label>Image Principale</label>
+                                    {{ image_form.is_main }}
+                                </div>
                             </div>
                             <div style="margin-top: 20px; display: flex; gap: 10px;">
                                 <button type="submit" name="add_image" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">Enregistrer la photo</button>
@@ -351,6 +355,10 @@
                                 <div class="form-group" style="margin: 0;">
                                     <label>Légende / Titre</label>
                                     {{ video_form.legende }}
+                                </div>
+                                <div class="form-check" style="margin: 0;">
+                                    <label>Visite Principale</label>
+                                    {{ video_form.is_main }}
                                 </div>
                             </div>
                             <div style="margin-top: 20px; display: flex; gap: 10px;">

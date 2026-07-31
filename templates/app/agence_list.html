@@ -1,28 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Nos Agence - Elite Mall{% endblock %}
+{% block title %}Nos Agences - BBcars{% endblock %}
 
 {% block content %}
+
 <div class="row mb-3">
     <div class="col-12">
         <h1 class="display-4 text-center mb-4">Nos agences</h1>
-        <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection de boutiques allant de la haute couture à la technologie de pointe.</p>
+        <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection d'agences de vente de voiture.</p>
     </div>
 </div>
 
-
 <!-- Filter by City -->
-
     <div class="card-body">
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-search"></i></span>
-            <input type="text" id="citySearch" class="form-control" placeholder="Rechercher une ville...">
+            <input type="text" id="citySearch" class="form-control" placeholder="Rechercher par ville...">
         </div>
     </div>
-
 <!-- end filter by city -->
-
 <br>
+<!-- liste des agences -->
 <div class="row">
      <!-- Agence List -->
     <div class="col-lg-12">
@@ -79,6 +77,19 @@
         {% endif %}
     </div>
 </div>
+<!-- end liste des agences -->
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
