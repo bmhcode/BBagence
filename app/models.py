@@ -83,6 +83,7 @@ class Agence(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
     image = models.ImageField(upload_to='agences/')
+    banniere = models.ImageField(upload_to='agences/banners/', blank=True, null=True)
 
     # ── Relation ──
     manager = models.ForeignKey(User,on_delete=models.CASCADE, related_name='agences')
@@ -337,6 +338,8 @@ class Car(models.Model):
 
     est_en_vedette = models.BooleanField(default=False)
     est_disponible = models.BooleanField(default=True)
+    views_count = models.PositiveIntegerField(default=0)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
 
     cree_le = models.DateTimeField(auto_now_add=True)
     modifie_le = models.DateTimeField(auto_now=True)
@@ -350,13 +353,19 @@ class Car(models.Model):
         return f"{self.marque} {self.modele} ({self.annee})"
 
     def get_absolute_url(self):
-        return reverse("car_detail", kwargs={"slug": self.slug})
+        return reverse("car_detail", kwargs={"agence_slug": self.agence.slug, "car_id": self.id})
 
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = generate_unique_slug(Car, self.titre)
-
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+        else:
+            if self.pk:
+                old = Car.objects.get(pk=self.pk)
+                if old.marque != self.marque or old.modele != self.modele:
+                    self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+            else:
+                self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+        super().save(*args, **kwargs)
 
     def main_image(self):
         return self.images.filter(is_main=True).first()
@@ -390,7 +399,7 @@ class Car(models.Model):
     @property
     def prix_affiche(self):
         """Retourne le prix promo s'il est actif, sinon le prix normal"""
-        if self.est_en_promotion and self.prix_promo and self.est_promotion_valide():
+        if self.est_en_promotion and self.prix_promo and self.est_en_promotion_valide:
             return self.prix_promo
         return self.nouveau_prix
 
@@ -492,6 +501,7 @@ class ContactMessage(models.Model):
     sujet = models.CharField(max_length=200)
     message = models.TextField()
     cree_le = models.DateTimeField(auto_now_add=True)
+    agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')
 
     def __str__(self):
         return f"Message de {self.nom} - {self.sujet}"

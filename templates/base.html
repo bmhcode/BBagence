@@ -11,6 +11,20 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --color-primary: #1e293b;
+            --color-pink: #d63384;
+            --accent: #d63384;
+            --color-bg: #f8f9fa;
+            --color-muted: #64748b;
+            --color-border: #e2e8f0;
+            --transition: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+            --radius-lg: 12px;
+            --radius-xl: 20px;
+            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
+            --font-display: 'Montserrat', sans-serif;
+        }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
@@ -45,6 +59,8 @@
             border: none;
             transition: transform 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -56,23 +72,68 @@
 
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcars  </a>
+            <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcars</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'agence_list' %}">agences</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'car_list' %}">Voitures</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'agence_list' %}">Agences</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'evenement_list' %}">Événements</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'promotion_list' %}">Promotions</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog_list' %}">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'wishlist_list' %}">
+                            Wishlist
+                            <span class="badge rounded-pill bg-danger wishlist-badge ms-1" style="{% if wishlist_count == 0 %}display: none;{% endif %}">
+                                {{ wishlist_count }}
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
-                <form class="d-flex" action="{% url 'agence_list' %}" method="get">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Rechercher une agence..." aria-label="Search">
+                <form class="d-flex me-3" action="{% url 'car_list' %}" method="get">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Rechercher une voiture..." aria-label="Search">
                     <button class="btn btn-outline-primary" type="submit">Rechercher</button>
                 </form>
+                <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
+                        <li class="nav-item me-2">
+                            <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard' %}">
+                                <i class="fas fa-chart-line me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if request.user.profile.image and request.user.profile.image.name != 'profiles/default.png' %}
+                                    <img src="{{ request.user.profile.image.url }}" class="rounded-circle me-1" style="width: 30px; height: 30px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user-circle fa-lg me-1"></i>
+                                {% endif %}
+                                {{ request.user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="Mon Profil"><i class="fas fa-id-card me-2"></i> Mon Profil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0; padding:0;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Connexion</a></li>
+                        <li class="nav-item"><a class="btn btn-primary rounded-pill px-3" href="{% url 'signup' %}">Inscription</a></li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
