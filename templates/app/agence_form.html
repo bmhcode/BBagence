@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Modifier {{ object.nom }}{% else %}Créer une agence{% endif %} – BBcars
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+.form-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    border-bottom: 2px solid var(--color-pink);
+    padding-bottom: .5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'agence_list' %}">Agences</a></li>
+        <li class="breadcrumb-item active">
+            {% if object %}Modifier{% else %}Créer{% endif %} une agence
+        </li>
+    </ol>
+</nav>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+
+            <!-- Informations principales -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-building"></i> Informations de l'agence</div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nom de l'agence *</label>
+                        {{ form.nom }}
+                        {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Description *</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Logo / Image principale</label>
+                        {{ form.image }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Bannière</label>
+                        {{ form.banniere }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-address-book"></i> Coordonnées</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Téléphone</label>
+                        {{ form.telephone }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Site web</label>
+                        {{ form.site_web }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Wilaya</label>
+                        {{ form.ville }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Commune</label>
+                        {{ form.commune }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Adresse</label>
+                        {{ form.adresse }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horaires -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-clock"></i> Horaires d'ouverture</div>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Heure ouverture</label>
+                        {{ form.heure_ouverture }}
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Heure fermeture</label>
+                        {{ form.heure_fermeture }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            {{ form.est_ferme }}
+                            <label class="form-check-label" for="{{ form.est_ferme.id_for_label }}">Fermée</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Observation (fermeture exceptionnelle…)</label>
+                        {{ form.observation }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Localisation -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-map-marked-alt"></i> Localisation Google Maps</div>
+                <label class="form-label fw-semibold">URL embed Google Maps</label>
+                {{ form.google_map }}
+                <small class="text-muted">Ex&nbsp;: <code>https://www.google.com/maps/embed?pb=…</code></small>
+            </div>
+
+            <!-- Réseaux sociaux -->
+            {% if social_form %}
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-share-alt"></i> Réseaux sociaux</div>
+                <div class="row g-3">
+                    {% for field in social_form %}
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="fab fa-{{ field.name }} me-1"></i>{{ field.label }}
+                        </label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Buttons -->
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
+                    <i class="fas fa-save me-2"></i>{% if object %}Enregistrer{% else %}Créer{% endif %}
+                </button>
+                <a href="{% url 'agence_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+            </div>
+        </div>
+
+        <!-- Preview card -->
+        {% if object %}
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 text-center">
+                    {% if object.image %}
+                    <img src="{{ object.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ object.nom }}" style="max-height:140px; object-fit:cover;">
+                    {% endif %}
+                    <h5 class="mb-1">{{ object.nom }}</h5>
+                    <p class="text-muted small">{{ object.ville }}</p>
+                    <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm rounded-pill">
+                        <i class="fas fa-eye me-1"></i>Voir la page
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

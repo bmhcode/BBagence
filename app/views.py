@@ -1,4 +1,3 @@
-from django.template import context
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
 from django.db.models import Q, Sum, Count
@@ -273,6 +272,12 @@ class CarListView(ListView):
         context['energies'] = Car.FUEL_CHOICES
         context['boites'] = Car.TRANSMISSION_CHOICES
         context['villes'] = Agence.objects.values_list('ville', flat=True).distinct().order_by('ville')
+        # Pass user's wishlist IDs so the heart buttons render correctly
+        if self.request.user.is_authenticated:
+            wishlist, _ = Wishlist.objects.get_or_create(user=self.request.user)
+            context['user_wishlist_ids'] = list(wishlist.cars.values_list('id', flat=True))
+        else:
+            context['user_wishlist_ids'] = []
         return context
 
 class CarDetailView(DetailView):
@@ -478,8 +483,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Latest cars (10 items)
         latest_cars = cars.select_related('agence').prefetch_related('images')[:10]
         
-        # Contact Messages
-        messages_received = ContactMessage.objects.filter(agence__in=agences).order_by('-cree_le')
+        # Contact Messages (renamed to avoid shadowing Django's messages framework)
+        contact_messages = ContactMessage.objects.filter(agence__in=agences).order_by('-cree_le')
         
         context.update({
             'agences': agences,
@@ -488,7 +493,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'total_favorites': total_favorites,
             'total_promotions': total_promotions,
             'latest_cars': latest_cars,
-            'messages_received': messages_received,
+            'messages_received': contact_messages,
         })
         return context
 

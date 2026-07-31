@@ -84,7 +84,7 @@ class CarForm(forms.ModelForm):
     class Meta:
         model = Car
         fields = [
-            'marque', 'modele', 'annee', 'couleur', 'finition', 'moteur', 
+            'marque', 'modele', 'annee', 'etat', 'couleur', 'finition', 'moteur', 
             'energie', 'boite_de_vitesse', 'kilometrage', 'description', 
             'ancien_prix', 'nouveau_prix', 'est_en_promotion', 'prix_promo', 
             'date_debut_promo', 'date_fin_promo', 'est_en_vedette', 'est_disponible'
@@ -93,6 +93,7 @@ class CarForm(forms.ModelForm):
             'marque': forms.Select(attrs={'class': 'form-select'}),
             'modele': forms.TextInput(attrs={'class': 'form-control'}),
             'annee': forms.NumberInput(attrs={'class': 'form-control'}),
+            'etat': forms.Select(attrs={'class': 'form-select'}),
             'couleur': forms.TextInput(attrs={'class': 'form-control'}),
             'finition': forms.TextInput(attrs={'class': 'form-control'}),
             'moteur': forms.TextInput(attrs={'class': 'form-control'}),

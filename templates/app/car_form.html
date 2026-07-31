@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Modifier {{ object.marque }} {{ object.modele }}{% else %}Ajouter une voiture{% endif %} – BBcars
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+.form-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    border-bottom: 2px solid var(--color-pink);
+    padding-bottom: .5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.gallery-thumb {
+    position: relative;
+    width: 110px;
+    height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    transition: border-color .2s;
+}
+.gallery-thumb:hover { border-color: var(--color-pink); }
+.gallery-thumb img   { width: 100%; height: 100%; object-fit: cover; }
+.gallery-thumb .thumb-actions {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity .2s;
+}
+.gallery-thumb:hover .thumb-actions { opacity: 1; }
+.gallery-thumb .thumb-actions form { margin: 0; padding: 0; line-height: 1; }
+.gallery-thumb .main-star { color: gold; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ agence.get_absolute_url }}">{{ agence.nom }}</a></li>
+        <li class="breadcrumb-item active">
+            {% if object %}Modifier{% else %}Ajouter{% endif %} une voiture
+        </li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <!-- Informations générales -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-info-circle"></i> Informations générales</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Marque *</label>
+                        {{ form.marque }}
+                        {% if form.marque.errors %}<div class="text-danger small">{{ form.marque.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Modèle *</label>
+                        {{ form.modele }}
+                        {% if form.modele.errors %}<div class="text-danger small">{{ form.modele.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Année *</label>
+                        {{ form.annee }}
+                        {% if form.annee.errors %}<div class="text-danger small">{{ form.annee.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Couleur</label>
+                        {{ form.couleur }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Finition</label>
+                        {{ form.finition }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Description</label>
+                        {{ form.description }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caractéristiques techniques -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-cogs"></i> Caractéristiques techniques</div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Carburant</label>
+                        {{ form.energie }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Boîte de vitesses</label>
+                        {{ form.boite_de_vitesse }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Kilométrage (km)</label>
+                        {{ form.kilometrage }}
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Moteur</label>
+                        {{ form.moteur }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prix & Promotion -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-tag"></i> Prix &amp; Promotion</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Prix actuel (DA) *</label>
+                        {{ form.nouveau_prix }}
+                        {% if form.nouveau_prix.errors %}<div class="text-danger small">{{ form.nouveau_prix.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ancien prix (barré)</label>
+                        {{ form.ancien_prix }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            {{ form.est_en_promotion }}
+                            <label class="form-check-label fw-semibold" for="{{ form.est_en_promotion.id_for_label }}">
+                                Activer la promotion
+                            </label>
+                        </div>
+                    </div>
+                    <div id="promo-fields" class="row g-3 col-12" {% if not form.instance.est_en_promotion %}style="display:none"{% endif %}>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Prix promo (DA)</label>
+                            {{ form.prix_promo }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Date début</label>
+                            {{ form.date_debut_promo }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Date fin</label>
+                            {{ form.date_fin_promo }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Galerie d'images -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-images"></i> Galerie d'images</div>
+
+                <!-- Existing images (edit mode) -->
+                {% if images %}
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    {% for img in images %}
+                    <div class="gallery-thumb">
+                        <img src="{{ img.image.url }}" alt="">
+                        <div class="thumb-actions">
+                            {% if not img.is_main %}
+                            <form method="post" action="{% url 'car_image_set_main' agence.slug object.id img.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link p-0" title="Définir comme principale">
+                                    <i class="fas fa-star text-white" style="font-size:1.1rem;"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <i class="fas fa-star main-star" title="Image principale" style="font-size:1.1rem;"></i>
+                            {% endif %}
+                            <form method="post" action="{% url 'car_image_delete' agence.slug object.id img.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link p-0" title="Supprimer"
+                                        onclick="return confirm('Supprimer cette image ?')">
+                                    <i class="fas fa-trash text-danger" style="font-size:.95rem;"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% if img.is_main %}
+                        <div style="position:absolute;bottom:4px;left:4px;background:var(--color-pink);color:#fff;font-size:.6rem;padding:2px 6px;border-radius:100px;">Principale</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            {% if object %}Remplacer l'image principale{% else %}Image principale{% endif %}
+                        </label>
+                        {{ form.image }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ajouter des images (galerie)</label>
+                        {{ form.gallery }}
+                        <small class="text-muted">Sélectionnez plusieurs fichiers à la fois</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statut -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-toggle-on"></i> Statut</div>
+                <div class="d-flex gap-4">
+                    <div class="form-check form-switch">
+                        {{ form.est_disponible }}
+                        <label class="form-check-label" for="{{ form.est_disponible.id_for_label }}">Disponible</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        {{ form.est_en_vedette }}
+                        <label class="form-check-label" for="{{ form.est_en_vedette.id_for_label }}">Mise en vedette</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
+                    <i class="fas fa-save me-2"></i>{% if object %}Enregistrer{% else %}Publier{% endif %}
+                </button>
+                <a href="{{ agence.get_absolute_url }}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Sidebar info -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h6 class="fw-bold mb-3"><i class="fas fa-building me-2"></i>Agence</h6>
+                {% if agence.image %}
+                <img src="{{ agence.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ agence.nom }}">
+                {% endif %}
+                <h5 class="mb-1">{{ agence.nom }}</h5>
+                <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ agence.ville }} – {{ agence.commune }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Show/hide promo fields based on toggle */
+const promoSwitch = document.getElementById('{{ form.est_en_promotion.id_for_label }}');
+const promoFields = document.getElementById('promo-fields');
+if (promoSwitch) {
+    promoSwitch.addEventListener('change', () => {
+        promoFields.style.display = promoSwitch.checked ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

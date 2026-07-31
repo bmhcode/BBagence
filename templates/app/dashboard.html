@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard – BBcars{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Dashboard Layout ── */
+.dash-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.dash-hero h1 { font-size: 1.8rem; }
+.dash-hero p  { opacity: .7; font-size: .95rem; }
+
+/* ── Stat card ── */
+.stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    transition: transform .2s, box-shadow .2s;
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.1); }
+.stat-icon {
+    width: 64px; height: 64px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+.stat-value { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1; }
+.stat-label { font-size: .8rem; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-top: .3rem; }
+
+/* ── Section card ── */
+.section-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    overflow: hidden;
+}
+.section-card .section-header {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.section-card .section-header h6 { font-weight: 700; color: #1e293b; margin: 0; font-size: 1rem; }
+
+/* ── Mini car row ── */
+.mini-car {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .9rem 1.5rem;
+    border-bottom: 1px solid #f8fafc;
+    transition: background .15s;
+}
+.mini-car:last-child  { border-bottom: none; }
+.mini-car:hover       { background: #f8fafc; }
+.mini-car__img        { width: 64px; height: 50px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #f1f5f9; }
+.mini-car__img img    { width: 100%; height: 100%; object-fit: cover; }
+.mini-car__name       { font-weight: 700; font-size: .9rem; color: #1e293b; }
+.mini-car__meta       { font-size: .75rem; color: #64748b; }
+.mini-car__price      { font-weight: 700; color: var(--accent); font-size: .95rem; margin-left: auto; white-space: nowrap; }
+
+/* ── Msg row ── */
+.msg-row {
+    padding: .9rem 1.5rem;
+    border-bottom: 1px solid #f8fafc;
+    transition: background .15s;
+}
+.msg-row:last-child { border-bottom: none; }
+.msg-row:hover      { background: #f8fafc; }
+.msg-row .from      { font-weight: 600; font-size: .9rem; }
+.msg-row .subject   { font-size: .8rem; color: #475569; }
+.msg-row .time      { font-size: .75rem; color: #94a3b8; }
+
+/* ── Agence mini ── */
+.agence-mini {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: .9rem 1.5rem;
+    border-bottom: 1px solid #f8fafc;
+}
+.agence-mini:last-child { border-bottom: none; }
+.agence-mini img        { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="dash-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon" style="background: rgba(255,255,255,.15);">
+                <i class="fas fa-chart-line text-white"></i>
+            </div>
+            <div>
+                <h1 class="mb-0">Tableau de bord</h1>
+                <p class="mb-0">Bonjour, {{ request.user.first_name|default:request.user.username }} 👋</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+
+    <!-- ── Stat Cards ── -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #eff6ff;">
+                    <i class="fas fa-car" style="color: #2563eb;"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_cars }}</div>
+                    <div class="stat-label">Voitures</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fdf2f8;">
+                    <i class="fas fa-eye" style="color: var(--accent);"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_views|intcomma }}</div>
+                    <div class="stat-label">Vues totales</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef2f2;">
+                    <i class="fas fa-heart" style="color: #ef4444;"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_favorites }}</div>
+                    <div class="stat-label">Favoris</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #f0fdf4;">
+                    <i class="fas fa-tag" style="color: #16a34a;"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_promotions }}</div>
+                    <div class="stat-label">Promotions actives</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- ── Latest Cars ── -->
+        <div class="col-lg-7">
+            <div class="section-card">
+                <div class="section-header">
+                    <h6><i class="fas fa-car me-2 text-primary"></i>Dernières voitures</h6>
+                    {% if agences.count == 1 %}
+                    <a href="{% url 'cars_agence_list' agences.first.slug %}" class="btn btn-outline-primary btn-sm rounded-pill">
+                        Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% for car in latest_cars %}
+                <div class="mini-car">
+                    <div class="mini-car__img">
+                        {% if car.main_image %}
+                        <img src="{{ car.main_image.image.url }}" alt="">
+                        {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-car text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="mini-car__name">{{ car.marque }} {{ car.modele }}</div>
+                        <div class="mini-car__meta">
+                            {{ car.annee }} • {{ car.get_energie_display }} • {{ car.kilometrage|intcomma }} km
+                        </div>
+                    </div>
+                    <div class="mini-car__price">{{ car.prix_affiche|intcomma }} DA</div>
+                    <div class="ms-2 d-flex gap-1">
+                        <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-sm btn-outline-primary rounded-pill" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-car-crash fa-2x mb-2 d-block"></i>
+                    Aucune voiture pour le moment.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ── Right column ── -->
+        <div class="col-lg-5">
+
+            <!-- Messages reçus -->
+            <div class="section-card mb-4">
+                <div class="section-header">
+                    <h6><i class="fas fa-envelope me-2 text-danger"></i>Messages reçus</h6>
+                    <span class="badge bg-danger rounded-pill">{{ messages_received.count }}</span>
+                </div>
+                {% for msg in messages_received|slice:":8" %}
+                <div class="msg-row">
+                    <div class="from">{{ msg.nom }}
+                        <small class="text-muted"> · {{ msg.email }}</small>
+                    </div>
+                    <div class="subject">{{ msg.sujet }}</div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <small class="text-muted text-truncate" style="max-width:200px;">{{ msg.message|truncatechars:55 }}</small>
+                        <span class="time ms-2">{{ msg.cree_le|date:"d/m/y H:i" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-4">Aucun message reçu.</div>
+                {% endfor %}
+            </div>
+
+            <!-- Mes Agences -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h6><i class="fas fa-building me-2 text-success"></i>Mes agences</h6>
+                    <a href="{% url 'agence_create' %}" class="btn btn-success btn-sm rounded-pill">
+                        <i class="fas fa-plus me-1"></i>Créer
+                    </a>
+                </div>
+                {% for agence in agences %}
+                <div class="agence-mini">
+                    {% if agence.image %}
+                    <img src="{{ agence.image.url }}" alt="{{ agence.nom }}">
+                    {% else %}
+                    <div style="width:48px;height:48px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-building text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="fw-bold" style="font-size:.9rem;">{{ agence.nom }}</div>
+                        <small class="text-muted">{{ agence.ville }} • {{ agence.cars.count }} voiture{{ agence.cars.count|pluralize }}</small>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <a href="{{ agence.get_absolute_url }}" class="btn btn-sm btn-outline-primary rounded-pill" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'agence_update' agence.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'car_create' agence.slug %}" class="btn btn-sm btn-primary rounded-pill" title="Ajouter voiture">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-4">
+                    <a href="{% url 'agence_create' %}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-plus me-2"></i>Créer ma première agence
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Toutes les voitures – BBcars{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Search hero ── */
+.search-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: 3rem 0 2rem;
+    margin-bottom: 2rem;
+}
+.search-hero h1 { color: #fff; font-size: 2.2rem; }
+.search-hero p  { color: rgba(255,255,255,.65); }
+
+/* ── Filter sidebar ── */
+.filter-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    padding: 1.5rem;
+    position: sticky;
+    top: 80px;
+}
+.filter-card h5 { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem; }
+.filter-section { margin-bottom: 1.5rem; }
+.filter-section label { font-size: 0.8rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; display: block; }
+
+/* ── Car card ── */
+.car-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    height: 100%;
+}
+.car-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,.12); }
+.car-card__img  { position: relative; height: 200px; overflow: hidden; background: #f1f5f9; }
+.car-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.car-card:hover .car-card__img img { transform: scale(1.06); }
+.car-card__body { padding: 1rem 1.1rem 1.3rem; }
+.car-card__brand { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: .2rem; }
+.car-card__title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: .5rem; }
+.car-card__meta  { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: .8rem; }
+.car-card__pill  { background: #f1f5f9; border-radius: 100px; padding: .15rem .6rem; font-size: .72rem; color: #475569; }
+.car-card__price { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+.car-card__price-old { font-size: .8rem; text-decoration: line-through; color: #94a3b8; margin-left: .4rem; }
+
+/* Promo badge */
+.promo-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    font-size: .65rem; font-weight: 700;
+    padding: .25rem .6rem;
+    border-radius: 100px;
+    z-index: 5;
+}
+
+/* Wishlist btn */
+.heart-btn {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: rgba(255,255,255,.9);
+    border: none;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    transition: background .2s, transform .2s;
+}
+.heart-btn:hover  { background: #fff; transform: scale(1.15); }
+.heart-btn.active i { color: var(--accent); }
+.heart-btn i { color: #94a3b8; font-size: 1rem; transition: color .2s; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 5rem 0; }
+.empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── Hero Search ── -->
+<section class="search-hero">
+    <div class="container">
+        <h1 class="mb-1"><i class="fas fa-car me-2"></i>Toutes les voitures</h1>
+        <p class="mb-3">{{ paginator.count }} voiture{{ paginator.count|pluralize }} trouvée{{ paginator.count|pluralize }}</p>
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-8">
+                <div class="input-group input-group-lg shadow-sm">
+                    <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-0 fs-6"
+                           placeholder="Marque, modèle, description…" value="{{ request.GET.q|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold">Rechercher</button>
+            </div>
+            {% if request.GET.q or request.GET.marque or request.GET.energie or request.GET.boite or request.GET.ville %}
+            <div class="col-md-2">
+                <a href="{% url 'car_list' %}" class="btn btn-outline-light w-100 btn-lg">Réinitialiser</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row g-4">
+
+        <!-- ── Filter Sidebar ── -->
+        <div class="col-lg-3">
+            <div class="filter-card">
+                <h5><i class="fas fa-sliders-h me-2"></i>Filtres</h5>
+                <form method="get" id="filter-form">
+                    <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+
+                    <!-- Marque -->
+                    <div class="filter-section">
+                        <label>Marque</label>
+                        <select name="marque" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Toutes les marques</option>
+                            {% for val, label in marques %}
+                            <option value="{{ val }}" {% if request.GET.marque == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Énergie -->
+                    <div class="filter-section">
+                        <label>Carburant</label>
+                        <select name="energie" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Tous</option>
+                            {% for val, label in energies %}
+                            <option value="{{ val }}" {% if request.GET.energie == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Boite -->
+                    <div class="filter-section">
+                        <label>Boîte de vitesses</label>
+                        <select name="boite" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Toutes</option>
+                            {% for val, label in boites %}
+                            <option value="{{ val }}" {% if request.GET.boite == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Ville -->
+                    <div class="filter-section">
+                        <label>Wilaya</label>
+                        <select name="ville" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Toutes</option>
+                            {% for v in villes %}
+                            <option value="{{ v }}" {% if request.GET.ville == v %}selected{% endif %}>{{ v }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Prix -->
+                    <div class="filter-section">
+                        <label>Prix (DA)</label>
+                        <div class="d-flex gap-1">
+                            <input type="number" name="prix_min" class="form-control form-control-sm"
+                                   placeholder="Min" value="{{ request.GET.prix_min|default:'' }}">
+                            <input type="number" name="prix_max" class="form-control form-control-sm"
+                                   placeholder="Max" value="{{ request.GET.prix_max|default:'' }}">
+                        </div>
+                    </div>
+
+                    <!-- Année -->
+                    <div class="filter-section">
+                        <label>Année</label>
+                        <div class="d-flex gap-1">
+                            <input type="number" name="annee_min" class="form-control form-control-sm"
+                                   placeholder="De" value="{{ request.GET.annee_min|default:'' }}">
+                            <input type="number" name="annee_max" class="form-control form-control-sm"
+                                   placeholder="À" value="{{ request.GET.annee_max|default:'' }}">
+                        </div>
+                    </div>
+
+                    <!-- Kilométrage -->
+                    <div class="filter-section">
+                        <label>Kilométrage max (km)</label>
+                        <input type="number" name="km_max" class="form-control form-control-sm"
+                               placeholder="Ex. 100000" value="{{ request.GET.km_max|default:'' }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-sm">
+                        <i class="fas fa-filter me-1"></i> Appliquer
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Car Grid ── -->
+        <div class="col-lg-9">
+            <!-- Sort bar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <small class="text-muted">
+                    Affichage de {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    sur {{ paginator.count }} résultat{{ paginator.count|pluralize }}
+                </small>
+                <form method="get" class="d-flex align-items-center gap-2">
+                    {% for key, val in request.GET.items %}
+                        {% if key != 'sort' and key != 'page' %}
+                        <input type="hidden" name="{{ key }}" value="{{ val }}">
+                        {% endif %}
+                    {% endfor %}
+                    <label class="text-muted small mb-0">Trier :</label>
+                    <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                        <option value="" {% if not request.GET.sort %}selected{% endif %}>Les plus récentes</option>
+                        <option value="price_asc"  {% if request.GET.sort == 'price_asc'  %}selected{% endif %}>Prix croissant</option>
+                        <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Prix décroissant</option>
+                        <option value="year_desc"  {% if request.GET.sort == 'year_desc'  %}selected{% endif %}>Année (récent)</option>
+                        <option value="km_asc"     {% if request.GET.sort == 'km_asc'     %}selected{% endif %}>Km (faible)</option>
+                    </select>
+                </form>
+            </div>
+
+            {% if cars %}
+            <div class="row g-4">
+                {% for car in cars %}
+                <div class="col-sm-6 col-xl-4">
+                    <div class="car-card">
+
+                        <!-- Promo badge -->
+                        {% if car.est_en_promotion_valide %}
+                        <span class="promo-badge">
+                            -{{ car.discount_percentage }}%
+                        </span>
+                        {% endif %}
+
+                        <!-- Heart / Wishlist -->
+                        {% if request.user.is_authenticated %}
+                        <button class="heart-btn {% if car.id in user_wishlist_ids %}active{% endif %}"
+                                data-car-id="{{ car.id }}"
+                                data-agence-slug="{{ car.agence.slug }}"
+                                title="Ajouter aux favoris">
+                            <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </button>
+                        {% endif %}
+
+                        <!-- Image -->
+                        <div class="car-card__img">
+                            <a href="{% url 'car_detail' car.agence.slug car.id %}">
+                                {% if car.main_image %}
+                                <img src="{{ car.main_image.image.url }}" alt="{{ car.marque }} {{ car.modele }}" loading="lazy">
+                                {% else %}
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-car fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </a>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="car-card__body">
+                            <div class="car-card__brand">{{ car.marque }}</div>
+                            <div class="car-card__title">{{ car.modele }} {{ car.annee }}</div>
+                            <div class="car-card__meta">
+                                <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ car.get_energie_display }}</span>
+                                <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ car.get_boite_de_vitesse_display }}</span>
+                                <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ car.kilometrage|intcomma }} km</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="car-card__price">{{ car.prix_affiche|intcomma }} DA</span>
+                                    {% if car.ancien_prix %}
+                                    <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'car_detail' car.agence.slug car.id %}"
+                                   class="btn btn-primary btn-sm rounded-pill px-3">
+                                    Voir
+                                </a>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ car.agence.nom }} — {{ car.agence.ville }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center gap-1">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link rounded-pill" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                        <a class="page-link rounded-pill" href="?page={{ i }}&{{ request.GET.urlencode }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link rounded-pill" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-car-crash"></i>
+                <h4>Aucune voiture trouvée</h4>
+                <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                <a href="{% url 'car_list' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-undo me-2"></i>Réinitialiser la recherche
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── AJAX Wishlist Toggle ── */
+function getCsrf() {
+    return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1];
+}
+function updateBadge(count) {
+    const badge = document.querySelector('.wishlist-badge');
+    if (!badge) return;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+document.querySelectorAll('.heart-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+        e.preventDefault();
+        const carId  = btn.dataset.carId;
+        const aSlug  = btn.dataset.agenceSlug;
+        const icon   = btn.querySelector('i');
+
+        btn.disabled = true;
+        fetch(`/agence/${aSlug}/wishlist/toggle/${carId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.classList.toggle('active', data.status === 'added');
+            icon.className = data.status === 'added' ? 'fas fa-heart' : 'far fa-heart';
+            updateBadge(data.wishlist_count);
+        })
+        .finally(() => btn.disabled = false);
+    });
+});
+</script>
+{% endblock %}

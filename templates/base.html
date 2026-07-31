@@ -119,7 +119,7 @@
                                 {{ request.user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="Mon Profil"><i class="fas fa-id-card me-2"></i> Mon Profil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card me-2"></i> Mon Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0; padding:0;">
@@ -177,7 +177,7 @@
             </div>
             <hr class="my-4">
             <div class="text-center">
-                <p class="mb-0">&copy; 2026 YES MALL. Tous droits réservés.</p>
+                <p class="mb-0">&copy; 2026 BBcars. Tous droits réservés.</p>
             </div>
         </div>
     </footer>

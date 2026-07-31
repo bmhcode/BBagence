@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer l'agence – BBcars{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm text-center p-4">
+            <i class="fas fa-building fa-3x text-danger mb-3"></i>
+            <h4 class="mb-2">Supprimer l'agence</h4>
+            <p class="text-muted mb-4">
+                Vous allez supprimer définitivement l'agence
+                <strong>{{ object.nom }}</strong> ainsi que toutes ses voitures et photos.
+                Cette action est <strong>irréversible</strong>.
+            </p>
+            <form method="post" class="d-flex justify-content-center gap-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger rounded-pill px-4">
+                    <i class="fas fa-trash me-2"></i>Supprimer définitivement
+                </button>
+                <a href="{{ object.get_absolute_url }}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
