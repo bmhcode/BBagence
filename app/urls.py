@@ -24,7 +24,7 @@ urlpatterns = [
 
     # =========================== Wishlist ================================
     path('wishlist/', views.WishlistListView.as_view(), name='wishlist_list'),
-    path('agence/<slug:agence_slug>/wishlist/toggle/<int:car_id>/', views.WishlistToggleView.as_view(), name='wishlist_toggle'),
+    path('wishlist/toggle/<int:car_id>/', views.WishlistToggleView.as_view(), name='wishlist_toggle'),
 
     # =========================== Agences CRUD =============================
     path('agences/', views.AgenceListView.as_view(), name='agence_list'),

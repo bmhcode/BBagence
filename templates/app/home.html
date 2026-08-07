@@ -38,28 +38,49 @@
     </header>
 
     <!-- Promotions en vedette -->
-    {% if promotions_actives %}
+    {% if promotions %}
     <section class="mb-5">
         <h2 class="mb-4">Offres Spéciales</h2>
         <div class="row g-4">
-            {% for promo in promotions_actives %}
+            {% for promo in promotions %}
             <div class="col-md-4">
                 <div class="card h-100 promotion-card">
                     <div class="card-body">
-                        <span class="badge bg-danger mb-2">PROMO</span>
-                        <h5 class="card-title">{{ promo.titre }}</h5>
-                        <p class="card-text text-truncate">{{ promo.description }}</p>
-                        <p class="small text-muted mb-0">Valable jusqu'au {{ promo.date_fin|date:"d F Y" }}</p>
+                        <span class="badge bg-danger mb-2">{{ promo.titre_promo }}</span>
+                        <p class="card-text text-truncate">{{ promo.description_promo }}</p>
+
+                        <h1>{{promo.prix_promo}} M</h1>
+
+
+                        
+                        <p class="small text-muted mb-0">Valable du {{promo.date_debut_promo|date:"d F Y"}} au {{ promo.date_fin_promo|date:"d F Y" }}</p>
                     </div>
 
-                    {% if promo.image %}
-                    <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.titre }}" style="height: 200px; object-fit: cover;">
+                    {% if promo.main_image %}
+                    <img src="{{ promo.main_image.image.url }}" class="card-img-top" alt="{{ promo.titre }}" style="height: 200px; object-fit: cover;">
                     {% endif %}
+
+
+
+                 
+                    
                     <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
                         PROMO
                     </div>
+
+                    <div class="mt-2 ">
+                        <small class="text-muted ">
+                            <i class="fas fa-store me-1"></i>
+                            <a href="{% url 'agence_detail' promo.agence.slug %}">{{ promo.agence.nom }}</a> — {{ promo.agence.ville }}
+                        </small>
+                    </div>
+
+
+                    
                 </div>
-                <p class="small text-muted mb-0 text-right">{{ promo.agence.nom }} | {{promo.agence.ville}}</p>
+
+
+
             </div>
 
             {% endfor %}
@@ -77,8 +98,8 @@
             {% for agence in agences_vedette %}
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm">
-                    {% if agence.image %}
-                    <img src="{{ agence.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 200px; object-fit: cover;">
+                    {% if agence.main_image %}
+                    <img src="{{ agence.main_image.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 200px; object-fit: cover;">
                     {% else %}
                     <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                         <i class="fas fa-store fa-3x text-muted"></i>

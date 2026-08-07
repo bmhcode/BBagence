@@ -1,3 +1,7 @@
+from django.contrib.sites import requests
+from django.contrib.sites import requests
+from django.contrib.sites import requests
+from asgiref import current_thread_executor
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
 from django.db.models import Q, Sum, Count
@@ -12,15 +16,33 @@ from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth import logout
 from django.utils import timezone
+import json
+
+
+
+
+
 
 from .models import (
     Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
-    Evenement, Promotion, ArticleBlog, ContactMessage, Wishlist, Profile
+    Evenement, ArticleBlog, ContactMessage, Wishlist, Profile
 )
 from .forms import (
     ContactForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
     SignupForm, UserForm, ProfileForm, CarForm, AgenceForm, AgenceSocialForm
 )
+
+
+# def _get_agence():
+#     """
+#     Retrieves the first agence object from the database.
+#     If no agence exists, it creates a default one.
+#     """
+#     agence = Agence.objects.first()
+#     if not agence:
+#         agence = Agence.objects.create(nom="Agence", description="Agence de voitures")
+#     return agence
+
 
 # =========================================
 # MIXINS & PERMISSIONS
@@ -97,7 +119,7 @@ class HomeView(TemplateView):
         context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
         context['evenements_prochains'] = Evenement.objects.all().order_by('date')[:3]
         # Active car promotions
-        context['promotions_actives'] = Car.objects.filter(
+        context['promotions'] = Car.objects.filter(
             est_en_promotion=True,
             date_debut_promo__lte=timezone.now().date(),
             date_fin_promo__gte=timezone.now().date()
@@ -306,61 +328,158 @@ class CarDetailView(DetailView):
 class CarCreateView(AgenceManagerRequiredMixin, CreateView):
     model = Car
     form_class = CarForm
-    template_name = 'app/car_form.html'
+    template_name = "app/car_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agence'] = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
+        context["agence"] = get_object_or_404(
+            Agence,
+            slug=self.kwargs.get("agence_slug")
+        )
         return context
 
     def form_valid(self, form):
-        agence = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
+        agence = get_object_or_404(
+            Agence,
+            slug=self.kwargs.get("agence_slug")
+        )
+
         form.instance.agence = agence
+
         with transaction.atomic():
+
             car = form.save()
-            
-            # Save main image
-            main_image = self.request.FILES.get('image')
+
+            # الصورة الرئيسية
+            main_image = self.request.FILES.get("image")
+
             if main_image:
-                CarImages.objects.create(car=car, image=main_image, is_main=True)
-                
-            # Save gallery images
-            gallery_files = self.request.FILES.getlist('gallery')
-            for f in gallery_files:
-                CarImages.objects.create(car=car, image=f, is_main=False)
-                
-        messages.success(self.request, "La voiture a été ajoutée avec succès.")
-        return redirect('cars_agence_list', agence_slug=agence.slug)
+                CarImages.objects.create(
+                    car=car,
+                    image=main_image,
+                )
+
+            # صور المعرض
+            gallery_files = self.request.FILES.getlist("gallery")
+
+            for image in gallery_files:
+                CarImages.objects.create(
+                    car=car,
+                    image=image,
+                )
+
+        messages.success(
+            self.request,
+            "La voiture a été ajoutée avec succès."
+        )
+
+        return redirect(
+            "cars_agence_list",
+            agence_slug=agence.slug,
+        )
+
 
 class CarUpdateView(AgenceManagerRequiredMixin, UpdateView):
     model = Car
     form_class = CarForm
-    template_name = 'app/car_form.html'
-    pk_url_kwarg = 'car_id'
+    template_name = "app/car_form.html"
+    pk_url_kwarg = "car_id"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agence'] = self.object.agence
-        context['images'] = self.object.images.all()
+        context["agence"] = self.object.agence
+        context["images"] = self.object.images.order_by("order", "id")
         return context
 
     def form_valid(self, form):
+
         with transaction.atomic():
+
             car = form.save()
-            
-            # Save main image if provided
-            main_image = self.request.FILES.get('image')
+
+            # ============================
+            # الصورة الرئيسية
+            # ============================
+            main_image = self.request.FILES.get("image")
+
             if main_image:
-                car.images.update(is_main=False)
-                CarImages.objects.create(car=car, image=main_image, is_main=True)
-                
-            # Save gallery images
-            gallery_files = self.request.FILES.getlist('gallery')
-            for f in gallery_files:
-                CarImages.objects.create(car=car, image=f, is_main=False)
-                
-        messages.success(self.request, "La voiture a été modifiée avec succès.")
-        return redirect('car_detail', agence_slug=car.agence.slug, car_id=car.id)
+                current_main = car.images.order_by("order", "id").first()
+
+                if current_main:
+                    current_main.image = main_image
+                    current_main.save()
+                else:
+                    CarImages.objects.create(
+                        car=car,
+                        image=main_image,
+                        order=0,
+                    )
+
+            # ============================
+            # إضافة صور جديدة
+            # ============================
+            gallery = self.request.FILES.getlist("gallery")
+
+            last_order = (
+                car.images.order_by("-order")
+                .values_list("order", flat=True)
+                .first()
+            )
+
+            if last_order is None:
+                last_order = -1
+
+            for image in gallery:
+                last_order += 1
+
+                CarImages.objects.create(
+                    car=car,
+                    image=image,
+                    order=last_order,
+                )
+
+            # ============================
+            # حفظ ترتيب الصور
+            # ============================
+            image_order = self.request.POST.get("image_order")
+
+            if image_order:
+
+                try:
+                    data = json.loads(image_order)
+
+                    # صور السيارة الحالية
+                    images = {
+                        str(img.id): img
+                        for img in car.images.all()
+                    }
+
+                    updated = []
+
+                    for item in data:
+
+                        img = images.get(str(item["id"]))
+
+                        if img:
+                            img.order = int(item["order"])
+                            updated.append(img)
+
+                    if updated:
+                        CarImages.objects.bulk_update(updated, ["order"])
+
+                except Exception as e:
+                    print(e)
+
+        messages.success(
+            self.request,
+            "La voiture a été modifiée avec succès."
+        )
+
+        return redirect(
+            "car_detail",
+            agence_slug=car.agence.slug,
+            car_id=car.pk,
+        )
 
 class CarDeleteView(AgenceManagerRequiredMixin, DeleteView):
     model = Car
@@ -402,7 +521,9 @@ def car_image_set_main(request, agence_slug, car_id, image_id):
     image.is_main = True
     image.save()
     messages.success(request, "Image principale mise à jour.")
-    return redirect('car_update', agence_slug=agence_slug, car_id=car.id)
+    # return redirect('car_update', agence_slug=agence_slug, car_id=car.id)
+    return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
+
 
 class CarsAgenceListView(ListView):
     model = Car
@@ -425,18 +546,20 @@ class CarsAgenceListView(ListView):
 class WishlistToggleView(LoginRequiredMixin, View):
     def post(self, request, car_id):
         car = get_object_or_404(Car, id=car_id)
+
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-        
+
         if wishlist.cars.filter(id=car.id).exists():
             wishlist.cars.remove(car)
-            status = 'removed'
+            in_wishlist = False
         else:
             wishlist.cars.add(car)
-            status = 'added'
-            
+            in_wishlist = True
+
         return JsonResponse({
-            'status': status,
-            'wishlist_count': wishlist.cars.count()
+            "success": True,
+            "in_wishlist": in_wishlist,
+            "wishlist_count": wishlist.cars.count(),
         })
 
 class WishlistListView(LoginRequiredMixin, ListView):
@@ -548,6 +671,7 @@ class AgencePresentationManageView(LoginRequiredMixin, TemplateView):
 
         return redirect('agence_presentation_manage', agence_slug=agence.slug)
 
+
 class AgenceImageDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         image = get_object_or_404(AgenceImages, pk=pk)
@@ -634,10 +758,13 @@ class EvenementDetailView(DetailView):
     context_object_name = 'evenement'
 
 class PromotionListView(ListView):
-    model = Promotion
+    model = Car
     template_name = 'app/promotion_list.html'
     context_object_name = 'promotions'
     ordering = ['-cree_le']
+
+    def get_queryset(self):
+        return super().get_queryset().filter(est_en_promotion=True)
 
 class ArticleBlogListView(ListView):
     model = ArticleBlog

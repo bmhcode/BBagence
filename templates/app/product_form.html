@@ -1,0 +1,252 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    .preview-box {
+        position: relative;
+        margin: 10px;
+        width: 120px;
+        height: 120px;
+    }
+
+    .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .main-badge {
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        background: #0d6efd;
+        color: white;
+        padding: 2px 5px;
+        font-size: 12px;
+        border-radius: 5px;
+        z-index: 5;
+    }
+
+
+    .preview-box {
+        position: relative;
+    }
+</style>
+
+<div class="container mt-5" style="max-width:900px;">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white text-center">
+            <h4> {{ title }} </h4>
+        </div>
+
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" id="productForm">
+                {% csrf_token %}
+                <div class="row">
+
+                    <!-- Images -->
+                    <div class="col-12 mb-3">
+                        <label>Product images</label>
+                        <input type="file" id="imageInput" name="images" multiple class="form-control">
+
+                        <small class="text-muted">Max 10 images</small>
+
+                        <div id="preview" class="d-flex flex-wrap mt-3">
+                            {% for image in product.images.all %}
+                            <div class="preview-box" data-old-image-id="{{ image.id }}">
+
+                                <img src="{{ image.image.url }}">
+
+                                <button type="button" class="remove-btn">&times;</button>
+
+                                {% if forloop.first %}
+                                <span class="main-badge">Main</span>
+                                {% endif %}
+
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="col-md-7">
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.category }}
+
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="form-check mb-2">
+                            {{ form.is_active }}
+                            <label class="form-check-label">
+                                {{ form.is_active.label }}
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ form.featured_product }}
+                            <label class="form-check-label">
+                                {{ form.featured_product.label }}
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <input type="hidden" name="image_order" id="image_order">
+
+                <button class="btn btn-success w-100 mt-4">
+                    Publish Product
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+    const form = document.getElementById("productForm");
+    const maxImages = 10;
+
+    let filesArray = [];
+
+    // sortable
+    Sortable.create(preview, {
+        animation: 150
+    });
+
+    // preview new images
+    imageInput.addEventListener("change", function () {
+
+        const files = Array.from(this.files);
+
+        files.forEach(file => {
+
+            if (preview.children.length >= maxImages) {
+                alert("Max 10 images allowed");
+                return;
+            }
+
+            filesArray.push(file);
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+
+                const box = document.createElement("div");
+                box.classList.add("preview-box");
+
+                const img = document.createElement("img");
+                img.src = e.target.result;
+
+                const remove = document.createElement("button");
+                remove.type = "button";
+                remove.innerHTML = "×";
+                remove.classList.add("remove-btn");
+
+                remove.onclick = function () {
+                    box.remove();
+                    filesArray = filesArray.filter(f => f !== file);
+                };
+
+                box.appendChild(img);
+                box.appendChild(remove);
+
+                preview.appendChild(box);
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    });
+
+    // delete old image
+    preview.addEventListener("click", function (e) {
+
+        if (e.target.classList.contains("remove-btn")) {
+
+            const box = e.target.parentElement;
+            const oldId = box.dataset.oldImageId;
+
+            if (oldId) {
+
+                fetch("{% url 'delete_product_image' 0 %}".replace("0", oldId), {
+                    method: "POST",
+                    headers: { "X-CSRFToken": "{{ csrf_token }}" }
+                }).then(res => {
+                    if (res.ok) box.remove();
+                });
+
+            } else {
+                box.remove();
+            }
+
+        }
+
+    });
+
+    // submit form
+    form.addEventListener("submit", function () {
+
+        // save order
+        const order = [];
+
+        document.querySelectorAll("#preview .preview-box").forEach((box, index) => {
+
+            const id = box.dataset.oldImageId;
+
+            if (id) {
+                order.push({
+                    id: id,
+                    order: index
+                });
+            }
+
+        });
+
+        document.getElementById("image_order").value = JSON.stringify(order);
+
+    });
+
+</script>
+{% endblock %}

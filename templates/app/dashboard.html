@@ -242,8 +242,8 @@
                 </div>
                 {% for agence in agences %}
                 <div class="agence-mini">
-                    {% if agence.image %}
-                    <img src="{{ agence.image.url }}" alt="{{ agence.nom }}">
+                    {% if agence.main_image %}
+                    <img src="{{ agence.main_image.image.url }}" alt="{{ agence.nom }}">
                     {% else %}
                     <div style="width:48px;height:48px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
                         <i class="fas fa-building text-muted"></i>

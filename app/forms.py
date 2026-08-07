@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, ContactMessage, Profile, ALGERIA_CITIES
+from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, ContactMessage, Profile, ALGERIA_CITIES
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Adresse e-mail")
@@ -77,19 +77,29 @@ class ProfileForm(forms.ModelForm):
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
-class CarForm(forms.ModelForm):
-    image = forms.ImageField(required=False, label="Image principale (remplace l'actuelle)")
-    gallery = forms.FileField(widget=MultipleFileInput(), required=False, label="Ajouter d'autres images")
+    
 
+class CarForm(forms.ModelForm):
+    # image = forms.ImageField(required=False, label="Image principale (remplace l'actuelle)")
+    # video = forms.FileField(required=False,label="Vidéo",widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"}))
+    
     class Meta:
         model = Car
         fields = [
             'marque', 'modele', 'annee', 'etat', 'couleur', 'finition', 'moteur', 
             'energie', 'boite_de_vitesse', 'kilometrage', 'description', 
-            'ancien_prix', 'nouveau_prix', 'est_en_promotion', 'prix_promo', 
-            'date_debut_promo', 'date_fin_promo', 'est_en_vedette', 'est_disponible'
+            'ancien_prix', 'nouveau_prix', 
+            'est_en_promotion', 'titre_promo', 'description_promo', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'video',
+            'est_en_vedette', 'est_disponible'
         ]
         widgets = {
+
+            'gallery': forms.FileField(widget=MultipleFileInput(), required=False),
+            
+            
+            # 'video': forms.FileField(required=False,label="Vidéo",widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"})),
+           
+           
             'marque': forms.Select(attrs={'class': 'form-select'}),
             'modele': forms.TextInput(attrs={'class': 'form-control'}),
             'annee': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -103,27 +113,51 @@ class CarForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'ancien_prix': forms.NumberInput(attrs={'class': 'form-control'}),
             'nouveau_prix': forms.NumberInput(attrs={'class': 'form-control'}),
+
             'est_en_promotion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'titre_promo': forms.TextInput(attrs={'class': 'form-control'}),
+            'description_promo': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'prix_promo': forms.NumberInput(attrs={'class': 'form-control'}),
-            'date_debut_promo': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'date_fin_promo': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+           'date_debut_promo': forms.DateInput(
+    format='%Y-%m-%d',
+    attrs={
+        'class': 'form-control',
+        'type': 'date',
+    }
+),
+
+'date_fin_promo': forms.DateInput(
+    format='%Y-%m-%d',
+    attrs={
+        'class': 'form-control',
+        'type': 'date',
+    }
+),
+            'video': forms.ClearableFileInput(attrs={'class': 'form-control','accept': 'video/*',}),
+
             'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'est_disponible': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
+        self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
+
+
 
 class AgenceForm(forms.ModelForm):
     class Meta:
         model = Agence
         fields = [
-            'nom', 'description', 'image', 'banniere', 'telephone', 'site_web', 
+            'nom', 'description', 'telephone', 'site_web', 
             'email', 'ville', 'commune', 'adresse', 'google_map', 
             'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation'
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
-            'banniere': forms.FileInput(attrs={'class': 'form-control'}),
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
             'site_web': forms.URLInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),

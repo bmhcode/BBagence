@@ -82,9 +82,7 @@ class Agence(models.Model):
     nom = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
-    image = models.ImageField(upload_to='agences/')
-    banniere = models.ImageField(upload_to='agences/banners/', blank=True, null=True)
-
+   
     # ── Relation ──
     manager = models.ForeignKey(User,on_delete=models.CASCADE, related_name='agences')
 
@@ -327,14 +325,19 @@ class Car(models.Model):
     kilometrage = models.PositiveIntegerField(default=0, help_text="Kilométrage en km")
     description = models.TextField(blank=True)
 
-    ancien_prix = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    nouveau_prix = models.DecimalField(max_digits=12, decimal_places=2)
+    ancien_prix = models.DecimalField(max_digits=12, decimal_places=1, null=True, blank=True)
+    nouveau_prix = models.DecimalField(max_digits=12, decimal_places=1)
 
     # Promotion
     est_en_promotion = models.BooleanField(default=False)
-    prix_promo = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    titre_promo = models.CharField(max_length=200, null=True, blank=True)
+    description_promo = models.TextField(null=True, blank=True)
+    prix_promo = models.DecimalField(max_digits=12, decimal_places=1, null=True, blank=True)
     date_debut_promo = models.DateField(null=True, blank=True)
     date_fin_promo = models.DateField(null=True, blank=True)
+
+
+    video = models.FileField(upload_to='cars/videos/', blank=True, null=True, verbose_name="Video")
 
     est_en_vedette = models.BooleanField(default=False)
     est_disponible = models.BooleanField(default=True)
@@ -346,8 +349,8 @@ class Car(models.Model):
 
     class Meta:
         ordering = ["-cree_le"]
-        verbose_name = "Car"
-        verbose_name_plural = "Cars"
+        verbose_name = "Voiture"
+        verbose_name_plural = "Voitures"
 
     def __str__(self):
         return f"{self.marque} {self.modele} ({self.annee})"
@@ -357,18 +360,18 @@ class Car(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+            self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele} {self.id}")
         else:
             if self.pk:
                 old = Car.objects.get(pk=self.pk)
                 if old.marque != self.marque or old.modele != self.modele:
-                    self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+                    self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele} {self.id}")
             else:
-                self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele}")
+                self.slug = generate_unique_slug(Car, f"{self.marque} {self.modele} {self.id}")
         super().save(*args, **kwargs)
 
     def main_image(self):
-        return self.images.filter(is_main=True).first()
+        return self.images.all().first()
 
     @property
     def is_new(self):
@@ -412,24 +415,43 @@ class Car(models.Model):
             and self.date_debut_promo
             and self.date_fin_promo
             and self.date_debut_promo <= timezone.now().date() <= self.date_fin_promo
-        )        
+        )      
+
+
+        # def clean(self):
+        #     super().clean()
+        #     from django.core.exceptions import ValidationError
+        #     if self.agence:
+        #         qs = Promotion.objects.filter(agence=self.agence)
+        #         if self.pk:
+        #             qs = qs.exclude(pk=self.pk)
+        #         if qs.exists():
+        #             raise ValidationError("Cette agence a déjà une promotion active. Une seule promotion est autorisée par agence.")
+    
 
 class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="cars/gallery/")
     caption = models.CharField(max_length=200, blank=True)
-    is_main = models.BooleanField(default=False)
     cree_le = models.DateTimeField(auto_now_add=True)
 
-    # 👇 لترتيب الصور (الأهم أولاً)
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField(default=0) 
 
+    
     class Meta:
-        ordering = ["-is_main", "id"]
+        verbose_name_plural = "Images des voitures" 
+        ordering = ['order', 'cree_le']
 
     def __str__(self):
-        return f"{self.car.modele} Image"     
-
+        return f"Image de {self.car.marque} {self.car.modele} - {self.id}"
+      
+    @property
+    def imageURL(self):
+        try:
+            url = self.image.url
+        except:
+            url = ''
+        return url
 
 #============== End Car ==============
 
@@ -456,37 +478,6 @@ class Evenement(models.Model):
     class Meta:
         verbose_name = "Événement"
         verbose_name_plural = "Événements"
-
-class Promotion(models.Model):
-    agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='promotions')
-    
-    titre = models.CharField(max_length=200)
-    description = models.TextField()
-    image = models.ImageField(upload_to='promotions/')
-    video = models.FileField(upload_to='promotions/videos/', blank=True, null=True, verbose_name="Video")
-
-    date_debut = models.DateField()
-    date_fin = models.DateField()
-
-    cree_le = models.DateTimeField(auto_now_add=True)
-
-    def clean(self):
-        super().clean()
-        from django.core.exceptions import ValidationError
-        if self.agence:
-            qs = Promotion.objects.filter(agence=self.agence)
-            if self.pk:
-                qs = qs.exclude(pk=self.pk)
-            if qs.exists():
-                raise ValidationError("Cette agence a déjà une promotion active. Une seule promotion est autorisée par agence.")
-
-
-    def __str__(self):
-        return f"{self.titre} - {self.agence.nom}"
-
-    class Meta:
-        verbose_name = "Promotion"
-        verbose_name_plural = "Promotions"
 
 class Wishlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wishlist")

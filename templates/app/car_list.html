@@ -4,7 +4,9 @@
 {% block title %}Toutes les voitures – BBcars{% endblock %}
 
 {% block extra_css %}
+
 <style>
+
 /* ── Search hero ── */
 .search-hero {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
@@ -62,27 +64,53 @@
 }
 
 /* Wishlist btn */
-.heart-btn {
-    position: absolute;
-    top: 12px; left: 12px;
-    background: rgba(255,255,255,.9);
-    border: none;
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    z-index: 5;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-    transition: background .2s, transform .2s;
+.heart-btn{
+    position:absolute;
+    top:12px;
+    left:12px;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,.95);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+    transition:.25s;
 }
-.heart-btn:hover  { background: #fff; transform: scale(1.15); }
-.heart-btn.active i { color: var(--accent); }
-.heart-btn i { color: #94a3b8; font-size: 1rem; transition: color .2s; }
 
+.heart-btn:hover{
+    transform:scale(1.12);
+    background:#fff;
+}
+
+.heart-btn i{
+    color:#94a3b8;
+    transition:.25s;
+    font-size:18px;
+}
+
+.heart-btn.active i{
+    color:#ef4444;
+}
+
+.heart-pop{
+    animation:heartPop .3s ease;
+}
+
+@keyframes heartPop{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.35);}
+    100%{transform:scale(1);}
+}
 /* Empty state */
 .empty-state { text-align: center; padding: 5rem 0; }
 .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem; }
+
 </style>
+
 {% endblock %}
 
 {% block content %}
@@ -241,13 +269,24 @@
 
                         <!-- Heart / Wishlist -->
                         {% if request.user.is_authenticated %}
-                        <button class="heart-btn {% if car.id in user_wishlist_ids %}active{% endif %}"
+                        <button class="heart-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
                                 data-car-id="{{ car.id }}"
                                 data-agence-slug="{{ car.agence.slug }}"
                                 title="Ajouter aux favoris">
-                            <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                            <i class="{% if car.id in user_wishlist_ids %} fas {% else %} far {% endif %} fa-heart"></i>
                         </button>
                         {% endif %}
+<!-- Wishlist Button -->
+            <!-- <button
+                type="button"
+                onclick="toggleWishlist(this, {{ car.id }})"
+                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                aria-label="Ajouter aux favoris"
+                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+            </button> -->
+
 
                         <!-- Image -->
                         <div class="car-card__img">
@@ -262,6 +301,7 @@
                             </a>
                         </div>
 
+                     
                         <!-- Body -->
                         <div class="car-card__body">
                             <div class="car-card__brand">{{ car.marque }}</div>
@@ -273,7 +313,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="car-card__price">{{ car.prix_affiche|intcomma }} DA</span>
+                                    <span class="car-card__price">{{ car.prix_affiche|intcomma }} M</span>
                                     {% if car.ancien_prix %}
                                     <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
                                     {% endif %}
@@ -285,8 +325,9 @@
                             </div>
                             <div class="mt-2">
                                 <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                    {{ car.agence.nom }} — {{ car.agence.ville }}
+                                    <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                                    <i class="fas fa-store me-1"></i>
+                                    <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
                                 </small>
                             </div>
                         </div>
@@ -333,43 +374,143 @@
             </div>
             {% endif %}
         </div>
+        <!-- / ── Car Grid ── -->
+
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+
 /* ── AJAX Wishlist Toggle ── */
-function getCsrf() {
-    return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1];
-}
-function updateBadge(count) {
-    const badge = document.querySelector('.wishlist-badge');
-    if (!badge) return;
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline-block' : 'none';
-}
 
-document.querySelectorAll('.heart-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-        e.preventDefault();
-        const carId  = btn.dataset.carId;
-        const aSlug  = btn.dataset.agenceSlug;
-        const icon   = btn.querySelector('i');
+document.addEventListener("DOMContentLoaded", function () {
 
-        btn.disabled = true;
-        fetch(`/agence/${aSlug}/wishlist/toggle/${carId}/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            btn.classList.toggle('active', data.status === 'added');
-            icon.className = data.status === 'added' ? 'fas fa-heart' : 'far fa-heart';
-            updateBadge(data.wishlist_count);
-        })
-        .finally(() => btn.disabled = false);
+    function getCookie(name) {
+        let cookieValue = null;
+
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+
+                if (cookie.startsWith(name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+
+    function updateWishlistBadge(count) {
+        document.querySelectorAll(".wishlist-badge").forEach(badge => {
+
+            badge.textContent = count;
+
+            if (count > 0) {
+                badge.style.display = "inline-flex";
+            } else {
+                badge.style.display = "none";
+            }
+
+        });
+    }
+
+    document.querySelectorAll(".heart-btn").forEach(button => {
+
+        button.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            if (button.dataset.loading === "1")
+                return;
+
+            button.dataset.loading = "1";
+
+            const carId = button.dataset.carId;
+            const agenceSlug = button.dataset.agenceSlug;
+
+            fetch(`/agence/${agenceSlug}/wishlist/toggle/${carId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+
+            .then(response => {
+
+                if (response.status === 403) {
+                    window.location.href = "/accounts/login/?next=" + window.location.pathname;
+                    return;
+                }
+
+                if (!response.ok)
+                    throw new Error("Server Error");
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                if (!data)
+                    return;
+
+                document.querySelectorAll(
+                    `.heart-btn[data-car-id="${carId}"]`
+                ).forEach(btn => {
+
+                    const icon = btn.querySelector("i");
+
+                    if (data.status === "added") {
+
+                        btn.classList.add("active");
+                        icon.classList.remove("far");
+                        icon.classList.add("fas");
+
+                    } else {
+
+                        btn.classList.remove("active");
+                        icon.classList.remove("fas");
+                        icon.classList.add("far");
+
+                    }
+
+                    btn.classList.add("heart-pop");
+
+                    setTimeout(() => {
+                        btn.classList.remove("heart-pop");
+                    }, 300);
+
+                });
+
+                if (data.wishlist_count !== undefined) {
+                    updateWishlistBadge(data.wishlist_count);
+                }
+
+            })
+
+            .catch(err => {
+                console.error(err);
+                alert("Une erreur est survenue.");
+            })
+
+            .finally(() => {
+                button.dataset.loading = "0";
+            });
+
+        });
+
     });
+
 });
 </script>
+</script>
+
+
 {% endblock %}

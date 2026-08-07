@@ -52,6 +52,123 @@
 .gallery-thumb .thumb-actions form { margin: 0; padding: 0; line-height: 1; }
 .gallery-thumb .main-star { color: gold; }
 </style>
+
+<style>
+
+.preview-card{
+    position:relative;
+}
+
+.preview-image{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+    border:1px solid #ddd;
+}
+
+.remove-image{
+    position:absolute;
+    top:8px;
+    right:15px;
+    width:28px;
+    height:28px;
+    border:none;
+    border-radius:50%;
+    background:red;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+</style>
+
+<style>
+    .section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:1.4rem;
+    font-weight:700;
+}
+
+.upload-video-box{
+    border:2px dashed #d7dce5;
+    border-radius:16px;
+    padding:30px;
+    text-align:center;
+    background:#fafbfc;
+    transition:.3s;
+    margin-bottom:25px;
+}
+
+.upload-video-box:hover{
+    border-color:#0d6efd;
+    background:#f7fbff;
+}
+
+.upload-label{
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:15px;
+    font-size:17px;
+    font-weight:600;
+}
+
+.upload-label i{
+    font-size:45px;
+    color:#0d6efd;
+}
+
+.upload-label input{
+    display:none;
+}
+
+.video-preview{
+    border:1px solid #e6e6e6;
+    border-radius:15px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.video-preview video{
+    width:100%;
+    max-height:420px;
+    display:block;
+    background:#000;
+}
+
+.video-footer{
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.empty-video{
+    border:2px dashed #d8d8d8;
+    border-radius:15px;
+    padding:50px;
+    text-align:center;
+    color:#999;
+}
+
+.empty-video i{
+    font-size:55px;
+    margin-bottom:20px;
+}
+
+.empty-video h5{
+    margin-bottom:10px;
+    font-weight:700;
+}
+</style>
+
+
 {% endblock %}
 
 {% block content %}
@@ -66,15 +183,29 @@
     </ol>
 </nav>
 
+
 <div class="row g-4">
     <div class="col-lg-8">
-        <form method="post" enctype="multipart/form-data" novalidate>
+        <form id="carForm" method="post" enctype="multipart/form-data" novalidate>
+
             {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                {{ form.errors }}
+            </div>
+            {% endif %}
 
             <!-- Informations générales -->
             <div class="form-section">
                 <div class="form-section-title"><i class="fas fa-info-circle"></i> Informations générales</div>
                 <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Etat *</label>
+                        {{ form.etat }}
+                        {% if form.etat.errors %}<div class="text-danger small">{{ form.etat.errors.0 }}</div>{% endif %}
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Marque *</label>
                         {{ form.marque }}
@@ -149,6 +280,16 @@
                             </label>
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Titre de promotion</label>
+                        {{ form.titre_promo }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Description</label>
+                        {{ form.description_promo }}
+                    </div>
+
                     <div id="promo-fields" class="row g-3 col-12" {% if not form.instance.est_en_promotion %}style="display:none"{% endif %}>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Prix promo (DA)</label>
@@ -165,59 +306,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Galerie d'images -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-images"></i> Galerie d'images</div>
-
-                <!-- Existing images (edit mode) -->
-                {% if images %}
-                <div class="d-flex flex-wrap gap-3 mb-4">
-                    {% for img in images %}
-                    <div class="gallery-thumb">
-                        <img src="{{ img.image.url }}" alt="">
-                        <div class="thumb-actions">
-                            {% if not img.is_main %}
-                            <form method="post" action="{% url 'car_image_set_main' agence.slug object.id img.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link p-0" title="Définir comme principale">
-                                    <i class="fas fa-star text-white" style="font-size:1.1rem;"></i>
-                                </button>
-                            </form>
-                            {% else %}
-                            <i class="fas fa-star main-star" title="Image principale" style="font-size:1.1rem;"></i>
-                            {% endif %}
-                            <form method="post" action="{% url 'car_image_delete' agence.slug object.id img.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link p-0" title="Supprimer"
-                                        onclick="return confirm('Supprimer cette image ?')">
-                                    <i class="fas fa-trash text-danger" style="font-size:.95rem;"></i>
-                                </button>
-                            </form>
-                        </div>
-                        {% if img.is_main %}
-                        <div style="position:absolute;bottom:4px;left:4px;background:var(--color-pink);color:#fff;font-size:.6rem;padding:2px 6px;border-radius:100px;">Principale</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            {% if object %}Remplacer l'image principale{% else %}Image principale{% endif %}
-                        </label>
-                        {{ form.image }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Ajouter des images (galerie)</label>
-                        {{ form.gallery }}
-                        <small class="text-muted">Sélectionnez plusieurs fichiers à la fois</small>
-                    </div>
-                </div>
-            </div>
-
+            <!-- / Prix & Promotion -->
+            
             <!-- Statut -->
             <div class="form-section">
                 <div class="form-section-title"><i class="fas fa-toggle-on"></i> Statut</div>
@@ -233,34 +323,419 @@
                 </div>
             </div>
 
+            <!-- ===================== VIDEO CARD ===================== -->
+                <div class="manage-card">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                        <h2 class="section-title">
+                            <i class="fas fa-video text-danger"></i>
+                            Visite Vidéo
+                        </h2>
+                    </div>
+
+                    <!-- Upload Video -->
+                    <div class="upload-video-box">
+                        <label for="id_video" class="upload-label">
+                            <i class="fas fa-video me-2"></i>
+                            Choisir une vidéo
+                            {{ form.video }}
+                        </label>
+
+                        <div id="selectedVideoName" class="small text-success mt-2"></div>
+                    </div>
+
+                    <!-- Preview -->
+                    {% if object.video %}
+                    <div class="video-preview">
+
+                        <video controls preload="metadata">
+                            <source src="{{ object.video.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la vidéo.
+                        </video>
+
+                        <div class="video-footer">
+
+                            <div>
+                                <strong>Vidéo de présentation</strong><br>
+                                <small>{{ object.video.name|cut:"videos/" }}</small>
+                            </div>
+
+                            <a href="{{ object.video.url }}"
+                            target="_blank"
+                            class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-expand"></i>
+                                Voir
+                            </a>
+
+                        </div>
+
+                    </div>
+                    {% else %}
+                    <div class="empty-video">
+
+                        <i class="fas fa-film"></i>
+
+                        <h5>Aucune vidéo</h5>
+
+                        <p>Ajoutez une vidéo pour présenter votre véhicule.</p>
+
+                    </div>
+                    {% endif %}
+
+                </div>
+            <!-- =================== END VIDEO CARD =================== -->
+
+            <!-- bmh  Add Galerry images -->
+            <div class="container mt-5" style="max-width:900px;">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white text-center">
+                        <h4> {{ title }} </h4>
+                    </div>
+                    <div class="card-body">
+                            <div class="row">
+                                <!-- Images -->
+                                <div class="col-12 mb-3">
+                                    <label>Car images</label>
+                                    <input type="file" id="gallery" name="gallery" multiple class="form-control">
+                                    <small class="text-muted">Max 10 images</small>
+
+                                    <div id="preview" class="d-flex flex-wrap mt-3">
+                                        {% for image in car.images.all %}
+                                        <div class="preview-box" data-old-image-id="{{ image.id }}">
+                                            <img src="{{ image.image.url }}">
+                                            <button type="button" class="remove-btn">&times;</button>
+                                            {% if forloop.first %}
+                                                <span class="main-badge">Main</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / bmh Add Galerry images -->
+
+            <input type="hidden" name="image_order" id="image_order">
+
             <!-- Buttons -->
-            <div class="d-flex gap-3">
+            <div class="d-flex gap-3 mt-4">
                 <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
-                    <i class="fas fa-save me-2"></i>{% if object %}Enregistrer{% else %}Publier{% endif %}
+                    <i class="fas fa-save me-2"></i>{% if object %} Enregistrer {% else %} Publier {% endif %}
                 </button>
-                <a href="{{ agence.get_absolute_url }}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+                <a href="{% url 'agence_detail' agence.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
             </div>
         </form>
     </div>
 
     <!-- Sidebar info -->
     <div class="col-lg-4">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h6 class="fw-bold mb-3"><i class="fas fa-building me-2"></i>Agence</h6>
-                {% if agence.image %}
-                <img src="{{ agence.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ agence.nom }}">
-                {% endif %}
-                <h5 class="mb-1">{{ agence.nom }}</h5>
-                <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ agence.ville }} – {{ agence.commune }}</p>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-building me-2"></i>Agence</h6>
+                    {% if agence.main_image.image.url %}
+                    <img src="{{ agence.main_image.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ agence.nom }}">
+                    {% endif %}
+                    <h5 class="mb-1">{{ agence.nom }}</h5>
+                    <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ agence.ville }} – {{ agence.commune }}</p>
+                </div>
             </div>
-        </div>
     </div>
 </div>
+
+
 {% endblock %}
 
 {% block extra_js %}
+
+
+
+
+
+<style>
+    .preview-box {
+        position: relative;
+        margin: 10px;
+        width: 120px;
+        height: 120px;
+    }
+
+    .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .main-badge {
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        background: #0d6efd;
+        color: white;
+        padding: 2px 5px;
+        font-size: 12px;
+        border-radius: 5px;
+        z-index: 5;
+    }
+
+
+    .preview-box {
+        position: relative;
+    }
+</style>
+
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
+
+const gallery = document.getElementById("gallery");
+const preview = document.getElementById("preview");
+const form = gallery.closest("form");
+
+const MAX_IMAGES = 10;
+
+let filesArray = [];
+
+
+/*-------------------------
+    Sortable
+-------------------------*/
+Sortable.create(preview, {
+    animation: 150,
+    ghostClass: "sortable-ghost",
+
+    onEnd() {
+
+        // إعادة ترتيب filesArray حسب ترتيب الـ Preview
+
+        const newOrder = [];
+
+        preview.querySelectorAll(".preview-box").forEach(box => {
+
+            const index = parseInt(box.dataset.fileIndex);
+
+            if (!isNaN(index))
+                newOrder.push(filesArray[index]);
+
+        });
+
+        filesArray = newOrder;
+
+        // تحديث fileIndex
+
+        preview.querySelectorAll(".preview-box").forEach((box, i) => {
+            box.dataset.fileIndex = i;
+        });
+
+        updateInputFiles();
+
+    }
+
+});
+
+
+/*-------------------------
+    Update input.files
+-------------------------*/
+function updateInputFiles() {
+
+    const dt = new DataTransfer();
+
+    filesArray.forEach(file => dt.items.add(file));
+
+    gallery.files = dt.files;
+
+}
+
+
+/*-------------------------
+    Create Preview
+-------------------------*/
+function createPreview(file) {
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        const box = document.createElement("div");
+        box.className = "preview-box";
+        box.dataset.fileIndex = filesArray.length - 1;
+
+        const img = document.createElement("img");
+        img.src = e.target.result;
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove-btn";
+        remove.innerHTML = "&times;";
+
+        remove.addEventListener("click", function () {
+
+            const index = parseInt(box.dataset.fileIndex);
+
+            filesArray.splice(index, 1);
+
+            box.remove();
+
+            // تحديث الفهارس
+
+            preview.querySelectorAll(".preview-box").forEach((item, i) => {
+                item.dataset.fileIndex = i;
+            });
+
+            updateInputFiles();
+
+        });
+
+        box.appendChild(img);
+        box.appendChild(remove);
+
+        preview.appendChild(box);
+
+    };
+
+    reader.readAsDataURL(file);
+
+}
+
+
+/*-------------------------
+    Add Images
+-------------------------*/
+gallery.addEventListener("change", function () {
+
+    const selectedFiles = Array.from(this.files);
+
+    for (const file of selectedFiles) {
+
+        if (!file.type.startsWith("image/")) {
+
+            alert(file.name + " is not an image.");
+            continue;
+
+        }
+
+        if (filesArray.length >= MAX_IMAGES) {
+
+            alert("Maximum " + MAX_IMAGES + " images.");
+            break;
+
+        }
+
+        // منع التكرار
+
+        const exists = filesArray.some(f =>
+            f.name === file.name &&
+            f.size === file.size &&
+            f.lastModified === file.lastModified
+        );
+
+        if (exists)
+            continue;
+
+        filesArray.push(file);
+
+        createPreview(file);
+
+    }
+
+    updateInputFiles();
+
+    gallery.value = "";
+
+});
+
+
+/*-------------------------
+    Delete old image
+-------------------------*/
+preview.addEventListener("click", function(e){
+
+    if (!e.target.classList.contains("remove-btn"))
+        return;
+
+    const box = e.target.closest(".preview-box");
+
+    const oldId = box.dataset.oldImageId;
+
+    if (!oldId)
+        return;
+
+    fetch(
+        "{% url 'car_image_delete' object.agence.slug object.id 0 %}".replace("0", oldId),
+        {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        }
+    )
+    .then(response => {
+
+        if (!response.ok)
+            throw new Error();
+
+        box.remove();
+
+    })
+    .catch(() => {
+
+        alert("Error deleting image.");
+
+    });
+
+});
+
+
+/*-------------------------
+    Submit
+-------------------------*/
+form.addEventListener("submit", function () {
+
+    updateInputFiles();
+
+    const order = [];
+
+    preview.querySelectorAll(".preview-box").forEach((box, index) => {
+
+        const id = box.dataset.oldImageId;
+
+        if (id) {
+
+            order.push({
+                id: id,
+                order: index
+            });
+
+        }
+
+    });
+
+    document.getElementById("image_order").value =
+        JSON.stringify(order);
+
+});
+
+</script>
+<script>
+    
 /* Show/hide promo fields based on toggle */
 const promoSwitch = document.getElementById('{{ form.est_en_promotion.id_for_label }}');
 const promoFields = document.getElementById('promo-fields');
@@ -269,5 +744,48 @@ if (promoSwitch) {
         promoFields.style.display = promoSwitch.checked ? '' : 'none';
     });
 }
+
+const videoInput = document.getElementById("id_video");
+
+if (videoInput) {
+
+    videoInput.addEventListener("change", function () {
+
+        if (!this.files.length) return;
+
+        const file = this.files[0];
+
+        const oldPreview = document.querySelector(".new-video-preview");
+
+        if (oldPreview) oldPreview.remove();
+
+        const url = URL.createObjectURL(file);
+
+        const div = document.createElement("div");
+        div.className = "video-preview new-video-preview mt-4";
+
+        div.innerHTML = `
+            <video controls>
+                <source src="${url}">
+            </video>
+
+            <div class="video-footer">
+                <div>
+                    <strong>${file.name}</strong><br>
+                    <small>${(file.size/1024/1024).toFixed(2)} MB</small>
+                </div>
+            </div>
+        `;
+
+        document.querySelector(".upload-video-box").after(div);
+
+    });
+
+}
+
+
 </script>
+
+
+
 {% endblock %}

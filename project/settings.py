@@ -54,7 +54,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'app.context_processors.wishlist_context',
+
+                # custom processors
+                "app.context_processors.wishlist_context",
+                "app.context_processors.user_has_agence",
+              
+
+
             ],
         },
     },

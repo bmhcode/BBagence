@@ -79,22 +79,60 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'car_list' %}">Voitures</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'agence_list' %}">Agences</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'evenement_list' %}">Événements</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'car_list' %}">Voitures</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'promotion_list' %}">Promotions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'evenement_list' %}">Événements</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog_list' %}">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
-                    {% if request.user.is_authenticated %}
+                    <!-- {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link d-flex align-items-center" href="{% url 'wishlist_list' %}">
-                            Wishlist
+                            <i class="fa fa-heart text-dark"></i>
+                           
                             <span class="badge rounded-pill bg-danger wishlist-badge ms-1" style="{% if wishlist_count == 0 %}display: none;{% endif %}">
                                 {{ wishlist_count }}
                             </span>
                         </a>
                     </li>
-                    {% endif %}
+                    {% endif %} -->
+
+                   <!-- {% if request.user.is_authenticated %}
+<a class="nav-icon position-relative me-3"
+   href="{% url 'wishlist_list' %}"
+   id="wishlist-link">
+
+    <i class="fa fa-heart text-dark"></i>
+
+    <span
+        id="wishlist-count"
+        class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle {% if wishlist_count == 0 %}d-none{% endif %}">
+        {{ wishlist_count }}
+    </span>
+
+</a>
+{% endif %} -->
+
+
+{% if request.user.is_authenticated %}
+<a class="nav-icon position-relative me-3" href="{% url 'wishlist_list' %}">
+    <i class="fa fa-heart text-dark"></i>
+
+    <span id="wishlist-count"
+          class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle">
+        {{ wishlist_count }}
+    </span>
+
+</a>
+{% endif %}
+
+
+
+
+
+
+
+
                 </ul>
                 <form class="d-flex me-3" action="{% url 'car_list' %}" method="get">
                     <input class="form-control me-2" type="search" name="q" placeholder="Rechercher une voiture..." aria-label="Search">
@@ -102,13 +140,7 @@
                 </form>
                 <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
                     {% if request.user.is_authenticated %}
-                        {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
-                        <li class="nav-item me-2">
-                            <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard' %}">
-                                <i class="fas fa-chart-line me-1"></i> Dashboard
-                            </a>
-                        </li>
-                        {% endif %}
+                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if request.user.profile.image and request.user.profile.image.name != 'profiles/default.png' %}
@@ -120,6 +152,9 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card me-2"></i> Mon Profil</a></li>
+                                {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
+                                    <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-chart-line me-2"></i> Mon Dashboard</a></li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0; padding:0;">

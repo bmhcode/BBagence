@@ -4,44 +4,240 @@
 {% block title %}Offres Spéciales - BBcars{% endblock %}
 
 {% block content %}
-<div class="row mb-5">
-    <div class="col-12 text-center">
-        <h1 class="display-4 mb-3">Offres &amp; Promotions</h1>
-        <p class="lead text-muted mx-auto col-md-6">
-            Profitez des meilleures promotions sur les voitures neuves et d'occasion.
-        </p>
-    </div>
+
+<style>
+
+
+.promo-card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    transition:.3s;
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.08);
+}
+
+.promo-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 1rem 2rem rgba(0,0,0,.15);
+}
+
+.promo-image{
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    border-radius:15px;
+}
+
+.price-old{
+    text-decoration:line-through;
+    color:#6c757d;
+    font-size:1rem;
+}
+
+.price-new{
+    color:#dc3545;
+    font-size:2rem;
+    font-weight:700;
+}
+
+.video-box{
+    background:#111;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.video-box video{
+    width:100%;
+    max-height:450px;
+    border-radius:15px;
+}
+
+.no-video{
+    color:#fff;
+    text-align:center;
+}
+
+.no-video i{
+    font-size:70px;
+    opacity:.4;
+    margin-bottom:20px;
+}
+
+.badge-promo{
+    background:#dc3545;
+    color:#fff;
+    padding:8px 15px;
+    border-radius:50px;
+    display:inline-block;
+    margin-bottom:15px;
+}
+
+.btn-offer{
+    border-radius:50px;
+    padding:10px 25px;
+}
+
+.card-info{
+    padding:30px;
+}
+
+@media (max-width:991px){
+
+    .video-box{
+        min-height:300px;
+    }
+
+    .promo-image{
+        height:220px;
+    }
+
+}
+</style>
+
+<div class="text-center mb-5">
+
+    <h1 class="display-4 mb-3">
+        Offres & Promotions
+    </h1>
+
+    <p class="lead">
+        Découvrez les meilleures offres proposées par les concessionnaires BBcars partout en Algérie.
+    </p>
+
 </div>
 
-<div class="row g-4">
-    {% for promotion in promotions %}
-    <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="position-relative">
-                {% if promotion.image %}
-                <img src="{{ promotion.image.url }}" class="card-img-top" alt="{{ promotion.titre }}" style="height: 200px; object-fit: cover;">
+{% for promo in promotions %}
+
+<div class="card promo-card mb-5">
+
+    <div class="row g-0">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-7">
+
+            <div class="card-info d-flex flex-column h-100">
+
+                <span class="badge-promo">
+                    {{ promo.titre_promo }}
+                </span>
+
+                {% if promo.main_image %}
+                    <img src="{{ promo.main_image.image.url }}"
+                         class="promo-image mb-4"
+                         alt="{{ promo.titre_promo }}">
                 {% endif %}
-                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                    PROMO
+
+                <!-- <small class="text-primary fw-bold text-uppercase">
+                    {{ promo.agence.nom }}
+                </small> -->
+
+                <h2 class="fw-bold mt-2"> {{promo.marque}} {{promo.modele}} {{promo.annee}} </h2>
+
+                <p class="text-muted mt-3"> {{ promo.description_promo }} </p>
+
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-baseline gap-2 mb-4">
+
+                        <div class="price-new"> {{ promo.prix_promo|intcomma }} DA </div>
+                        {% if promo.ancien_prix %}
+                            <div class="price-old"> {{ promo.ancien_prix|intcomma }} DA </div>
+                        {% endif %}
+                    </div>
+
                 </div>
-            </div>
-            <div class="card-body p-4 text-center">
-                <small class="text-uppercase text-primary fw-bold">{{ promotion.agence.nom }}</small>
-                <h4 class="card-title my-2">{{ promotion.titre }}</h4>
-                <p class="card-text text-muted small">{{ promotion.description }}</p>
-                <hr>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="small text-muted"><i class="far fa-clock me-1"></i> Jusqu'au {{ promotion.date_fin|date:"d M Y" }}</span>
-                    <a href="{{ promotion.agence.get_absolute_url }}" class="btn btn-dark btn-sm rounded-pill px-3">Profiter</a>
+
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+
+                    <div class="text-muted">
+                        <i class="far fa-clock me-2"></i>
+                        Jusqu'au
+                        <strong>{{ promo.date_fin_promo|date:"d M Y" }}</strong>
+                    </div>
+
+                    <a href="{{ promo.get_absolute_url }}"
+                       class="btn btn-danger btn-offer">
+                        <i class="fas fa-tags me-2"></i>
+                        Voir l'offre
+                    </a>
+                   
                 </div>
+
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                        <i class="fas fa-store me-1"></i>
+                        <a href="{% url 'agence_detail' promo.agence.slug %}"> {{ promo.agence.nom }} </a> — {{ promo.agence.ville }}
+                    </small>
+                </div>
+
             </div>
         </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-5">
+
+            <div class="video-box">
+
+                {% if promo.video %}
+
+                    <video controls preload="metadata">
+
+                        <source src="{{ promo.video.url }}" type="video/mp4">
+
+                        Votre navigateur ne supporte pas la vidéo.
+
+                    </video>
+
+                {% else %}
+
+                    <div class="no-video">
+
+                        <i class="fas fa-film"></i>
+
+                        <h4>Aucune vidéo</h4>
+
+                        <p class="mb-0">
+                            Cette promotion ne possède pas encore de vidéo.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
     </div>
-    {% empty %}
-    <div class="col-12 text-center py-5">
-        <i class="fas fa-tag fa-3x text-muted mb-3"></i>
-        <p class="text-muted">Aucune promotion en cours. Revenez bientôt !</p>
-    </div>
-    {% endfor %}
+
 </div>
+
+{% empty %}
+
+<div class="text-center py-5">
+
+    <i class="fas fa-percent fa-5x text-danger mb-4"></i>
+
+    <h2 class="fw-bold">
+        Aucune promotion disponible
+    </h2>
+
+    <p class="text-muted mb-4">
+        Revenez bientôt pour découvrir les prochaines offres.
+    </p>
+
+    <a href="{% url 'car_list' %}"
+       class="btn btn-danger rounded-pill px-5">
+
+        Voir toutes les voitures
+
+    </a>
+
+</div>
+
+{% endfor %}
+
 {% endblock %}

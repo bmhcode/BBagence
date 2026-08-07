@@ -28,8 +28,8 @@
             {% for agence in agences %}
            <div class="col-md-6 col-xl-4 agence-card" data-city="{{ agence.ville|lower }}">
                 <div class="card h-100 shadow-sm">
-                    {% if agence.image %}
-                    <img src="{{ agence.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 180px; object-fit: cover;">
+                    {% if agence.main_image %}
+                    <img src="{{ agence.main_image.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 180px; object-fit: cover;">
                     {% else %}
                     <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
                         <i class="fas fa-store fa-3x text-muted"></i>
