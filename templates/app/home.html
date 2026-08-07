@@ -40,32 +40,40 @@
     <!-- Promotions en vedette -->
     {% if promotions %}
     <section class="mb-5">
-        <h2 class="mb-4">Offres Spéciales</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-4">Offres Spéciales</h2>
+            <a href="{% url 'promotion_list' %}" class="text-decoration-none">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
         <div class="row g-4">
             {% for promo in promotions %}
             <div class="col-md-4">
                 <div class="card h-100 promotion-card">
                     <div class="card-body">
                         <span class="badge bg-danger mb-2">{{ promo.titre_promo }}</span>
+
+                        <h3>{{promo.marque}} {{promo.modele}} {{promo.annee}} </h3>
+
+
+
                         <p class="card-text text-truncate">{{ promo.description_promo }}</p>
 
                         <h1>{{promo.prix_promo}} M</h1>
 
-
-                        
                         <p class="small text-muted mb-0">Valable du {{promo.date_debut_promo|date:"d F Y"}} au {{ promo.date_fin_promo|date:"d F Y" }}</p>
                     </div>
 
-                    {% if promo.main_image %}
-                    <img src="{{ promo.main_image.image.url }}" class="card-img-top" alt="{{ promo.titre }}" style="height: 200px; object-fit: cover;">
-                    {% endif %}
+                    <div class="position-relative">
 
+                        {% if promo.main_image %}
+                            <img src="{{ promo.main_image.image.url }}"
+                                class="promo-image mb-0"
+                                alt="{{ promo.titre_promo }}">
+                        {% endif %}
 
+                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                            PROMO
+                        </div>
 
-                 
-                    
-                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                        PROMO
                     </div>
 
                     <div class="mt-2 ">

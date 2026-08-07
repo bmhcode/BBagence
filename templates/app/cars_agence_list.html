@@ -268,7 +268,15 @@
                                     <i class="fas fa-car fa-3x text-muted"></i>
                                 </div>
                                 {% endif %}
+
+  
                             </a>
+                        {% if car.est_en_promotion %}
+                         <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                            PROMO
+                        </div>
+                        {% endif %}
+
                         </div>
 
                         <!-- Edit/Delete buttons for manager or superuser -->
@@ -294,7 +302,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="car-card__price">{{ car.prix_affiche|intcomma }} M</span>
+                                    <span class="car-card__price">{{ car.nouveau_prix|intcomma }} M</span>
                                     {% if car.ancien_prix %}
                                     <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
                                     {% endif %}

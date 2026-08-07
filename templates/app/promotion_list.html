@@ -124,11 +124,19 @@
                     {{ promo.titre_promo }}
                 </span>
 
-                {% if promo.main_image %}
-                    <img src="{{ promo.main_image.image.url }}"
-                         class="promo-image mb-4"
-                         alt="{{ promo.titre_promo }}">
-                {% endif %}
+       <div class="position-relative">
+
+    {% if promo.main_image %}
+        <img src="{{ promo.main_image.image.url }}"
+             class="promo-image mb-0"
+             alt="{{ promo.titre_promo }}">
+    {% endif %}
+
+    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+        PROMO
+    </div>
+
+</div>
 
                 <!-- <small class="text-primary fw-bold text-uppercase">
                     {{ promo.agence.nom }}

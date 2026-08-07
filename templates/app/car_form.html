@@ -678,15 +678,17 @@ preview.addEventListener("click", function(e){
     if (!oldId)
         return;
 
-    fetch(
-        "{% url 'car_image_delete' object.agence.slug object.id 0 %}".replace("0", oldId),
-        {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
-            }
+   {% if object and object.pk %}
+fetch(
+    "{% url 'car_image_delete' object.agence.slug object.id 0 %}".replace("0", oldId),
+    {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
         }
-    )
+    }
+)
+{% endif %}
     .then(response => {
 
         if (!response.ok)

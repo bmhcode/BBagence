@@ -291,8 +291,22 @@
                         <!-- Image -->
                         <div class="car-card__img">
                             <a href="{% url 'car_detail' car.agence.slug car.id %}">
+
                                 {% if car.main_image %}
-                                <img src="{{ car.main_image.image.url }}" alt="{{ car.marque }} {{ car.modele }}" loading="lazy">
+                                <div class="position-relative">
+                                    {% if car.main_image %}
+                                        <img src="{{ car.main_image.image.url }}"
+                                            class="promo-image mb-0"
+                                            alt="{{ car.titre_promo }}">
+                                    {% endif %}
+                                    {% if car.est_en_promotion %}
+                                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                        PROMO
+                                    </div>
+                                    {% endif %}
+
+                                </div>                       
+                                
                                 {% else %}
                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                                     <i class="fas fa-car fa-3x text-muted"></i>
