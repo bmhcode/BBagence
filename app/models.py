@@ -317,11 +317,11 @@ class Car(models.Model):
     annee = models.PositiveIntegerField()
     marque = models.CharField(max_length=20, choices=MARQUE_CHOICES, default="")
     modele = models.CharField(max_length=100)
-    couleur = models.CharField(max_length=100, default="Black",blank=True, null=True)
+    couleur = models.CharField(max_length=100, default="",blank=True, null=True)
     finition = models.CharField(max_length=100, default="Full options",blank=True, null=True)
     moteur = models.CharField(max_length=100, default="1.5 181ch 16v turbo",blank=True, null=True)
     energie = models.CharField(max_length=20, choices=FUEL_CHOICES, default="essence")
-    boite_de_vitesse = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES, default="automatique")
+    boite_de_vitesse = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES, default="manuelle")
     kilometrage = models.PositiveIntegerField(default=0, help_text="Kilométrage en km")
     description = models.TextField(blank=True)
 
@@ -455,47 +455,45 @@ class CarImages(models.Model):
 
 #============== End Car ==============
 
-class Evenement(models.Model):
-    titre = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
-    date = models.DateTimeField()
-    description = models.TextField()
-    image = models.ImageField(upload_to='evenements/')
-    lieu = models.CharField(max_length=200, default="Place Centrale")
-    cree_le = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.titre)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.titre
-
-    def get_absolute_url(self):
-        return reverse('evenement_detail', kwargs={'slug': self.slug})
-
-    class Meta:
-        verbose_name = "Événement"
-        verbose_name_plural = "Événements"
-
+# ============== Wishlist ==============
 class Wishlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wishlist")
     cars = models.ManyToManyField(Car, blank=True, related_name="wishlists")
 
     def __str__(self):
         return f"Wishlist de {self.user.username}"
+#============== / Wishlist ==============
 
-class ContactMessage(models.Model):
-    nom = models.CharField(max_length=100)
-    email = models.EmailField()
-    sujet = models.CharField(max_length=200)
-    message = models.TextField()
+# ============== Event Blog Message ==============
+class Evenement(models.Model):
+    titre = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField()
+    image = models.ImageField(upload_to='evenements/')
+    lieu = models.CharField(max_length=200, default="Place Centrale")
+
+    date_debut = models.DateField(null=True, blank=True)
+    date_fin = models.DateField(null=True, blank=True)
+    
     cree_le = models.DateTimeField(auto_now_add=True)
-    agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')
+
+    class Meta:
+        verbose_name = "Événement"
+        verbose_name_plural = "Événements"
 
     def __str__(self):
-        return f"Message de {self.nom} - {self.sujet}"
+        return self.titre
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.titre)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('evenement_detail', kwargs={'id': self.id})
+
+    def eventValide(self):
+        return timezone.now().date() >= self.date_debut and timezone.now().date() <= self.date_fin
 
 class ArticleBlog(models.Model):
     titre = models.CharField(max_length=200)
@@ -504,21 +502,33 @@ class ArticleBlog(models.Model):
     image = models.ImageField(upload_to='blog/')
     date_publication = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Article de Blog"
+        verbose_name_plural = "Articles de Blog"
+
+    def __str__(self):
+        return self.titre
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.titre)
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.titre
-
     def get_absolute_url(self):
         return reverse('blog_detail', kwargs={'slug': self.slug})
 
-    class Meta:
-        verbose_name = "Article de Blog"
-        verbose_name_plural = "Articles de Blog"
+class ContactMessage(models.Model):
+    agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')
+    nom = models.CharField(max_length=100)
+    email = models.EmailField()
+    sujet = models.CharField(max_length=200)
+    message = models.TextField()
+    cree_le = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Message de {self.nom} - {self.sujet}"
+
+#============== / Event Blog Message ==============
 
 # =========================================
 # PROFILE

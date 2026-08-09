@@ -209,20 +209,28 @@
     }
 </style>
 
-<!-- Page Hero -->
-<section class="abc-page-hero" style="padding: 80px 0 40px; background: #000;color: var(--color-primary);">
-    <div class="abc-container">
-        <p class="abc-eyebrow"><i class="fas fa-cog"></i> Administration</p>
-        <h1 class="abc-section-title" style="color: #fff; font-family: var(--font-display);">Gérer la Présentation</h1>
-        <p class="abc-section-subtitle" style="color: rgba(255,255,255,0.7);">Mettez à jour les photos, les vidéos et la localisation de <strong>{{ agence.name }}</strong>.</p>
+<section class="" style="padding: 10px 0 10px; ">
+    <div class="container" style="position: relative; z-index: 2;">
+        <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
+            <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <a href="{% url 'agence_detail' agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence.nom }}</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <span style="color: rgba(19, 22, 33, 0.7); font-weight: 500;">Gérer la Présentation</span>
+        </nav>
     </div>
 </section>
 
+<div class="text-center mb-1">
+    <h1 class="display-4 mb-2"> Gérer la Présentation </h1>
+    <p class="lead">
+        Mettez à jour les photos, les vidéos et la localisation de <strong>{{ agence.nom }}</strong>.
+    </p>
+</div>
+
 <section class="abc-section abc-section--gray" style="padding: 60px 0;">
     <div class="abc-container">
-        
         <div class="dashboard-grid">
-
             <!-- ================= SIDEBAR (LEFT) ================= -->
             <div>
                 <!-- Google Map Card -->
@@ -312,7 +320,7 @@
                         <div class="media-item">
                             <img src="{{ img.image.url }}" alt="{{ img.legende }}">
                             <div class="media-info">
-                                <p>{{ img.legende|default:"Photo supermarché" }}</p>
+                                <p>{{ img.legende|default:"Photo" }}</p>
                             </div>
                             <!-- Delete form -->
                             <form method="POST" action="{% url 'agence_image_delete' img.pk %}" class="delete-btn-overlay">

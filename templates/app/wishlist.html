@@ -140,16 +140,19 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<section class="wishlist-hero">
-    <div class="container d-flex align-items-center gap-3">
-        <i class="fas fa-heart fa-2x"></i>
-        <div>
-            <h1 class="mb-0">Ma Wishlist</h1>
-            <p class="mb-0">{{ page_obj.paginator.count }} voiture{{ page_obj.paginator.count|pluralize }} sauvegardée{{ page_obj.paginator.count|pluralize }}</p>
-        </div>
-    </div>
-</section>
+<div class="text-center mb-5">
+    <h3 class="display-5 fw-bold mb-2">
+        Ma Wishlist
+    </h3>
+    <p class="text-muted mb-0">
+        <strong class="text-danger"> {{ page_obj.paginator.count }}</strong>
+        voiture{{ page_obj.paginator.count|pluralize }}
+        sauvegardée{{ page_obj.paginator.count|pluralize }}
+    </p>
+    <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+</div>
+
+
 
 <div class="container">
     {% if cars %}
@@ -170,18 +173,19 @@
                     <a href="{% url 'car_detail' car.agence.slug car.id %}">
 
                         {% if car.main_image %}
-                        <img src="{{ car.main_image.image.url }}" alt="{{ car.marque }} {{ car.modele }}" loading="lazy">
+                            <img src="{{ car.main_image.image.url }}" alt="{{ car.marque }} {{ car.modele }}" loading="lazy">
                         {% else %}
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-                            <i class="fas fa-car fa-3x text-muted"></i>
-                        </div>
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-car fa-3x text-muted"></i>
+                            </div>
                         {% endif %}
                         {% if car.est_en_promotion %}
-                         <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                            PROMO
-                        </div>
+                            <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                    PROMO
+                                </div>
+                            </a>
                         {% endif %}
-                        
                     </a>
                 </div>
 

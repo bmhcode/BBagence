@@ -310,14 +310,17 @@
                         <div class="bg-light rounded-circle p-3 me-3">
                             <i class="fas fa-map-marker-alt text-primary"></i>
                         </div>
-                        <div>
-                            <!-- <small class="text-muted d-block uppercase fw-bold">LOCALISATION</small> -->
-                            <a href="{% url 'agence_localisation_acces' agence.slug %}">
-                                <span>{{ agence.ville }} - {{ agence.commune }}</span><br>
-                                {% if agence.adresse %}<span class="text-muted m-0">{{ agence.adresse }}</span>{% endif %}
-                            </a>
-                            
-                        </div>
+                       
+
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <a href="{% url 'agence_localisation_acces' agence.slug %}">{{ agence.ville }}</a> , {{ agence.commune }}
+                            <br>{% if agence.adresse %}<span class="text-muted m-0">{{ agence.adresse }}</span>{% endif %}
+                        </small>
+                    </div>
+
+
+
                     </div>
 
                     {% if agence.telephone %}
@@ -398,7 +401,7 @@
            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 class="section-title" style="margin: 0;">Nos voitures</h2>
 
-            <a href="{% url 'cars_agence_list' agence.slug %}" class="btn btn-outline-primary btn-sm">
+            <a href="{% url 'agence_carlist' agence.slug %}" class="btn btn-outline-primary btn-sm">
               Voir tout <i class="fas fa-arrow-right"></i>
             </a>
 

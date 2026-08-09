@@ -24,10 +24,14 @@
             </div>
             <div class="card-body p-4">
                 <h4 class="card-title mb-2">{{ evenement.titre }}</h4>
-                <div class="d-flex align-items-center mb-3 text-muted">
+                <div class="d-flex align-items-center mb-2 text-muted">
                     <i class="fas fa-map-marker-alt me-2 text-primary"></i> <small>{{ evenement.lieu }}</small>
-                    <i class="far fa-clock ms-3 me-2 text-primary"></i> <small>{{ evenement.date|date:"H:i" }}</small>
+                    <!-- <i class="far fa-clock ms-3 me-2 text-primary"></i> <small>{{ evenement.heure|date:"H:i" }}</small> -->
                 </div>
+                <small> <i class="fas fa-calendar-alt me-2"></i>
+                {{ evenement.date_debut|date:"d M Y" }} -  {{ evenement.date_fin|date:"d M Y" }}</small>      
+
+
                 <p class="card-text text-muted">{{ evenement.description|truncatewords:20 }}</p>
                 <a href="{{ evenement.get_absolute_url }}" class="btn btn-outline-primary w-100 rounded-pill mt-auto">Voir les détails</a>
             </div>

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, ContactMessage, Profile, ALGERIA_CITIES
+from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, Evenement, ArticleBlog, ContactMessage, Profile, ALGERIA_CITIES
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Adresse e-mail")
@@ -77,11 +77,20 @@ class ProfileForm(forms.ModelForm):
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
-    
+# ===================== Car forms ====================== 
 
 class CarForm(forms.ModelForm):
-    # image = forms.ImageField(required=False, label="Image principale (remplace l'actuelle)")
-    # video = forms.FileField(required=False,label="Vidéo",widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"}))
+    # Champs supplémentaires hors-modèle
+    image   = forms.ImageField(
+        required=False,
+        label="Image principale (remplace la première)",
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
+    )
+    gallery = forms.FileField(
+        required=False,
+        label="Galerie d'images",
+        widget=MultipleFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
+    )
     
     class Meta:
         model = Car
@@ -93,13 +102,6 @@ class CarForm(forms.ModelForm):
             'est_en_vedette', 'est_disponible'
         ]
         widgets = {
-
-            'gallery': forms.FileField(widget=MultipleFileInput(), required=False),
-            
-            
-            # 'video': forms.FileField(required=False,label="Vidéo",widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"})),
-           
-           
             'marque': forms.Select(attrs={'class': 'form-select'}),
             'modele': forms.TextInput(attrs={'class': 'form-control'}),
             'annee': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -145,7 +147,9 @@ class CarForm(forms.ModelForm):
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
 
+# ====================== / Car forms ====================== 
 
+# ====================== Agence forms ====================== 
 
 class AgenceForm(forms.ModelForm):
     class Meta:
@@ -224,3 +228,21 @@ class ContactForm(forms.ModelForm):
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre message', 'rows': 5}),
             'agence': forms.Select(attrs={'class': 'form-select'}),
         }
+
+# ===================== / Agence forms ====================== 
+
+# ===================== Events forms ===================== # 
+class EvenementForm(forms.ModelForm):
+    class Meta:
+        model = Evenement
+        fields = ['titre', 'description', 'date_debut', 'date_fin', 'lieu', 'image']
+        widgets = {
+            'titre': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'lieu': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+
+# ===================== / Events forms ======================   

@@ -174,8 +174,6 @@
 
 
 
-
-
 <div class="row">
     <div class="col-lg-8">
         <div class="card shadow rounded-3 overflow-hidden mb-4" >
@@ -191,41 +189,30 @@
                 <span class="wishlist-loader spinner-border spinner-border-sm"></span>
             </button>
 
-            <!-- {% if car.main_image %}
-                <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
-            {% endif %} -->
-
-                        <!-- {% if car.main_image %}
-                            <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
-
-                        {% endif %}
-
-                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                            PROMO
-                        </div> -->
-
-                                <div class="position-relative">
-                                    {% if car.main_image %}
-                                        <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
-                                    {% endif %}
-                                    {% if car.est_en_promotion %}
-                                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                                        PROMO
-                                    </div>
-                                    {% endif %}
-                                </div>      
+            <div class="position-relative">
+                {% if car.main_image %}
+                    <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+                {% endif %}
+                {% if car.est_en_promotion %}
+                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                        PROMO
+                    </div>
+                </a>
+                {% endif %}
+            </div>      
 
             <!-- Edit/Delete buttons for manager or superuser -->
-                        {% if request.user.is_superuser or car.agence.manager == request.user %}
-                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                            <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-edit"></i>
+            {% if request.user.is_superuser or car.agence.manager == request.user %}
+                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-trash"></i>
                             </a>
-                            <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </div>
-                        {% endif %}
+                </div>
+            {% endif %}
 
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -341,18 +328,8 @@
                 <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
                     Contacter la boutique {{ car.agence.telephone }}
                 </a>
-
-              
             </div>
         </div>
-
-        <!-- <div class="bg-white p-4 shadow-sm rounded-3">
-            <h5 class="mb-3">Partagez l'expérience</h5>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-facebook-f me-2"></i>Partager</button>
-                <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-twitter me-2"></i>Tweet</button>
-            </div>
-        </div> -->
     </div>
 
     <!-- Secondary images if any -->
@@ -437,9 +414,13 @@
 
                 <!-- PROMO - Bottom Left -->
                 {% if car.est_en_promotion %}
-                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm fw-bold">
-                    PROMO
-                </div>
+
+
+            <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                        PROMO
+                    </div>
+                </a>
                 {% endif %}
 
             </div>

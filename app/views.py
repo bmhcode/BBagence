@@ -1,7 +1,4 @@
-from django.contrib.sites import requests
-from django.contrib.sites import requests
-from django.contrib.sites import requests
-from asgiref import current_thread_executor
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
 from django.db.models import Q, Sum, Count
@@ -18,19 +15,31 @@ from django.contrib.auth import logout
 from django.utils import timezone
 import json
 
+from .models import ( Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
+    Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
+from .forms import (ContactForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
+    SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, AgenceForm, AgenceSocialForm)
 
 
+# =========================================
+# HOME & GENERAL VIEWS
+# =========================================
+class HomeView(TemplateView):
+    template_name = 'app/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
+        context['evenements_prochains'] = Evenement.objects.all().order_by('date_debut')[:3]
+        # Active car promotions
+        context['promotions'] = Car.objects.filter(
+            est_en_promotion=True,
+            date_debut_promo__lte=timezone.now().date(),
+            date_fin_promo__gte=timezone.now().date()
+        ).select_related('agence').prefetch_related('images')[:6]
+        return context
 
 
-
-from .models import (
-    Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
-    Evenement, ArticleBlog, ContactMessage, Wishlist, Profile
-)
-from .forms import (
-    ContactForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
-    SignupForm, UserForm, ProfileForm, CarForm, AgenceForm, AgenceSocialForm
-)
 
 
 # def _get_agence():
@@ -108,61 +117,6 @@ class UserProfileUpdateView(LoginRequiredMixin, View):
             return redirect('profile')
         return render(request, 'registration/user_update.html', {'u_form': u_form, 'p_form': p_form})
 
-# =========================================
-# HOME & GENERAL VIEWS
-# =========================================
-class HomeView(TemplateView):
-    template_name = 'app/home.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
-        context['evenements_prochains'] = Evenement.objects.all().order_by('date')[:3]
-        # Active car promotions
-        context['promotions'] = Car.objects.filter(
-            est_en_promotion=True,
-            date_debut_promo__lte=timezone.now().date(),
-            date_fin_promo__gte=timezone.now().date()
-        ).select_related('agence').prefetch_related('images')[:6]
-        return context
-
-class AgenceListView(ListView):
-    model = Agence
-    template_name = 'app/agence_list.html'
-    context_object_name = 'agences'
-    paginate_by = 12
-
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        agence_nom = self.request.GET.get('agence_nom')
-        queryset = Agence.objects.all()
-        if query:
-            queryset = queryset.filter(
-                Q(nom__icontains=query) | Q(description__icontains=query)
-            )
-        if agence_nom:
-            queryset = queryset.filter(nom=agence_nom)
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['noms'] = Agence.objects.values_list('nom', flat=True).distinct()
-        context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
-        return context
-
-class AgenceDetailView(DetailView):
-    model = Agence
-    template_name = 'app/agence_detail.html'
-    context_object_name = 'agence'
-    slug_url_kwarg = 'agence_slug'
-
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related('cars', 'images', 'videos')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['videos'] = self.object.videos.all()
-        return context
 
 # =========================================
 # AGENCE CRUD VIEWS
@@ -214,6 +168,182 @@ class AgenceDeleteView(AgenceManagerRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "L'agence a été supprimée.")
         return super().delete(request, *args, **kwargs)
+
+class AgenceListView(ListView):
+    model = Agence
+    template_name = 'app/agence_list.html'
+    context_object_name = 'agences'
+    paginate_by = 12
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        agence_nom = self.request.GET.get('agence_nom')
+        queryset = Agence.objects.all()
+        if query:
+            queryset = queryset.filter(
+                Q(nom__icontains=query) | Q(description__icontains=query)
+            )
+        if agence_nom:
+            queryset = queryset.filter(nom=agence_nom)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['noms'] = Agence.objects.values_list('nom', flat=True).distinct()
+        context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
+        return context
+
+class AgenceDetailView(DetailView):
+    model = Agence
+    template_name = 'app/agence_detail.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('cars', 'images', 'videos')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['videos'] = self.object.videos.all()
+        return context
+
+# AGENCE PRESENTATION & MEDIA MANAGEMENT
+
+class AgencePresentationManageView(LoginRequiredMixin, TemplateView):
+    template_name = 'app/agence_presentation_manage.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agence = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
+        
+        if not self.request.user.is_superuser and agence.manager != self.request.user:
+            raise PermissionDenied
+
+        context['agence'] = agence
+        context['map_form'] = AgencePresentationForm(instance=agence)
+        context['image_form'] = AgenceImageForm()
+        context['video_form'] = AgenceVideoForm()
+        context['images'] = agence.images.all()
+        context['videos'] = agence.videos.all()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        agence = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
+        
+        if not self.request.user.is_superuser and agence.manager != self.request.user:
+            raise PermissionDenied
+
+        if 'update_map' in request.POST:
+            form = AgencePresentationForm(request.POST, request.FILES, instance=agence)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "La localisation a été mise à jour.")
+        
+        elif 'add_image' in request.POST:
+            form = AgenceImageForm(request.POST, request.FILES)
+            if form.is_valid():
+                image = form.save(commit=False)
+                image.agence = agence
+                image.save()
+                messages.success(request, "Image ajoutée successfully.")
+        
+        elif 'add_video' in request.POST:
+            form = AgenceVideoForm(request.POST, request.FILES)
+            if form.is_valid():
+                video = form.save(commit=False)
+                video.agence = agence
+                video.save()
+                messages.success(request, "Vidéo ajoutée successfully.")
+
+        return redirect('agence_presentation_manage', agence_slug=agence.slug)
+
+class AgenceImageDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        image = get_object_or_404(AgenceImages, pk=pk)
+        agence = image.agence
+        if not request.user.is_superuser and agence.manager != request.user:
+            raise PermissionDenied
+        image.delete()
+        messages.success(request, "Image supprimée.")
+        return redirect('agence_presentation_manage', agence_slug=agence.slug)
+
+class AgenceVideoDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        video = get_object_or_404(AgenceVideos, pk=pk)
+        agence = video.agence
+        if not request.user.is_superuser and agence.manager != request.user:
+            raise PermissionDenied
+        video.delete()
+        messages.success(request, "Vidéo supprimée.")
+        return redirect('agence_presentation_manage', agence_slug=agence.slug)
+
+class AgencePresentationView(DetailView):
+    model = Agence
+    template_name = 'app/agence_presentation.html'
+    context_object_name = 'agence'
+
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = self.object.images.all()
+        context['videos'] = self.object.videos.all()
+        return context
+
+class AgenceLocalisationAccesView(DetailView):
+    model = Agence
+    template_name = 'app/agence_localisation_acces.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+class AgenceVideoView(DetailView):
+    model = Agence
+    template_name = 'app/agence_visites_video.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['videos'] = self.object.videos.all()
+        return context
+
+class AgencePhotosView(DetailView):
+    model = Agence
+    template_name = 'app/agence_galerie_photos.html'
+    context_object_name = 'agence'
+    slug_url_kwarg = 'agence_slug'
+
+    def get_object(self):
+        slug = self.kwargs.get('agence_slug')
+        return get_object_or_404(Agence, slug=slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = self.object.images.all()
+        return context
+
+class AgenceCarListView(ListView):
+    model = Car
+    template_name = 'app/agence_carlist.html'
+    context_object_name = 'cars'
+    ordering = ['-cree_le']
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(agence__slug=self.kwargs.get('agence_slug'))
+        return queryset.select_related('agence').prefetch_related('images')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['agence'] = Agence.objects.get(slug=self.kwargs.get('agence_slug'))
+        return context
+
+
 
 # =========================================
 # CAR CRUD VIEWS
@@ -321,8 +451,20 @@ class CarDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cars_related'] = Car.objects.filter(agence=self.object.agence).exclude(pk=self.object.pk).prefetch_related('images')[:4]
+        context['cars_related'] = (
+            Car.objects
+            .filter(agence=self.object.agence)
+            .exclude(pk=self.object.pk)
+            .select_related('agence')
+            .prefetch_related('images')[:4]
+        )
         context['agence'] = self.object.agence
+        # Wishlist IDs pour les boutons coeur
+        if self.request.user.is_authenticated:
+            wishlist, _ = Wishlist.objects.get_or_create(user=self.request.user)
+            context['user_wishlist_ids'] = list(wishlist.cars.values_list('id', flat=True))
+        else:
+            context['user_wishlist_ids'] = []
         return context
 
 class CarCreateView(AgenceManagerRequiredMixin, CreateView):
@@ -374,10 +516,9 @@ class CarCreateView(AgenceManagerRequiredMixin, CreateView):
         )
 
         return redirect(
-            "cars_agence_list",
+            "agence_carlist",
             agence_slug=agence.slug,
         )
-
 
 class CarUpdateView(AgenceManagerRequiredMixin, UpdateView):
     model = Car
@@ -510,34 +651,48 @@ def car_image_delete(request, agence_slug, car_id, image_id):
 @login_required
 @require_POST
 def car_image_set_main(request, agence_slug, car_id, image_id):
+    """
+    Définit une image comme image principale en lui attribuant l'ordre 0
+    et en réordonnant les autres.
+    """
     image = get_object_or_404(CarImages, id=image_id)
     car = image.car
     
     # Permission check
     if not request.user.is_superuser and car.agence.manager != request.user:
         raise PermissionDenied
-        
-    car.images.update(is_main=False)
-    image.is_main = True
-    image.save()
+
+    # Réordonner : l'image choisie passe en 0, les autres décalent
+    image.order = 0
+    image.save(update_fields=['order'])
+    other_images = car.images.exclude(pk=image.pk).order_by('order', 'id')
+    for idx, img in enumerate(other_images, start=1):
+        img.order = idx
+    CarImages.objects.bulk_update(other_images, ['order'])
+
     messages.success(request, "Image principale mise à jour.")
-    # return redirect('car_update', agence_slug=agence_slug, car_id=car.id)
     return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
 
-
-class CarsAgenceListView(ListView):
+class PromotionListView(ListView):
     model = Car
-    template_name = 'app/cars_agence_list.html'
-    context_object_name = 'cars'
+    template_name = 'app/promotion_list.html'
+    context_object_name = 'promotions'
     ordering = ['-cree_le']
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(agence__slug=self.kwargs.get('agence_slug'))
-        return queryset.select_related('agence').prefetch_related('images')
-    
+        return super().get_queryset().filter(est_en_promotion=True)
+
+
+# =========================== Promotion CRUD =============================
+
+class CarPromotionView(DetailView):
+    model = Car
+    template_name = 'app/car_promotion.html'
+    pk_url_kwarg = 'car_id'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agence'] = Agence.objects.get(slug=self.kwargs.get('agence_slug'))
+        context['car'] = self.object
         return context
 
 # =========================================
@@ -620,151 +775,40 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         })
         return context
 
-# =========================================
-# AGENCE PRESENTATION & MEDIA MANAGEMENT
-# =========================================
-class AgencePresentationManageView(LoginRequiredMixin, TemplateView):
-    template_name = 'app/agence_presentation_manage.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        agence = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
-        
-        if not self.request.user.is_superuser and agence.manager != self.request.user:
-            raise PermissionDenied
-
-        context['agence'] = agence
-        context['map_form'] = AgencePresentationForm(instance=agence)
-        context['image_form'] = AgenceImageForm()
-        context['video_form'] = AgenceVideoForm()
-        context['images'] = agence.images.all()
-        context['videos'] = agence.videos.all()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        agence = get_object_or_404(Agence, slug=self.kwargs.get('agence_slug'))
-        
-        if not self.request.user.is_superuser and agence.manager != self.request.user:
-            raise PermissionDenied
-
-        if 'update_map' in request.POST:
-            form = AgencePresentationForm(request.POST, request.FILES, instance=agence)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "La localisation a été mise à jour.")
-        
-        elif 'add_image' in request.POST:
-            form = AgenceImageForm(request.POST, request.FILES)
-            if form.is_valid():
-                image = form.save(commit=False)
-                image.agence = agence
-                image.save()
-                messages.success(request, "Image ajoutée successfully.")
-        
-        elif 'add_video' in request.POST:
-            form = AgenceVideoForm(request.POST, request.FILES)
-            if form.is_valid():
-                video = form.save(commit=False)
-                video.agence = agence
-                video.save()
-                messages.success(request, "Vidéo ajoutée successfully.")
-
-        return redirect('agence_presentation_manage', agence_slug=agence.slug)
-
-
-class AgenceImageDeleteView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        image = get_object_or_404(AgenceImages, pk=pk)
-        agence = image.agence
-        if not request.user.is_superuser and agence.manager != request.user:
-            raise PermissionDenied
-        image.delete()
-        messages.success(request, "Image supprimée.")
-        return redirect('agence_presentation_manage', agence_slug=agence.slug)
-
-class AgenceVideoDeleteView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        video = get_object_or_404(AgenceVideos, pk=pk)
-        agence = video.agence
-        if not request.user.is_superuser and agence.manager != request.user:
-            raise PermissionDenied
-        video.delete()
-        messages.success(request, "Vidéo supprimée.")
-        return redirect('agence_presentation_manage', agence_slug=agence.slug)
-
-class AgencePresentationView(DetailView):
-    model = Agence
-    template_name = 'app/agence_presentation.html'
-    context_object_name = 'agence'
-
-    def get_object(self):
-        slug = self.kwargs.get('agence_slug')
-        return get_object_or_404(Agence, slug=slug)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['images'] = self.object.images.all()
-        context['videos'] = self.object.videos.all()
-        return context
-
-class AgenceLocalisationAccesView(DetailView):
-    model = Agence
-    template_name = 'app/agence_localisation_acces.html'
-    context_object_name = 'agence'
-    slug_url_kwarg = 'agence_slug'
-
-class AgenceVideoView(DetailView):
-    model = Agence
-    template_name = 'app/agence_visites_video.html'
-    context_object_name = 'agence'
-    slug_url_kwarg = 'agence_slug'
-
-    def get_object(self):
-        slug = self.kwargs.get('agence_slug')
-        return get_object_or_404(Agence, slug=slug)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['videos'] = self.object.videos.all()
-        return context
-
-class AgencePhotosView(DetailView):
-    model = Agence
-    template_name = 'app/agence_galerie_photos.html'
-    context_object_name = 'agence'
-    slug_url_kwarg = 'agence_slug'
-
-    def get_object(self):
-        slug = self.kwargs.get('agence_slug')
-        return get_object_or_404(Agence, slug=slug)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['images'] = self.object.images.all()
-        return context
 
 # =========================================
 # OTHER VIEWS
 # =========================================
+
+class EvenementCreateView(CreateView):
+    model = Evenement
+    template_name = 'app/evenement_form.html'
+    context_object_name = 'evenement'
+    form_class = EvenementForm
+
+class EvenementUpdateView(UpdateView):
+    model = Evenement
+    template_name = 'app/evenement_form.html'
+    context_object_name = 'evenement'
+    form_class = EvenementForm
+
+class EvenementDeleteView(DeleteView):
+    model = Evenement
+    template_name = 'app/evenement_delete.html'
+    context_object_name = 'evenement'
+    success_url = reverse_lazy('evenement_list')
+
 class EvenementListView(ListView):
     model = Evenement
     template_name = 'app/evenement_list.html'
     context_object_name = 'evenements'
-    ordering = ['-date']
+    ordering = ['-date_debut']
 
 class EvenementDetailView(DetailView):
     model = Evenement
     template_name = 'app/evenement_detail.html'
     context_object_name = 'evenement'
-
-class PromotionListView(ListView):
-    model = Car
-    template_name = 'app/promotion_list.html'
-    context_object_name = 'promotions'
-    ordering = ['-cree_le']
-
-    def get_queryset(self):
-        return super().get_queryset().filter(est_en_promotion=True)
+    pk_url_kwarg = 'id'
 
 class ArticleBlogListView(ListView):
     model = ArticleBlog

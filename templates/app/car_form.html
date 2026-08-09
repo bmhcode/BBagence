@@ -54,36 +54,6 @@
 </style>
 
 <style>
-
-.preview-card{
-    position:relative;
-}
-
-.preview-image{
-    width:100%;
-    height:180px;
-    object-fit:cover;
-    border-radius:10px;
-    border:1px solid #ddd;
-}
-
-.remove-image{
-    position:absolute;
-    top:8px;
-    right:15px;
-    width:28px;
-    height:28px;
-    border:none;
-    border-radius:50%;
-    background:red;
-    color:white;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-</style>
-
-<style>
     .section-title{
     display:flex;
     align-items:center;
@@ -400,7 +370,7 @@
                                     <small class="text-muted">Max 10 images</small>
 
                                     <div id="preview" class="d-flex flex-wrap mt-3">
-                                        {% for image in car.images.all %}
+                                        {% for image in object.images.all %}
                                         <div class="preview-box" data-old-image-id="{{ image.id }}">
                                             <img src="{{ image.image.url }}">
                                             <button type="button" class="remove-btn">&times;</button>
@@ -451,343 +421,702 @@
 
 
 
-
-
-<style>
-    .preview-box {
-        position: relative;
-        margin: 10px;
-        width: 120px;
-        height: 120px;
-    }
-
-    .preview-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-
-    .remove-btn {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        cursor: pointer;
-        z-index: 10;
-    }
-
-    .main-badge {
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        background: #0d6efd;
-        color: white;
-        padding: 2px 5px;
-        font-size: 12px;
-        border-radius: 5px;
-        z-index: 5;
-    }
-
-
-    .preview-box {
-        position: relative;
-    }
-</style>
-
-
-<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-const gallery = document.getElementById("gallery");
-const preview = document.getElementById("preview");
-const form = gallery.closest("form");
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
 
-const MAX_IMAGES = 10;
+    const form = document.getElementById("carForm");
+    const gallery = document.getElementById("gallery");
+    const preview = document.getElementById("preview");
+    const imageOrderInput = document.getElementById("image_order");
 
-let filesArray = [];
+    const promoSwitch =
+        document.getElementById(
+            "{{ form.est_en_promotion.id_for_label }}"
+        );
+
+    const promoFields =
+        document.getElementById("promo-fields");
+
+    const videoInput =
+        document.getElementById("id_video");
+
+    const uploadVideoBox =
+        document.querySelector(".upload-video-box");
 
 
-/*-------------------------
-    Sortable
--------------------------*/
-Sortable.create(preview, {
-    animation: 150,
-    ghostClass: "sortable-ghost",
+    /* =========================================================
+       CONFIG
+    ========================================================= */
 
-    onEnd() {
+    const MAX_IMAGES = 10;
 
-        // إعادة ترتيب filesArray حسب ترتيب الـ Preview
+    let filesArray = [];
 
-        const newOrder = [];
 
-        preview.querySelectorAll(".preview-box").forEach(box => {
+    /* =========================================================
+       SAFETY CHECK
+    ========================================================= */
 
-            const index = parseInt(box.dataset.fileIndex);
-
-            if (!isNaN(index))
-                newOrder.push(filesArray[index]);
-
-        });
-
-        filesArray = newOrder;
-
-        // تحديث fileIndex
-
-        preview.querySelectorAll(".preview-box").forEach((box, i) => {
-            box.dataset.fileIndex = i;
-        });
-
-        updateInputFiles();
-
+    if (!form) {
+        console.warn("carForm not found.");
+        return;
     }
 
-});
+
+    /* =========================================================
+       GALLERY
+    ========================================================= */
+
+    if (gallery && preview) {
 
 
-/*-------------------------
-    Update input.files
--------------------------*/
-function updateInputFiles() {
+        /* -----------------------------------------------------
+           GET NEW IMAGE BOXES
+        ----------------------------------------------------- */
 
-    const dt = new DataTransfer();
+        function getNewImageBoxes() {
 
-    filesArray.forEach(file => dt.items.add(file));
+            return Array.from(
+                preview.querySelectorAll(".preview-box")
+            ).filter(box => !box.dataset.oldImageId);
 
-    gallery.files = dt.files;
-
-}
+        }
 
 
-/*-------------------------
-    Create Preview
--------------------------*/
-function createPreview(file) {
+        /* -----------------------------------------------------
+           UPDATE FILE INDEXES
+        ----------------------------------------------------- */
 
-    const reader = new FileReader();
+        function updateFileIndexes() {
 
-    reader.onload = function(e) {
+            const boxes = getNewImageBoxes();
 
-        const box = document.createElement("div");
-        box.className = "preview-box";
-        box.dataset.fileIndex = filesArray.length - 1;
+            boxes.forEach((box, index) => {
 
-        const img = document.createElement("img");
-        img.src = e.target.result;
+                box.dataset.fileIndex = index;
 
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "remove-btn";
-        remove.innerHTML = "&times;";
-
-        remove.addEventListener("click", function () {
-
-            const index = parseInt(box.dataset.fileIndex);
-
-            filesArray.splice(index, 1);
-
-            box.remove();
-
-            // تحديث الفهارس
-
-            preview.querySelectorAll(".preview-box").forEach((item, i) => {
-                item.dataset.fileIndex = i;
             });
+
+        }
+
+
+        /* -----------------------------------------------------
+           UPDATE INPUT FILES
+        ----------------------------------------------------- */
+
+        function updateInputFiles() {
+
+            const dataTransfer = new DataTransfer();
+
+            filesArray.forEach(file => {
+
+                dataTransfer.items.add(file);
+
+            });
+
+            gallery.files = dataTransfer.files;
+
+            console.log(
+                "Gallery files:",
+                gallery.files.length
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           CHECK DUPLICATE FILE
+        ----------------------------------------------------- */
+
+        function isDuplicate(file) {
+
+            return filesArray.some(existingFile =>
+
+                existingFile.name === file.name &&
+                existingFile.size === file.size &&
+                existingFile.lastModified === file.lastModified
+
+            );
+
+        }
+
+
+        /* -----------------------------------------------------
+           CREATE IMAGE PREVIEW
+        ----------------------------------------------------- */
+
+        function createPreview(file, fileIndex) {
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+
+                const box =
+                    document.createElement("div");
+
+                box.className = "preview-box";
+
+                box.dataset.fileIndex = fileIndex;
+
+
+                const img =
+                    document.createElement("img");
+
+                img.src = event.target.result;
+
+                img.alt = file.name;
+
+                img.loading = "lazy";
+
+
+                const removeButton =
+                    document.createElement("button");
+
+                removeButton.type = "button";
+
+                removeButton.className = "remove-btn";
+
+                removeButton.innerHTML = "&times;";
+
+                removeButton.title =
+                    "Supprimer cette image";
+
+                removeButton.setAttribute(
+                    "aria-label",
+                    "Supprimer cette image"
+                );
+
+
+                box.appendChild(img);
+
+                box.appendChild(removeButton);
+
+                preview.appendChild(box);
+
+                updateFileIndexes();
+
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+
+        /* -----------------------------------------------------
+           ADD IMAGES
+        ----------------------------------------------------- */
+
+        gallery.addEventListener("change", function () {
+
+            const selectedFiles =
+                Array.from(this.files);
+
+
+            if (!selectedFiles.length) {
+                return;
+            }
+
+
+            for (const file of selectedFiles) {
+
+
+                /* IMAGE VALIDATION */
+
+                if (!file.type.startsWith("image/")) {
+
+                    alert(
+                        `"${file.name}" n'est pas une image.`
+                    );
+
+                    continue;
+                }
+
+
+                /* MAXIMUM */
+
+                if (filesArray.length >= MAX_IMAGES) {
+
+                    alert(
+                        `Maximum ${MAX_IMAGES} images.`
+                    );
+
+                    break;
+                }
+
+
+                /* DUPLICATE */
+
+                if (isDuplicate(file)) {
+                    continue;
+                }
+
+
+                /* ADD FILE */
+
+                const fileIndex =
+                    filesArray.length;
+
+                filesArray.push(file);
+
+                createPreview(
+                    file,
+                    fileIndex
+                );
+
+            }
+
+
+            updateFileIndexes();
 
             updateInputFiles();
 
         });
 
-        box.appendChild(img);
-        box.appendChild(remove);
 
-        preview.appendChild(box);
+        /* -----------------------------------------------------
+           DELETE IMAGE
+        ----------------------------------------------------- */
 
-    };
+        preview.addEventListener(
+            "click",
+            function (event) {
 
-    reader.readAsDataURL(file);
+                const button =
+                    event.target.closest(".remove-btn");
 
-}
+                if (!button) {
+                    return;
+                }
 
 
-/*-------------------------
-    Add Images
--------------------------*/
-gallery.addEventListener("change", function () {
+                const box =
+                    button.closest(".preview-box");
 
-    const selectedFiles = Array.from(this.files);
+                if (!box) {
+                    return;
+                }
 
-    for (const file of selectedFiles) {
 
-        if (!file.type.startsWith("image/")) {
+                /* =============================================
+                   OLD IMAGE
+                   ============================================= */
 
-            alert(file.name + " is not an image.");
-            continue;
+                const oldImageId =
+                    box.dataset.oldImageId;
 
-        }
 
-        if (filesArray.length >= MAX_IMAGES) {
+                if (oldImageId) {
 
-            alert("Maximum " + MAX_IMAGES + " images.");
-            break;
+                    deleteOldImage(
+                        box,
+                        oldImageId
+                    );
 
-        }
+                    return;
+                }
 
-        // منع التكرار
 
-        const exists = filesArray.some(f =>
-            f.name === file.name &&
-            f.size === file.size &&
-            f.lastModified === file.lastModified
+                /* =============================================
+                   NEW IMAGE
+                   ============================================= */
+
+                const fileIndex =
+                    Number(box.dataset.fileIndex);
+
+
+                if (
+                    Number.isInteger(fileIndex) &&
+                    fileIndex >= 0 &&
+                    fileIndex < filesArray.length
+                ) {
+
+                    filesArray.splice(
+                        fileIndex,
+                        1
+                    );
+
+                    box.remove();
+
+                    updateFileIndexes();
+
+                    updateInputFiles();
+
+                }
+
+            }
         );
 
-        if (exists)
-            continue;
 
-        filesArray.push(file);
+        /* -----------------------------------------------------
+           DELETE OLD DATABASE IMAGE
+        ----------------------------------------------------- */
 
-        createPreview(file);
+        function deleteOldImage(box, imageId) {
 
-    }
+            {% if object and object.pk %}
 
-    updateInputFiles();
-
-    gallery.value = "";
-
-});
+            const deleteUrl =
+                "{% url 'car_image_delete' object.agence.slug object.id 0 %}"
+                .replace("0", imageId);
 
 
-/*-------------------------
-    Delete old image
--------------------------*/
-preview.addEventListener("click", function(e){
+            fetch(deleteUrl, {
 
-    if (!e.target.classList.contains("remove-btn"))
-        return;
+                method: "POST",
 
-    const box = e.target.closest(".preview-box");
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
 
-    const oldId = box.dataset.oldImageId;
+            })
 
-    if (!oldId)
-        return;
+            .then(response => {
 
-   {% if object and object.pk %}
-fetch(
-    "{% url 'car_image_delete' object.agence.slug object.id 0 %}".replace("0", oldId),
-    {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}"
-        }
-    }
-)
-{% endif %}
-    .then(response => {
+                if (!response.ok) {
+                    throw new Error(
+                        "Delete failed"
+                    );
+                }
 
-        if (!response.ok)
-            throw new Error();
+                return response.json()
+                    .catch(() => ({}));
 
-        box.remove();
+            })
 
-    })
-    .catch(() => {
+            .then(() => {
 
-        alert("Error deleting image.");
+                box.remove();
 
-    });
+                updateFileIndexes();
 
-});
+            })
 
+            .catch(error => {
 
-/*-------------------------
-    Submit
--------------------------*/
-form.addEventListener("submit", function () {
+                console.error(
+                    "Delete image error:",
+                    error
+                );
 
-    updateInputFiles();
+                alert(
+                    "Erreur lors de la suppression de l'image."
+                );
 
-    const order = [];
-
-    preview.querySelectorAll(".preview-box").forEach((box, index) => {
-
-        const id = box.dataset.oldImageId;
-
-        if (id) {
-
-            order.push({
-                id: id,
-                order: index
             });
 
+            {% endif %}
+
         }
 
-    });
 
-    document.getElementById("image_order").value =
-        JSON.stringify(order);
+        /* -----------------------------------------------------
+           SORTABLE
+        ----------------------------------------------------- */
+
+        Sortable.create(preview, {
+
+            animation: 180,
+
+            ghostClass: "sortable-ghost",
+
+            chosenClass: "sortable-chosen",
+
+            dragClass: "sortable-drag",
+
+            onEnd: function () {
+
+                const newOrder = [];
+
+
+                /*
+                 * Only NEW images are stored
+                 * in filesArray.
+                 */
+
+                getNewImageBoxes().forEach(box => {
+
+                    const oldIndex =
+                        Number(
+                            box.dataset.fileIndex
+                        );
+
+
+                    if (
+                        Number.isInteger(oldIndex) &&
+                        filesArray[oldIndex]
+                    ) {
+
+                        newOrder.push(
+                            filesArray[oldIndex]
+                        );
+
+                    }
+
+                });
+
+
+                filesArray = newOrder;
+
+
+                updateFileIndexes();
+
+                updateInputFiles();
+
+            }
+
+        });
+
+
+        /* -----------------------------------------------------
+           FORM SUBMIT
+        ----------------------------------------------------- */
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                /*
+                 * Make sure all new images
+                 * are inside input.files.
+                 */
+
+                updateInputFiles();
+
+
+                /*
+                 * Save old image order.
+                 */
+
+                const order = [];
+
+
+                preview
+                    .querySelectorAll(".preview-box")
+                    .forEach((box, index) => {
+
+                        const imageId =
+                            box.dataset.oldImageId;
+
+
+                        if (imageId) {
+
+                            order.push({
+
+                                id: imageId,
+
+                                order: index
+
+                            });
+
+                        }
+
+                    });
+
+
+                if (imageOrderInput) {
+
+                    imageOrderInput.value =
+                        JSON.stringify(order);
+
+                }
+
+
+                console.log(
+                    "Submitting gallery:",
+                    gallery.files.length
+                );
+
+                console.log(
+                    "Image order:",
+                    order
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       PROMOTION
+    ========================================================= */
+
+    if (promoSwitch && promoFields) {
+
+
+        function updatePromotionFields() {
+
+            promoFields.style.display =
+                promoSwitch.checked
+                    ? ""
+                    : "none";
+
+        }
+
+
+        /* Initial state */
+
+        updatePromotionFields();
+
+
+        /* Change */
+
+        promoSwitch.addEventListener(
+            "change",
+            updatePromotionFields
+        );
+
+    }
+
+
+    /* =========================================================
+       VIDEO PREVIEW
+    ========================================================= */
+
+    if (videoInput && uploadVideoBox) {
+
+        videoInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                /* Validate */
+
+                if (!file.type.startsWith("video/")) {
+
+                    alert(
+                        "Veuillez sélectionner une vidéo valide."
+                    );
+
+                    this.value = "";
+
+                    return;
+                }
+
+
+                /* Remove old preview */
+
+                const oldPreview =
+                    document.querySelector(
+                        ".new-video-preview"
+                    );
+
+
+                if (oldPreview) {
+
+                    if (oldPreview.dataset.objectUrl) {
+
+                        URL.revokeObjectURL(
+                            oldPreview.dataset.objectUrl
+                        );
+
+                    }
+
+                    oldPreview.remove();
+
+                }
+
+
+                /* Create object URL */
+
+                const videoUrl =
+                    URL.createObjectURL(file);
+
+
+                /* Create preview */
+
+                const videoPreview =
+                    document.createElement("div");
+
+                videoPreview.className =
+                    "video-preview new-video-preview mt-4";
+
+                videoPreview.dataset.objectUrl =
+                    videoUrl;
+
+
+                videoPreview.innerHTML = `
+
+                    <video
+                        controls
+                        preload="metadata"
+                        class="w-100"
+                    >
+
+                        <source
+                            src="${videoUrl}"
+                            type="${file.type}"
+                        >
+
+                        Votre navigateur ne supporte pas
+                        la lecture vidéo.
+
+                    </video>
+
+
+                    <div class="video-footer">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHtml(file.name)}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                ${(
+                                    file.size /
+                                    1024 /
+                                    1024
+                                ).toFixed(2)} MB
+                            </small>
+
+                        </div>
+
+                    </div>
+                `;
+
+
+                uploadVideoBox.after(
+                    videoPreview
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent = value;
+
+        return div.innerHTML;
+
+    }
 
 });
-
 </script>
-<script>
-    
-/* Show/hide promo fields based on toggle */
-const promoSwitch = document.getElementById('{{ form.est_en_promotion.id_for_label }}');
-const promoFields = document.getElementById('promo-fields');
-if (promoSwitch) {
-    promoSwitch.addEventListener('change', () => {
-        promoFields.style.display = promoSwitch.checked ? '' : 'none';
-    });
-}
-
-const videoInput = document.getElementById("id_video");
-
-if (videoInput) {
-
-    videoInput.addEventListener("change", function () {
-
-        if (!this.files.length) return;
-
-        const file = this.files[0];
-
-        const oldPreview = document.querySelector(".new-video-preview");
-
-        if (oldPreview) oldPreview.remove();
-
-        const url = URL.createObjectURL(file);
-
-        const div = document.createElement("div");
-        div.className = "video-preview new-video-preview mt-4";
-
-        div.innerHTML = `
-            <video controls>
-                <source src="${url}">
-            </video>
-
-            <div class="video-footer">
-                <div>
-                    <strong>${file.name}</strong><br>
-                    <small>${(file.size/1024/1024).toFixed(2)} MB</small>
-                </div>
-            </div>
-        `;
-
-        document.querySelector(".upload-video-box").after(div);
-
-    });
-
-}
-
-
-</script>
-
-
 
 {% endblock %}

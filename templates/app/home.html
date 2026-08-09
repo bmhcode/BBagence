@@ -32,8 +32,13 @@
     <header class="hero-section">
         <div>
             <h1 class="display-4 mb-3">Expérience d'achat de voitures</h1>
-            <p class="lead mb-4">Découvrez les meilleures marques de voitures et des offres exclusives .</p>
-            <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
+            <!-- <p class="lead mb-D">Découvrez les meilleures marques de voitures et des offres exclusives .</p> -->
+            <p class="lead mb-D">
+                Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.
+            </p>
+
+           
+           <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
         </div>
     </header>
 
@@ -42,7 +47,7 @@
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-4">Offres Spéciales</h2>
-            <a href="{% url 'promotion_list' %}" class="text-decoration-none">Voir tout <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'promotion_list' %}" class="text-decoration-none"> Voir toutes les promotions <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="row g-4">
             {% for promo in promotions %}
@@ -59,8 +64,11 @@
 
                         <h1>{{promo.prix_promo}} M</h1>
 
-                        <p class="small text-muted mb-0">Valable du {{promo.date_debut_promo|date:"d F Y"}} au {{ promo.date_fin_promo|date:"d F Y" }}</p>
-                    </div>
+ <i class="far fa-clock me-2"></i>
+                        Valable du  
+                        <strong>{{ promo.date_debut_promo|date:"d M Y" }}</strong>
+                        Jusqu'au
+                        <strong>{{ promo.date_fin_promo|date:"d M Y" }}</strong>                    </div>
 
                     <div class="position-relative">
 

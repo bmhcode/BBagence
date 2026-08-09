@@ -59,8 +59,8 @@ class CarAdmin(admin.ModelAdmin):
 
 @admin.register(Evenement)
 class EvenementAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'date', 'lieu')
-    list_filter = ('date',)
+    list_display = ('titre', 'date_debut', 'date_fin', 'lieu')
+    list_filter = ('date_debut','date_fin')
     search_fields = ('titre', 'description')
     prepopulated_fields = {'slug': ('titre',)}
 
