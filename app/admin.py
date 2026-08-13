@@ -64,13 +64,13 @@ class EvenementAdmin(admin.ModelAdmin):
     search_fields = ('titre', 'description')
     prepopulated_fields = {'slug': ('titre',)}
 
+@admin.register(ArticleBlog)
+class ArticleBlogAdmin(admin.ModelAdmin):
+    list_display = ('titre', 'date_debut_publication', 'date_fin_publication')
+    search_fields = ('titre', 'contenu')
+    prepopulated_fields = {'slug': ('titre',)}
+
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ('nom', 'email', 'sujet', 'cree_le')
     readonly_fields = ('cree_le',)
-
-@admin.register(ArticleBlog)
-class ArticleBlogAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'date_publication')
-    search_fields = ('titre', 'contenu')
-    prepopulated_fields = {'slug': ('titre',)}

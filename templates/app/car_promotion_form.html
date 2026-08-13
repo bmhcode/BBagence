@@ -166,90 +166,13 @@
             </div>
             {% endif %}
 
-            <!-- Informations générales -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-info-circle"></i> Informations générales</div>
-                <div class="row g-3">
 
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Etat *</label>
-                        {{ form.etat }}
-                        {% if form.etat.errors %}<div class="text-danger small">{{ form.etat.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Marque *</label>
-                        {{ form.marque }}
-                        {% if form.marque.errors %}<div class="text-danger small">{{ form.marque.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Modèle *</label>
-                        {{ form.modele }}
-                        {% if form.modele.errors %}<div class="text-danger small">{{ form.modele.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Année *</label>
-                        {{ form.annee }}
-                        {% if form.annee.errors %}<div class="text-danger small">{{ form.annee.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Couleur</label>
-                        {{ form.couleur }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Finition</label>
-                        {{ form.finition }}
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Description</label>
-                        {{ form.description }}
-                    </div>
-                </div>
-            </div>
+       
 
-            <!-- Caractéristiques techniques -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-cogs"></i> Caractéristiques techniques</div>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Carburant</label>
-                        {{ form.energie }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Boîte de vitesses</label>
-                        {{ form.boite_de_vitesse }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Kilométrage (km)</label>
-                        {{ form.kilometrage }}
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">Moteur</label>
-                        {{ form.moteur }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Prix -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-tag"></i> Prix</div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Prix actuel (DA) *</label>
-                        {{ form.nouveau_prix }}
-                        {% if form.nouveau_prix.errors %}<div class="text-danger small">{{ form.nouveau_prix.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Ancien prix (barré)</label>
-                        {{ form.ancien_prix }}
-                    </div>
-                </div>
-            </div>
-            <!-- / Prix -->
-            
             <!-- Promotion -->
             <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-tag"></i>Promotion</div>
-                <div class="row g-3">           
+                <div class="form-section-title"><i class="fas fa-tag"></i> Promotion</div>
+                <div class="row g-3">
                     <div class="col-12">
                         <div class="form-check form-switch">
                             {{ form.est_en_promotion }}
@@ -284,27 +207,9 @@
                     </div>
                 </div>
             </div>
-            <!-- / Prix & Promotion -->
-
-
-
-
-
-            <!-- Statut -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-toggle-on"></i> Statut</div>
-                <div class="d-flex gap-4">
-                    <div class="form-check form-switch">
-                        {{ form.est_disponible }}
-                        <label class="form-check-label" for="{{ form.est_disponible.id_for_label }}">Disponible</label>
-                    </div>
-                    <div class="form-check form-switch">
-                        {{ form.est_en_vedette }}
-                        <label class="form-check-label" for="{{ form.est_en_vedette.id_for_label }}">Mise en vedette</label>
-                    </div>
-                </div>
-            </div>
-
+            <!-- /  Promotion -->
+            
+         
             <!-- ===================== VIDEO CARD ===================== -->
                 <div class="manage-card">
                     <!-- Header -->
@@ -367,46 +272,12 @@
                 </div>
             <!-- =================== END VIDEO CARD =================== -->
 
-            <!-- bmh  Add Galerry images -->
-            <div class="container mt-5" style="max-width:900px;">
-                <div class="card shadow">
-                    <div class="card-header bg-success text-white text-center">
-                        <h4> {{ title }} </h4>
-                    </div>
-                    <div class="card-body">
-                            <div class="row">
-                                <!-- Images -->
-                                <div class="col-12 mb-3">
-                                    <label>Car images</label>
-                                    <input type="file" id="gallery" name="gallery" multiple class="form-control">
-                                    <small class="text-muted">Max 10 images</small>
-
-                                    <div id="preview" class="d-flex flex-wrap mt-3">
-                                        {% for image in object.images.all %}
-                                        <div class="preview-box" data-old-image-id="{{ image.id }}">
-                                            <img src="{{ image.image.url }}">
-                                            <button type="button" class="remove-btn">&times;</button>
-                                            {% if forloop.first %}
-                                                <span class="main-badge">Main</span>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-            </div>
-            <!-- / bmh Add Galerry images -->
-
-            <input type="hidden" name="image_order" id="image_order">
-
             <!-- Buttons -->
             <div class="d-flex gap-3 mt-4">
                 <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
                     <i class="fas fa-save me-2"></i>{% if object %} Enregistrer {% else %} Publier {% endif %}
                 </button>
-                <a href="{% url 'agence_detail' agence.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+                <a href="{% url 'agence_detail' object.agence.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
             </div>
         </form>
     </div>
@@ -416,11 +287,11 @@
             <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-3"><i class="fas fa-building me-2"></i>Agence</h6>
-                    {% if agence.main_image.image.url %}
-                    <img src="{{ agence.main_image.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ agence.nom }}">
+                    {% if object.agence.main_image.image.url %}
+                    <img src="{{ object.agence.main_image.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ object.agence.nom }}">
                     {% endif %}
-                    <h5 class="mb-1">{{ agence.nom }}</h5>
-                    <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ agence.ville }} – {{ agence.commune }}</p>
+                    <h5 class="mb-1">{{ object.agence.nom }}</h5>
+                    <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ object.agence.ville }} – {{ object.agence.commune }}</p>
                 </div>
             </div>
     </div>

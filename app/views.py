@@ -17,8 +17,9 @@ import json
 
 from .models import ( Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
     Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
-from .forms import (ContactForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
-    SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, AgenceForm, AgenceSocialForm)
+from .forms import ( AgenceForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
+    SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, 
+    ArticleBlogForm,  AgenceSocialForm, ContactForm, PromotionForm)
 
 
 # =========================================
@@ -622,6 +623,8 @@ class CarUpdateView(AgenceManagerRequiredMixin, UpdateView):
             car_id=car.pk,
         )
 
+
+
 class CarDeleteView(AgenceManagerRequiredMixin, DeleteView):
     model = Car
     template_name = 'app/car_confirm_delete.html'
@@ -673,6 +676,8 @@ def car_image_set_main(request, agence_slug, car_id, image_id):
     messages.success(request, "Image principale mise à jour.")
     return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
 
+# =========================== Promotion CRUD =============================
+
 class PromotionListView(ListView):
     model = Car
     template_name = 'app/promotion_list.html'
@@ -681,9 +686,6 @@ class PromotionListView(ListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(est_en_promotion=True)
-
-
-# =========================== Promotion CRUD =============================
 
 class CarPromotionView(DetailView):
     model = Car
@@ -694,6 +696,19 @@ class CarPromotionView(DetailView):
         context = super().get_context_data(**kwargs)
         context['car'] = self.object
         return context
+
+class PromotionUpdateView(LoginRequiredMixin, UpdateView):
+    model = Car
+    form_class = PromotionForm
+    template_name = "app/car_promotion_form.html"
+
+    def get_success_url(self):
+        return reverse("car_promotion", kwargs={
+                                                    "agence_slug": self.object.agence.slug,
+                                                    "car_id": self.object.pk,
+        })
+
+ 
 
 # =========================================
 # WISHLIST VIEWS
@@ -780,6 +795,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 # OTHER VIEWS
 # =========================================
 
+# ============ Event Views ============
+
 class EvenementCreateView(CreateView):
     model = Evenement
     template_name = 'app/evenement_form.html'
@@ -791,10 +808,10 @@ class EvenementUpdateView(UpdateView):
     template_name = 'app/evenement_form.html'
     context_object_name = 'evenement'
     form_class = EvenementForm
-
+ 
 class EvenementDeleteView(DeleteView):
     model = Evenement
-    template_name = 'app/evenement_delete.html'
+    template_name = 'app/evenement_confirm_delete.html'
     context_object_name = 'evenement'
     success_url = reverse_lazy('evenement_list')
 
@@ -803,23 +820,64 @@ class EvenementListView(ListView):
     template_name = 'app/evenement_list.html'
     context_object_name = 'evenements'
     ordering = ['-date_debut']
-
+   
 class EvenementDetailView(DetailView):
     model = Evenement
-    template_name = 'app/evenement_detail.html'
-    context_object_name = 'evenement'
-    pk_url_kwarg = 'id'
+    template_name = "app/evenement_detail.html"
+    context_object_name = "evenement"
+
+# ============ / Evenement Views ============  
+
 
 class ArticleBlogListView(ListView):
     model = ArticleBlog
     template_name = 'app/blog_list.html'
     context_object_name = 'articles'
-    ordering = ['-date_publication']
+    ordering = ['-date_debut_publication']
+
+class ArticleBlogCreateView(LoginRequiredMixin, CreateView):
+    model = ArticleBlog
+    template_name = 'app/blog_form.html'
+    context_object_name = 'article'
+    form_class = ArticleBlogForm
+
+    def get_success_url(self):
+        return reverse(
+            'blog_detail',
+            kwargs={'pk': self.object.pk}
+        )
+
+
+
+
+class ArticleBlogUpdateView(UpdateView):
+    model = ArticleBlog
+    template_name = 'app/blog_form.html'
+    context_object_name = 'article'
+    form_class = ArticleBlogForm
+
+class ArticleBlogDeleteView(DeleteView):
+    model = ArticleBlog
+    template_name = 'app/blog_delete.html'
+    context_object_name = 'article'
+    success_url = reverse_lazy('blog_list')
+
+
+
+
 
 class ArticleBlogDetailView(DetailView):
     model = ArticleBlog
     template_name = 'app/blog_detail.html'
     context_object_name = 'article'
+
+
+
+
+
+
+
+
 
 class ContactView(CreateView):
     model = ContactMessage

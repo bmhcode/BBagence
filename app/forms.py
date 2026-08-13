@@ -120,21 +120,10 @@ class CarForm(forms.ModelForm):
             'titre_promo': forms.TextInput(attrs={'class': 'form-control'}),
             'description_promo': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'prix_promo': forms.NumberInput(attrs={'class': 'form-control'}),
-           'date_debut_promo': forms.DateInput(
-    format='%Y-%m-%d',
-    attrs={
-        'class': 'form-control',
-        'type': 'date',
-    }
-),
 
-'date_fin_promo': forms.DateInput(
-    format='%Y-%m-%d',
-    attrs={
-        'class': 'form-control',
-        'type': 'date',
-    }
-),
+            'date_debut_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'date_fin_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+
             'video': forms.ClearableFileInput(attrs={'class': 'form-control','accept': 'video/*',}),
 
             'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -231,7 +220,41 @@ class ContactForm(forms.ModelForm):
 
 # ===================== / Agence forms ====================== 
 
+
+class PromotionForm(forms.ModelForm):
+    # Champs supplémentaires hors-modèle
+       
+    class Meta:
+        model = Car
+        fields = [
+           'est_en_promotion', 'titre_promo', 'description_promo', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'video'
+        ]
+        widgets = {
+            'est_en_promotion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'titre_promo': forms.TextInput(attrs={'class': 'form-control'}),
+            'description_promo': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'prix_promo': forms.NumberInput(attrs={'class': 'form-control'}),
+
+            'date_debut_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'date_fin_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+
+            'video': forms.ClearableFileInput(attrs={'class': 'form-control','accept': 'video/*',}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
+        self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
+
+
+
+
+
+
 # ===================== Events forms ===================== # 
+
 class EvenementForm(forms.ModelForm):
     class Meta:
         model = Evenement
@@ -241,8 +264,30 @@ class EvenementForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'lieu': forms.TextInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            # 'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            # 'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+
+            'date_debut': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'date_fin': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+
+
+
         }
 
-# ===================== / Events forms ======================   
+# ===================== /Events forms ===================== # 
+
+# ===================== Blog forms ===================== # 
+
+class ArticleBlogForm(forms.ModelForm):
+    class Meta:
+        model = ArticleBlog
+        fields = ['titre', 'contenu', 'image', 'date_debut_publication', 'date_fin_publication']
+        widgets = {
+            'titre': forms.TextInput(attrs={'class': 'form-control'}),
+            'contenu': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'date_debut_publication': forms.DateInput(attrs={'class': 'form-control', 'type': 'datetime-local',}),
+            'date_fin_publication': forms.DateInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        }
+
+# ===================== / Blog forms ======================   

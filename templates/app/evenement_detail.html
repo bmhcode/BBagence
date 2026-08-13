@@ -1,39 +1,47 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ evenement.titre }} - Elite Mall{% endblock %}
+{% block title %}{{ object.titre }} - Elite Mall{% endblock %}
 
 {% block content %}
 <div class="row g-5">
     <div class="col-lg-7">
         <div class="mb-2">
-            <h1 class="display-4 font-bold mb-3">{{ evenement.titre }}</h1>
+            <h1 class="display-4 font-bold mb-3">{{ object.titre }}</h1>
             <div class="d-flex align-items-center mb-3">
-                <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm"><i class="far fa-calendar-alt me-2"></i>{{ evenement.date_debut|date:"l d F Y" }}</span> - 
-                <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm"><i class="far fa-calendar-alt me-2"></i>{{ evenement.date_fin|date:"l d F Y" }}</span>
+                <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm"><i class="far fa-calendar-alt me-2"></i>{{ evenement.date_debut|date:"l d F Y" }} - {{ evenement.date_fin|date:"l d F Y" }}</span>
 
-                <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill shadow-sm ms-2"><i class="far fa-clock me-2"></i>{{ evenement.date|date:"H:i" }}</span>
+                <!-- <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill shadow-sm ms-2"><i class="far fa-clock me-2"></i>{{ evenement.date|date:"H:i" }}</span> -->
             </div>
             <div class="d-flex align-items-center text-muted">
                <i class="fas fa-map-marker-alt me-2 text-primary fs-5"></i> <span>Lieu: <strong>{{ evenement.lieu }}</strong></span>
             </div>
-
-
-
         </div>
-        
         <div class="lead text-muted mb-5" style="white-space: pre-line;">
             {{ evenement.description }}
         </div>
-        
         <a href="{% url 'evenement_list' %}" class="btn btn-outline-secondary rounded-pill mb-5"><i class="fas fa-arrow-left me-2"></i>Retour aux événements</a>
     </div>
 
     <div class="col-lg-5">
-        {% if evenement.image %}
+        {% if object.image %}
         <div class="position-sticky" style="top: 100px;">
             <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
-                <img src="{{ evenement.image.url }}" class="img-fluid" alt="{{ evenement.titre }}">
+                <img src="{{ object.image.url }}" class="img-fluid" alt="{{ object.titre }}">
             </div>
+
+            <!-- Edit/Delete buttons for superuser -->
+            {% if request.user.is_superuser %}
+            <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                <a href="{% url 'evenement_update' object.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'evenement_delete' object.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+            {% endif %}
+            <!--  / Edit/Delete buttons for superuser -->
+
             <div class="mt-4 p-4 bg-white shadow-sm rounded-4 text-center">
                 <h5 class="mb-3">Ajouter à mon agenda ?</h5>
                 <div class="d-flex justify-content-center gap-2">

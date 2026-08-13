@@ -490,7 +490,7 @@ class Evenement(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('evenement_detail', kwargs={'id': self.id})
+        return reverse('evenement_detail', kwargs={'pk': self.id})
 
     def eventValide(self):
         return timezone.now().date() >= self.date_debut and timezone.now().date() <= self.date_fin
@@ -500,7 +500,10 @@ class ArticleBlog(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     contenu = models.TextField()
     image = models.ImageField(upload_to='blog/')
-    date_publication = models.DateTimeField(auto_now_add=True)
+
+    date_debut_publication = models.DateTimeField( null=True, blank=True)
+    date_fin_publication = models.DateTimeField(null=True, blank=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Article de Blog"
@@ -511,11 +514,23 @@ class ArticleBlog(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.titre)
+            base_slug = slugify(self.titre)
+            slug = base_slug
+            counter = 1
+
+            while ArticleBlog.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('blog_detail', kwargs={'slug': self.slug})
+        return reverse('blog_detail', kwargs={'pk': self.pk})
+
+    def blogValide(self):
+        return timezone.now().date() >= self.date_debut_publication and timezone.now().date() <= self.date_fin_publication
 
 class ContactMessage(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')

@@ -44,8 +44,6 @@ urlpatterns = [
     path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/delete/', views.car_image_delete, name='car_image_delete'),
     path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/set-main/', views.car_image_set_main, name='car_image_set_main'),
 
-    path('agence/<slug:agence_slug>/car/<int:car_id>/promotion/', views.CarPromotionView.as_view(), name='car_promotion'),
-
 
     # =========================== Agence Media Manage ======================
     path('agence/<slug:agence_slug>/cars/', views.AgenceCarListView.as_view(), name='agence_carlist'),
@@ -59,16 +57,23 @@ urlpatterns = [
 
     # =========================== Events, Promotions, Blog, Contact ========
     path('evenements/create/', views.EvenementCreateView.as_view(), name='evenement_create'),
-    path('evenements/update/<slug:slug>/', views.EvenementUpdateView.as_view(), name='evenement_update'),
-    path('evenements/delete/<slug:slug>/', views.EvenementDeleteView.as_view(), name='evenement_delete'),
-    path('evenement/<int:id>/', views.EvenementDetailView.as_view(), name='evenement_detail'),
+    path('evenements/update/<int:pk>/', views.EvenementUpdateView.as_view(), name='evenement_update'),
+    path('evenements/delete/<int:pk>/', views.EvenementDeleteView.as_view(), name='evenement_delete'),
+    path('evenement/<int:pk>/', views.EvenementDetailView.as_view(), name='evenement_detail'),
     path('evenements/', views.EvenementListView.as_view(), name='evenement_list'),
     
-
     path('promotions/', views.PromotionListView.as_view(), name='promotion_list'),
-    path('blog/', views.ArticleBlogListView.as_view(), name='blog_list'),
+    path('agence/<slug:agence_slug>/car/<int:car_id>/promotion/', views.CarPromotionView.as_view(), name='car_promotion'),
+    path('agence/<slug:agence_slug>/promotion/<int:pk>/update/', views.PromotionUpdateView.as_view(), name='promotion_update'),
 
-    path('blog/<slug:slug>/', views.ArticleBlogDetailView.as_view(), name='blog_detail'),
+
+
+
+    path('blog/', views.ArticleBlogListView.as_view(), name='blog_list'),
+    path('blog/create/', views.ArticleBlogCreateView.as_view(), name='blog_create'),
+    path('blog/<int:pk>/update/', views.ArticleBlogUpdateView.as_view(), name='blog_update'),
+    path('blog/<int:pk>/delete/', views.ArticleBlogDeleteView.as_view(), name='blog_delete'),
+    path('blog/<int:pk>/', views.ArticleBlogDetailView.as_view(), name='blog_detail'),
 
     path('contact/', views.ContactView.as_view(), name='contact'),
 ]
