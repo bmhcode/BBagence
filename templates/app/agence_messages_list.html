@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages Reçus – BBcars{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    .message-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,.05) !important;
+        border-color: #0d6efd;
+    }
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .message-meta {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ agence.get_absolute_url }}" class="text-decoration-none">{{ agence.nom }}</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">Messages Reçus</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-dark">
+            <i class="fas fa-envelope-open-text text-primary me-2"></i> Messages Reçus
+        </h2>
+        {% if page_obj.paginator.count %}
+        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">
+            {{ page_obj.paginator.count }} message{{ page_obj.paginator.count|pluralize }}
+        </span>
+        {% endif %}
+    </div>
+
+    {% if object_list %}
+        <div class="row g-4">
+            {% for msg in object_list %}
+            <div class="col-12">
+                <div class="card message-card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column flex-md-row gap-3">
+                            <!-- Avatar -->
+                            <div class="flex-shrink-0">
+                                <div class="avatar-circle shadow-sm">
+                                    {{ msg.nom|first|upper }}
+                                </div>
+                            </div>
+                            
+                            <!-- Message Content -->
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                    <div>
+                                        <h5 class="fw-bold mb-1 text-dark">{{ msg.sujet }}</h5>
+                                        <div class="message-meta">
+                                            <i class="fas fa-user me-1"></i> {{ msg.nom }} &bull; 
+                                            <i class="fas fa-envelope me-1"></i> <a href="mailto:{{ msg.email }}" class="text-decoration-none">{{ msg.email }}</a>
+                                        </div>
+                                    </div>
+                                    <div class="text-md-end message-meta">
+                                        <span class="badge bg-light text-dark border"><i class="far fa-clock me-1"></i> {{ msg.cree_le|date:"d M Y, H:i" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <hr class="text-muted opacity-25 my-3">
+                                
+                                <div class="text-secondary" style="white-space: pre-line;">
+                                    {{ msg.message }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 text-end pb-3 pe-4">
+                        <a href="mailto:{{ msg.email }}?subject=RE: {{ msg.sujet|urlencode }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <i class="fas fa-reply me-1"></i> Répondre
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-5" aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link shadow-sm rounded-start-pill px-3" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded-start-pill px-3">Précédent</span>
+                </li>
+                {% endif %}
+
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="page-item active"><span class="page-link shadow-sm">{{ i }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link shadow-sm" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link shadow-sm rounded-end-pill px-3" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded-end-pill px-3">Suivant</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="card shadow-sm border-0 rounded-4 py-5 text-center">
+            <div class="card-body">
+                <div class="display-1 text-muted mb-4 opacity-50">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Aucun message</h3>
+                <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+                    Vous n'avez pas encore reçu de messages de contact. Les messages envoyés depuis le formulaire de contact de votre agence apparaîtront ici.
+                </p>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -32,6 +32,7 @@ urlpatterns = [
     path('agence/<slug:agence_slug>/', views.AgenceDetailView.as_view(), name='agence_detail'),
     path('agence/<slug:agence_slug>/edit/', views.AgenceUpdateView.as_view(), name='agence_update'),
     path('agence/<slug:agence_slug>/delete/', views.AgenceDeleteView.as_view(), name='agence_delete'),
+    path('agence/<slug:agence_slug>/messages/', views.AgenceMessagesListView.as_view(), name='agence_messages'),
 
     # =========================== Cars CRUD ================================
     path('cars/', views.CarListView.as_view(), name='car_list'),

@@ -897,3 +897,22 @@ class ContactView(CreateView):
     def form_valid(self, form):
         messages.success(self.request, "Votre message a été envoyé avec succès !")
         return super().form_valid(form)
+
+# =========================================
+# AGENCE MESSAGES LIST
+# =========================================
+class AgenceMessagesListView(AgenceManagerRequiredMixin, ListView):
+    model = ContactMessage
+    template_name = 'app/agence_messages_list.html'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        agence_slug = self.kwargs.get('agence_slug')
+        agence = get_object_or_404(Agence, slug=agence_slug)
+        return ContactMessage.objects.filter(agence=agence).order_by('-cree_le')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agence_slug = self.kwargs.get('agence_slug')
+        context['agence'] = get_object_or_404(Agence, slug=agence_slug)
+        return context

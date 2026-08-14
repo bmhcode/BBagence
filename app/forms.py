@@ -77,6 +77,19 @@ class ProfileForm(forms.ModelForm):
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 # ===================== Car forms ====================== 
 
 class CarForm(forms.ModelForm):
@@ -86,7 +99,7 @@ class CarForm(forms.ModelForm):
         label="Image principale (remplace la première)",
         widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
     )
-    gallery = forms.FileField(
+    gallery = MultipleFileField(
         required=False,
         label="Galerie d'images",
         widget=MultipleFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
