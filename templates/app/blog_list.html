@@ -3,25 +3,48 @@
 {% block title %}Blog Elite - Elite Mall{% endblock %}
 
 {% block content %}
+
 <div class="row mb-5">
     <div class="col-12 text-center">
-        <h1 class="display-4 mb-3">Actualités & Inspiration</h1>
+        <h1 class="display-5 mb-3">Actualités & Inspiration</h1>
         <p class="lead text-muted mx-auto col-md-6">Restez à l'affût des dernières tendances mode, lifestyle et événements exclusifs.</p>
+        {% if request.user.is_superuser %}
+            <a href="{% url 'blog_create' %}" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-plus"></i> Ajouter un blog
+            </a>
+        {% endif %}
     </div>
 </div>
 
+
+
+
 <div class="row g-5">
-    {% for article in articles %}
+    {% for object in articles %}
     <div class="col-md-6 col-lg-4">
         <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-            {% if article.image %}
-            <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.titre }}" style="height: 250px; object-fit: cover;">
+            {% if object.image %}
+            <img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.titre }}" style="height: 250px; object-fit: cover;">
+            
+             <!-- Edit/Delete buttons for superuser -->
+            {% if request.user.is_superuser %}
+            <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                <a href="{% url 'blog_update' object.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'blog_delete' object.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+            {% endif %}
+            
+            <!--  / Edit/Delete buttons for superuser -->
             {% endif %}
             <div class="card-body p-4">
-                <p class="small text-primary mb-2 fw-bold text-uppercase">{{ article.date_publication|date:"d M Y" }}</p>
-                <h4 class="card-title mb-3 h5">{{ article.titre }}</h4>
-                <p class="card-text text-muted mb-4">{{ article.contenu|truncatewords:20 }}</p>
-                <a href="{{ article.get_absolute_url }}" class="btn btn-link p-0 text-decoration-none fw-bold">Lire la suite <i class="fas fa-arrow-right ms-1"></i></a>
+                <p class="small text-primary mb-2 fw-bold text-uppercase">{{ object.date_publication|date:"d M Y" }}</p>
+                <h4 class="card-title mb-3 h5">{{ object.titre }}</h4>
+                <p class="card-text text-muted mb-4">{{ object.contenu|truncatewords:20 }}</p>
+                <a href="{{ object.get_absolute_url }}" class="btn btn-link p-0 text-decoration-none fw-bold">Lire la suite <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
         </article>
     </div>

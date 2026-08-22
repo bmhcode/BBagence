@@ -321,6 +321,7 @@
                         </div>
                     </div>
 
+                    <div id="promo-fields" class="row g-3 col-12" {% if not form.instance.est_en_promotion %}style="display:none"{% endif %}>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Titre de promotion</label>
                         {{ form.titre_promo }}
@@ -330,7 +331,6 @@
                         {{ form.description_promo }}
                     </div>
 
-                    <div id="promo-fields" class="row g-3 col-12" {% if not form.instance.est_en_promotion %}style="display:none"{% endif %}>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Prix promo (DA)</label>
                             {{ form.prix_promo }}

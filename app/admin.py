@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Agence, Car, CarImages, Evenement, ContactMessage, ArticleBlog
+from .models import Profile, Agence, Car, CarImages, Brand, Evenement, ContactMessage, ArticleBlog
 from django.utils.html import format_html
 from django.contrib.auth.models import User
 
@@ -9,16 +9,12 @@ class ProfileAdmin(admin.ModelAdmin):
     can_delete = False
     verbose_name_plural = 'Profile'
 
-
-
-
 @admin.register(Agence)
 class AgenceAdmin(admin.ModelAdmin):
     list_display = ('nom', 'manager','ville','est_en_vedette')
     list_filter = ('manager','ville','est_en_vedette')
     search_fields = ('nom', 'description')
     prepopulated_fields = {'slug': ('nom',)}
-
 
 class CarImageInline(admin.TabularInline):
     model = CarImages
@@ -63,6 +59,13 @@ class EvenementAdmin(admin.ModelAdmin):
     list_filter = ('date_debut','date_fin')
     search_fields = ('titre', 'description')
     prepopulated_fields = {'slug': ('titre',)}
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ('nom','image', 'date_debut', 'date_fin')
+    search_fields = ('nom',)
+    prepopulated_fields = {'slug': ('nom',)}
+
 
 @admin.register(ArticleBlog)
 class ArticleBlogAdmin(admin.ModelAdmin):

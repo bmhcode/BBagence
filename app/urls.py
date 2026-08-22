@@ -77,4 +77,16 @@ urlpatterns = [
     path('blog/<int:pk>/', views.ArticleBlogDetailView.as_view(), name='blog_detail'),
 
     path('contact/', views.ContactView.as_view(), name='contact'),
+
+    path('agence/<slug:agence_slug>/message/<int:msg_id>/delete/', views.MessageDeleteView.as_view(), name='message_delete'),
+
+
+
+
+
 ]
+
+
+
+
+

@@ -328,6 +328,8 @@
                 <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
                     Contacter la boutique {{ car.agence.telephone }}
                 </a>
+
+             
             </div>
         </div>
     </div>
@@ -364,6 +366,37 @@
                         {% endif %}
                     </div>
                     {% endfor %}
+        </div>
+    {% endif %}
+
+
+ <!-- Video Tours Section -->
+    {% if car.video %}   
+        <div class="text-center mt-5 mb-5">
+            <h3 class="display-6 fw-bold mb-2">
+                Visite video
+            </h3>
+            <p class="text-muted mb-0">
+                Découvrez <strong>{{ car.marque }} {{ car.modele }} {{car.annee}}</strong> à travers nos présentations vidéo
+            </p>
+            <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+                <div class="video-card">
+                    <div class="video-container">
+                        <video controls>
+                            <source src="{{ car.video.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                    </div>
+                    <div class="video-body">
+                        <h4>
+                            <i class="fas fa-video"></i>
+                            {{ car.legende|default:"Présentation générale" }}
+                        </h4>
+                    </div>
+                </div>
         </div>
     {% endif %}
 
@@ -518,6 +551,107 @@
     </div>
 
 </div>
+
+
+
+<!-- Custom Styles for Premium Experience -->
+<style>    
+
+    /* Video cards styling */
+    .video-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .video-container {
+        position: relative;
+        padding-top: 56.25%;
+        background: #000;
+    }
+
+    .video-container video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    .video-body {
+        padding: 20px 24px;
+    }
+
+    .video-body h4 {
+        margin: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .video-body h4 i {
+        color: var(--color-pink);
+    }
+
+    
+    /* Pulse indicator animations */
+    .pulse-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .pulse-indicator.green {
+        background: #22c55e;
+    }
+    
+    .pulse-indicator.green::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+    
+    .pulse-indicator.red {
+        background: #ef4444;
+    }
+    
+    .pulse-indicator.red::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.4);
+        animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.7); opacity: 1; }
+        100% { transform: scale(1.6); opacity: 0; }
+    }
+</style>
+
+
+
+
+
+
 
 
 <script>

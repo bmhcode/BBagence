@@ -16,7 +16,7 @@ from django.utils import timezone
 import json
 
 from .models import ( Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
-    Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
+    Brand, Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
 from .forms import ( AgenceForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
     SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, 
     ArticleBlogForm,  AgenceSocialForm, ContactForm, PromotionForm)
@@ -32,6 +32,10 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
         context['evenements_prochains'] = Evenement.objects.all().order_by('date_debut')[:3]
+        context['articles_recent'] = ArticleBlog.objects.all().order_by('date_debut_publication')[:3]
+        context['brands'] = Brand.objects.all().order_by('date_debut')[:3]
+
+
         # Active car promotions
         context['promotions'] = Car.objects.filter(
             est_en_promotion=True,
@@ -858,7 +862,7 @@ class ArticleBlogUpdateView(UpdateView):
 
 class ArticleBlogDeleteView(DeleteView):
     model = ArticleBlog
-    template_name = 'app/blog_delete.html'
+    template_name = 'app/blog_confirm_delete.html'
     context_object_name = 'article'
     success_url = reverse_lazy('blog_list')
 
@@ -871,33 +875,38 @@ class ArticleBlogDetailView(DetailView):
     template_name = 'app/blog_detail.html'
     context_object_name = 'article'
 
-
-
-
-
-
-
-
-
 class ContactView(CreateView):
     model = ContactMessage
     form_class = ContactForm
     template_name = 'app/contact.html'
     success_url = reverse_lazy('contact')
 
-    def get_initial(self):
-        initial = super().get_initial()
+    def get_agence(self):
         agence_name = self.request.GET.get('agence')
         if agence_name:
-            agence = Agence.objects.filter(nom__iexact=agence_name).first()
-            if agence:
-                initial['agence'] = agence.id
+            return Agence.objects.filter(nom__iexact=agence_name).first()
+        return None
+
+    def get_initial(self):
+        initial = super().get_initial()
+        agence = self.get_agence()
+
+        if agence:
+            initial['agence'] = agence.id
+
         return initial
 
-    def form_valid(self, form):
-        messages.success(self.request, "Votre message a été envoyé avec succès !")
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['agence'] = self.get_agence()
+        return context
 
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "Votre message a été envoyé avec succès !"
+        )
+        return super().form_valid(form)
 # =========================================
 # AGENCE MESSAGES LIST
 # =========================================
@@ -909,10 +918,34 @@ class AgenceMessagesListView(AgenceManagerRequiredMixin, ListView):
     def get_queryset(self):
         agence_slug = self.kwargs.get('agence_slug')
         agence = get_object_or_404(Agence, slug=agence_slug)
-        return ContactMessage.objects.filter(agence=agence).order_by('-cree_le')
-
+        return ContactMessage.objects.filter(
+            Q(agence=agence) | Q(agence__isnull=True)
+        ).order_by('-cree_le')
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         agence_slug = self.kwargs.get('agence_slug')
         context['agence'] = get_object_or_404(Agence, slug=agence_slug)
         return context
+
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    model = ContactMessage
+    template_name = "app/message_confirm_delete.html"
+
+    def get_object(self, queryset=None):
+        agence_slug = self.kwargs["agence_slug"]
+        msg_id = self.kwargs["msg_id"]
+
+        return get_object_or_404(
+            ContactMessage,
+            pk=msg_id,
+            agence__slug=agence_slug
+        )
+
+    def get_success_url(self):
+        return reverse(
+            "agence_messages",
+            kwargs={
+                "agence_slug": self.kwargs["agence_slug"]
+            }
+        )

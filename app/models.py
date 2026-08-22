@@ -465,6 +465,59 @@ class Wishlist(models.Model):
 #============== / Wishlist ==============
 
 # ============== Event Blog Message ==============
+
+class Brand(models.Model):
+    nom = models.CharField(max_length=128, unique=True, verbose_name=_("Name of brand"), db_index=True)
+    slug = models.SlugField(max_length=160,unique=True,blank=True)
+
+    date_debut = models.DateField(null=True, blank=True)
+    date_fin = models.DateField(null=True, blank=True)
+        
+    image = models.ImageField(upload_to="brands/", blank=True, null=True)
+    # image = CloudinaryField("image",blank=True,null=True)
+
+    cree_le = models.DateTimeField(auto_now_add=True)
+    modifié_le = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Brand")
+        verbose_name_plural = _("Brands")
+        ordering = ["-date_debut"]
+
+    def __str__(self):
+        return self.nom
+
+    # 🔹 slug auto-generate (clean + safe)
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.nom)
+
+            # prevent duplicates
+            slug = base_slug
+            while Brand.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
+
+    # 🔹 safe image URL
+    @property
+    def imageURL(self):
+        if self.image:
+            return self.image.url
+        return ""
+
+    # 🔹 check if brand is currently active (based on date)
+    @property
+    def is_current(self):
+        now = timezone.now()
+        if self.date_fin:
+            return self.date_debut <= now <= self.date_fin
+        return self.date_debut <= now
+
+
+
 class Evenement(models.Model):
     titre = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
@@ -501,8 +554,11 @@ class ArticleBlog(models.Model):
     contenu = models.TextField()
     image = models.ImageField(upload_to='blog/')
 
-    date_debut_publication = models.DateTimeField( null=True, blank=True)
-    date_fin_publication = models.DateTimeField(null=True, blank=True)
+     
+    date_debut_publication = models.DateField(null=True, blank=True)
+    date_fin_publication = models.DateField(null=True, blank=True)
+
+     
     cree_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -533,15 +589,40 @@ class ArticleBlog(models.Model):
         return timezone.now().date() >= self.date_debut_publication and timezone.now().date() <= self.date_fin_publication
 
 class ContactMessage(models.Model):
-    agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')
+    class Status(models.TextChoices):
+        NEW = "Nouveau"
+        READ = "Lu"
+        REPLIED = "Répondu"
+        ARCHIVED = "Archivé"
+
+    class Priority(models.TextChoices):
+        LOW = "Faible"
+        NORMAL = "Normale"
+        HIGH = "Élevée"
+
+    agence = models.ForeignKey(Agence, on_delete=models.SET_NULL, null=True, blank=True, related_name="contact_messages")
+
     nom = models.CharField(max_length=100)
+    telephone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField()
     sujet = models.CharField(max_length=200)
     message = models.TextField()
-    cree_le = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW, db_index=True)
+    priority = models.CharField(max_length=10, choices=Priority.choices, default=Priority.NORMAL, db_index=True)
+
+    lu_le = models.DateTimeField(null=True, blank=True)
+    repondu_le = models.DateTimeField(null=True, blank=True)
+
+    cree_le = models.DateTimeField(auto_now_add=True, db_index=True)
+    modifie_le = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-cree_le"]
+        verbose_name = "Message de contact"
+        verbose_name_plural = "Messages de contact"
 
     def __str__(self):
-        return f"Message de {self.nom} - {self.sujet}"
+        return f"{self.nom} - {self.sujet}"
 
 #============== / Event Blog Message ==============
 

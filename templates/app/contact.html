@@ -5,16 +5,16 @@
 {% block content %}
 <div class="row g-5 align-items-center">
     <div class="col-lg-6">
-        <h1 class="display-4 font-bold mb-4">Contactez l'Élite</h1>
+        <h1 class="display-5 font-bold mb-4">{% if agence %} Contactez {{ agence.nom }}{% else %}Contactez toutes les agences{% endif %}</h1>
         <p class="lead text-muted mb-5">Nous sommes là pour répondre à vos questions, vos suggestions ou vos besoins d'assistance. Notre équipe est disponible 7j/7 pour vous accompagner dans votre expérience shopping.</p>
-        
+        {% if agence %}
         <div class="mb-4 d-flex align-items-center">
             <div class="bg-primary rounded-circle p-3 text-white me-4">
                 <i class="fas fa-phone-alt fa-2x"></i>
             </div>
             <div>
                 <h5 class="mb-1">Téléphone</h5>
-                <p class="text-muted mb-0">+33 1 23 45 67 89</p>
+                <p class="text-muted mb-0">{{ agence.telephone }}</p>
             </div>
         </div>
         
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <h5 class="mb-1">E-mail</h5>
-                <p class="text-muted mb-0">contact@elitemall.com</p>
+                <p class="text-muted mb-0">{{ agence.email }}</p>
             </div>
         </div>
         
@@ -34,14 +34,16 @@
             </div>
             <div>
                 <h5 class="mb-1">Horaires</h5>
-                <p class="text-muted mb-0">Lundi - Dimanche: 10h00 - 20h00</p>
+                <p class="text-muted mb-0">{{ agence.heure_ouverture }} - {{ agence.heure_fermeture }}</p>
             </div>
         </div>
+        {% endif %}
+
     </div>
 
     <div class="col-lg-6">
         <div class="card border-0 shadow-lg p-5 rounded-4 bg-white">
-            <h3 class="mb-4">Envoyez un message</h3>
+            <h3 class="mb-4">{% if agence %} Envoyez un message à {{ agence.nom }} {% else %}Envoyez un message à toutes les agences{% endif %}</h3>
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}

@@ -173,3 +173,141 @@
     </div>
 </form>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const villeNames = [
+        'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa',
+        'Biskra', 'Béchar', 'Blida', 'Bouira', 'Tamanrasset', 'Tébessa',
+        'Tlemcen', 'Tiaret', 'Tizi Ouzou', 'Alger', 'Djelfa', 'Jijel',
+        'Sétif', 'Saïda', 'Skikda', 'Sidi Bel Abbès', 'Annaba', 'Guelma',
+        'Constantine', 'Médéa', 'Mostaganem', "M'Sila", 'Mascara', 'Ouargla',
+        'Oran', 'El Bayadh', 'Illizi', 'Bordj Bou Arreridj', 'Boumerdès',
+        'El Tarf', 'Tindouf', 'Tissemsilt', 'El Oued', 'Khenchela',
+        'Souk Ahras', 'Tipaza', 'Mila', 'Aïn Defla', 'Naâma',
+        'Aïn Témouchent', 'Ghardaïa', 'Relizane', 'Timimoun',
+        'Bordj Badji Mokhtar', 'Ouled Djellal', 'Béni Abbès', 'In Salah',
+        'In Guezzam', 'Touggourt', 'Djanet', "El M'Ghair", 'El Meniaa'
+    ];
+
+    const villeSelect = document.getElementById(
+        '{{ form.ville.id_for_label }}'
+    );
+
+    const communeSelect = document.getElementById(
+        '{{ form.commune.id_for_label }}'
+    );
+
+    // Commune déjà enregistrée en mode modification
+    const currentCommune = "{{ form.instance.commune|default:''|escapejs }}";
+
+    let regionsData = [];
+
+    if (!villeSelect || !communeSelect) {
+        console.error("Ville ou commune introuvable");
+        return;
+    }
+
+    // Charger le fichier JSON
+    fetch("{% static 'js/algeria_communes.json' %}")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(
+                    "Impossible de charger algeria_communes.json"
+                );
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            regionsData = data;
+
+            console.log("Communes chargées :", regionsData);
+
+            // En mode modification
+            if (villeSelect.value) {
+                updateRegions(
+                    villeSelect.value,
+                    currentCommune
+                );
+            }
+        })
+        .catch(error => {
+            console.error("Erreur chargement communes :", error);
+        });
+
+
+    // Lorsque la wilaya change
+    villeSelect.addEventListener("change", function () {
+
+        updateRegions(
+            this.value,
+            null
+        );
+
+    });
+
+
+    function updateRegions(selectedVille, preselectedCommune) {
+
+        // Réinitialiser les communes
+        communeSelect.innerHTML =
+            '<option value="">---------</option>';
+
+        if (!selectedVille) {
+            return;
+        }
+
+        // Trouver l'ID de la wilaya
+        const villeIndex = villeNames.indexOf(selectedVille);
+
+        if (villeIndex === -1) {
+            console.error(
+                "Wilaya introuvable :",
+                selectedVille
+            );
+            return;
+        }
+
+        const villeId = (villeIndex + 1).toString();
+
+        console.log("Wilaya :", selectedVille);
+        console.log("Wilaya ID :", villeId);
+
+        // Filtrer les communes
+        const filteredCommunes = regionsData.filter(
+            commune => String(commune.wilaya_id) === villeId
+        );
+
+        console.log(
+            "Communes trouvées :",
+            filteredCommunes
+        );
+
+        // Ajouter les communes
+        filteredCommunes.forEach(commune => {
+
+            const option = document.createElement("option");
+
+            option.value = commune.name;
+            option.textContent = commune.name;
+
+            // Sélectionner la commune existante en modification
+            if (
+                preselectedCommune &&
+                preselectedCommune === commune.name
+            ) {
+                option.selected = true;
+            }
+
+            communeSelect.appendChild(option);
+        });
+
+    }
+
+});
+</script>
+{% endblock extra_js %}

@@ -1,0 +1,21 @@
+ <!-- Créer un événement -->
+    <a href="{% url 'evenement_create' %}" class="btn btn-success btn-sm rounded-pill">
+        <i class="fas fa-plus me-1"></i>Créer un événement
+    </a>
+
+    <!-- Créer un blog -->
+    <a href="{% url 'blog_create' %}" class="btn btn-success btn-sm rounded-pill">
+        <i class="fas fa-plus me-1"></i>Créer un blog
+    </a>
+
+    <!-- Créer une voiture -->
+    <a href="" class="btn btn-sm btn-primary rounded-pill" title="Ajouter voiture">
+        <i class="fas fa-plus me-1"></i>Ajouter une voiture
+    </a>
+
+
+      {% if request.user.is_superuser %}
+            <a href="{% url 'evenement_create' %}" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-plus"></i> Ajouter un événement
+            </a>
+        {% endif %}

@@ -40,7 +40,6 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Accueil</a></li>
             <li class="breadcrumb-item"><a href="{{ agence.get_absolute_url }}" class="text-decoration-none">{{ agence.nom }}</a></li>
-            
             <li class="breadcrumb-item active" aria-current="page">Messages Reçus</li>
         </ol>
     </nav>
@@ -83,6 +82,11 @@
                                     <div class="text-md-end message-meta">
                                         <span class="badge bg-light text-dark border"><i class="far fa-clock me-1"></i> {{ msg.cree_le|date:"d M Y, H:i" }}</span>
                                     </div>
+
+
+
+
+
                                 </div>
                                 
                                 <hr class="text-muted opacity-25 my-3">
@@ -97,6 +101,15 @@
                         <a href="mailto:{{ msg.email }}?subject=RE: {{ msg.sujet|urlencode }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                             <i class="fas fa-reply me-1"></i> Répondre
                         </a>
+
+                        <!-- Edit/Delete buttons for superuser -->
+                                 {% if request.user.is_superuser and msg.agence %}
+                        <a href="{% url 'message_delete' msg.agence.slug msg.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                            <i class="fas fa-trash me-1"></i> Supprimer
+                        </a>
+                        
+                     {% endif %}
+                                 <!--  / Edit/Del -->
                     </div>
                 </div>
             </div>

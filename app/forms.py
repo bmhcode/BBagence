@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, Evenement, ArticleBlog, ContactMessage, Profile, ALGERIA_CITIES
+from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, Brand, Evenement, ArticleBlog, ContactMessage, Profile, ALGERIA_CITIES
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Adresse e-mail")
@@ -168,7 +168,7 @@ class AgenceForm(forms.ModelForm):
             'site_web': forms.URLInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'ville': forms.Select(attrs={'class': 'form-select'}),
-            'commune': forms.TextInput(attrs={'class': 'form-control'}),
+            'commune': forms.Select(attrs={'class': 'form-select'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'google_map': forms.URLInput(attrs={'class': 'form-control'}),
             'heure_ouverture': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
@@ -222,16 +222,28 @@ class AgenceVideoForm(forms.ModelForm):
 class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
-        fields = ['nom', 'email', 'sujet', 'message', 'agence']
+        fields = ['nom', 'telephone','email', 'sujet', 'message', 'agence']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre nom'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre téléphone'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Votre email'}),
             'sujet': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sujet'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre message', 'rows': 5}),
-            'agence': forms.Select(attrs={'class': 'form-select'}),
+            'agence': forms.HiddenInput(),
         }
 
 # ===================== / Agence forms ====================== 
+
+class BrandForm(forms.ModelForm):
+    class Meta:
+        model = Brand
+        fields = ['nom', 'date_debut', 'date_fin', 'image']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nom de la marque'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-file'}),
+            'date_debut': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
+            'date_fin': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
+        }
 
 
 class PromotionForm(forms.ModelForm):
@@ -299,8 +311,8 @@ class ArticleBlogForm(forms.ModelForm):
             'titre': forms.TextInput(attrs={'class': 'form-control'}),
             'contenu': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'date_debut_publication': forms.DateInput(attrs={'class': 'form-control', 'type': 'datetime-local',}),
-            'date_fin_publication': forms.DateInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'date_debut_publication': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'date_fin_publication': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
         }
 
 # ===================== / Blog forms ======================   

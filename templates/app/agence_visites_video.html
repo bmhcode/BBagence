@@ -5,9 +5,6 @@
 
 {% block content %}
 
-
-
-
 <!-- Page Hero -->
 <section class="" style="padding: 10px 0 10px; ">
    
@@ -67,50 +64,7 @@
 
 
 <!-- Custom Styles for Premium Experience -->
-<style>
-    .layout-map-img:hover {
-        transform: scale(1.02);
-    }
-    
-    /* Layout styling for Google Map + Coordinates */
-    .map-info-container {
-        display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 0;
-        background: #fff;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--color-border);
-    }
-
-    .info-card-wrapper {
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 24px;
-        order: 2;
-    }
-
-    .map-card-wrapper {
-        height: 450px;
-        background: #e2e8f0;
-        order: 1;
-    }
-
-    @media (max-width: 991px) {
-        .map-info-container {
-            grid-template-columns: 1fr;
-        }
-        .map-card-wrapper {
-            height: 380px;
-            order: 1;
-        }
-        .info-card-wrapper {
-            order: 2;
-        }
-    }
+<style>    
 
     /* Video cards styling */
     .video-card {
@@ -160,58 +114,7 @@
         color: var(--color-pink);
     }
 
-    /* Gallery cards styling */
-    .gallery-card {
-        position: relative;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--color-border);
-        aspect-ratio: 4/3;
-        cursor: pointer;
-        background: #f9f9f9;
-    }
-
-    .gallery-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform var(--transition-slow);
-    }
-
-    .gallery-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(26,26,46,0.9) 0%, transparent 70%);
-        display: flex;
-        align-items: flex-end;
-        padding: 24px;
-        opacity: 0;
-        transition: opacity var(--transition);
-    }
-
-    .gallery-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .gallery-card:hover .gallery-overlay {
-        opacity: 1;
-    }
-
-    .gallery-overlay p {
-        color: #fff;
-        font-weight: 600;
-        font-size: 0.95rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .gallery-overlay p i {
-        color: var(--color-accent);
-    }
-
+    
     /* Pulse indicator animations */
     .pulse-indicator {
         display: inline-block;

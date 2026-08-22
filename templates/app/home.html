@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} Accueil - BBcars {% endblock %}
+{% block title %} Accueil - BBcar {% endblock %}
 
 {% block extra_css %}
 <style>
@@ -92,7 +92,7 @@
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>agences à la Une</h2>
-            <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir tout <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir toutes les agences <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="row g-4">
             {% for agence in agences_vedette %}
@@ -128,6 +128,54 @@
         </div>
     </section>
 
+
+<!-- ═══════════════════════════════════════
+     4.5 NOS MARQUES / BRANDS  
+═══════════════════════════════════════ -->
+<section class="mb-5">
+        <h2 class="mb-4">Brands</h2>
+        <div class="row g-4">
+            {% for brand in brands %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            {% if brand.image %}
+                            <img src="{{ brand.image.url }}" class="img-fluid rounded-start h-100" alt="{{ evenement.titre }}" style="object-fit: cover;">
+                            {% else %}
+                            <div class="h-100 bg-secondary rounded-start d-flex align-items-center justify-content-center text-white">
+                                <i class="fas fa-calendar-star fa-2x"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h6 class="card-title mb-1">{{ brand.nom }}</h6>
+                                <p class="small text-danger mb-1"><i class="far fa-calendar-alt me-1"></i> 
+                                    <!-- {{ evenement.date_debut|date:"d F" }} -->
+                                 {{ evenement.date_debut|date:"d M Y" }} -  {{ evenement.date_fin|date:"d M Y" }}
+                                </p>
+                                <p class="card-text small text-muted">{{ evenement.lieu }}</p>
+                                <a href="{{ evenement.get_absolute_url }}" class="btn btn-link btn-sm p-0 text-decoration-none">Détails <i class="fas fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">
+                <p>Aucun brand prévu pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+
+
+
+ 
+
     <!-- Événements à venir -->
     <section class="mb-5">
         <h2 class="mb-4">Événements Prochains</h2>
@@ -152,13 +200,6 @@
                                     <!-- {{ evenement.date_debut|date:"d F" }} -->
                                  {{ evenement.date_debut|date:"d M Y" }} -  {{ evenement.date_fin|date:"d M Y" }}
                                 </p>
-                                
-                                    
-
-                                
-                                
-                                
-                                
                                 <p class="card-text small text-muted">{{ evenement.lieu }}</p>
                                 <a href="{{ evenement.get_absolute_url }}" class="btn btn-link btn-sm p-0 text-decoration-none">Détails <i class="fas fa-angle-right"></i></a>
                             </div>
@@ -173,6 +214,54 @@
             {% endfor %}
         </div>
     </section>
+
+     <!-- Blog & articles -->
+    <section class="mb-5">
+        <h2 class="mb-4">Blog & articles</h2>
+        <div class="row g-4">
+            {% for object in articles_recent %}
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    {% if object.image %}
+                    <img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.titre }}" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                    <!-- Edit/Delete buttons for superuser -->
+                    {% if request.user.is_superuser %}
+                    <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                        <a href="{% url 'blog_update' object.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                            <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'blog_delete' object.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!--  / Edit/Delete buttons for superuser -->
+                
+                <div class="card-body p-4">
+                    <p class="small text-primary mb-2 fw-bold text-uppercase">{{ object.date_publication|date:"d M Y" }}</p>
+                    <h4 class="card-title mb-3 h5">{{ object.titre }}</h4>
+                    <p class="card-text text-muted mb-4">{{ object.contenu|truncatewords:20 }}</p>
+                    <a href="{{ object.get_absolute_url }}" class="btn btn-link p-0 text-decoration-none fw-bold">Lire la suite <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </article>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Aucun article pour le moment. Revenez bientôt !</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+
+
+
+
+
+
 
 
 {% endblock %}
