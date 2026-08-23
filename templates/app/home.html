@@ -114,8 +114,11 @@
                         </div>
                         <p class="card-text text-muted">{{ agence.description|truncatechars:30 }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-map-marker-alt"></i> {{agence.ville}} - {{agence.commune}} </span>
-                            <span><i class="fas fa-clock"></i> 09:00 - 22:00</span>
+                             <a href="{% url 'agence_localisation_acces' agence.slug %}"><small><span><i class="fas fa-map-marker-alt"></i> {{agence.ville}} {% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%} </span></a>
+                            </small>
+                                <small><span><i class="fas fa-clock"></i> 09:00 - 22:00</span> 
+                            </small>
+
                         </div>
                     </div>
                 </div>

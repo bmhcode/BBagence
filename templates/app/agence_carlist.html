@@ -3,8 +3,6 @@
 {% block title %}Nos voitures - BBcars{% endblock %}
 
 
-
-
 {% block extra_css %}
 
 <style>
@@ -86,8 +84,6 @@
 .empty-state { text-align: center; padding: 5rem 0; }
 .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem; }
 </style>
-
-
 
 <!-- Custom Styles for Premium Experience -->
 
@@ -183,16 +179,7 @@
 </style>
 
 
-
-
 {% endblock %}
-
-
-
-
-
-
-
 
 
 {% block content %}
@@ -328,10 +315,12 @@
             <div class="empty-state">
                 <i class="fas fa-car-crash"></i>
                 <h4>Aucune voiture trouvée</h4>
-                <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
-                <a href="{% url 'car_list' %}" class="btn btn-primary rounded-pill px-4">
-                    <i class="fas fa-undo me-2"></i>Réinitialiser la recherche
-                </a>
+                          
+            {% if request.user.is_superuser or agence.manager == request.user %}
+            <a href="{% url 'car_create' agence.slug %}" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-plus"></i> Ajouter une voiture
+            </a>
+            {% endif %}
             </div>
             {% endif %}
     </div>
