@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    Mon Profil — BB Shopping
+    Mon Profil — BBcar
 {% endblock title %}
 
 {% block content %}
@@ -24,12 +24,12 @@
             Mettez à jour vos informations personnelles et votre photo de profil.
         </p>
 
-        <a href=""
+        <!-- <a href=""
            class="btn btn-dark btn-lg rounded-pill px-4">
             <i class="fas fa-shopping-bag me-2"></i>
             Mes commandes
             <i class="fas fa-arrow-right ms-2"></i>
-        </a>
+        </a> -->
     </div>
 
 
@@ -40,7 +40,7 @@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
                 <!-- Card Header -->
-                <div class="card-header bg-dark text-white p-4 border-0">
+                <!-- <div class="card-header bg-dark text-white p-4 border-0">
                     <div class="d-flex align-items-center gap-3">
 
                         <div class="bg-primary rounded-circle p-3">
@@ -58,7 +58,7 @@
                         </div>
 
                     </div>
-                </div>
+                </div> -->
 
 
                 <div class="card-body p-4 p-md-5">
@@ -240,11 +240,11 @@
                                     Téléphone
                                 </label>
 
-                                {{ p_form.phone }}
+                                {{ p_form.telephone }}
 
-                                {% if p_form.phone.errors %}
+                                {% if p_form.telephone.errors %}
                                     <div class="text-danger small mt-1">
-                                        {{ p_form.phone.errors.0 }}
+                                        {{ p_form.telephone.errors.0 }}
                                     </div>
                                 {% endif %}
 
@@ -280,14 +280,14 @@
                                 <label for="{{ p_form.city.id_for_label }}"
                                        class="form-label fw-semibold">
                                     <i class="fas fa-city me-2 text-primary"></i>
-                                    Wilaya
+                                    Ville
                                 </label>
 
-                                {{ p_form.city }}
+                                {{ p_form.ville }}
 
-                                {% if p_form.city.errors %}
+                                {% if p_form.ville.errors %}
                                     <div class="text-danger small mt-1">
-                                        {{ p_form.city.errors.0 }}
+                                        {{ p_form.ville.errors.0 }}
                                     </div>
                                 {% endif %}
 
@@ -315,26 +315,7 @@
                         </div>
 
 
-                        <!-- ==================== ADDRESS ==================== -->
-                        <div class="mb-4">
-
-                            <label for="{{ p_form.address.id_for_label }}"
-                                   class="form-label fw-semibold">
-                                <i class="fas fa-home me-2 text-primary"></i>
-                                Adresse
-                            </label>
-
-                            {{ p_form.address }}
-
-                            {% if p_form.address.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ p_form.address.errors.0 }}
-                                </div>
-                            {% endif %}
-
-                        </div>
-
-
+                    
                         <!-- ==================== ACTIONS ==================== -->
                         <div class="border-top pt-4 mt-5">
 
@@ -476,7 +457,6 @@
         "El M'Ghair",
         'El Meniaa'
     ];
-
 
     const citySelect = document.getElementById(
         "{{ p_form.city.id_for_label }}"

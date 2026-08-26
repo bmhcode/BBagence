@@ -87,7 +87,6 @@
 }
 </style>
 
-
 <style>
 
 /* ── Car card ── */
@@ -171,372 +170,6 @@
 .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem; }
 
 </style>
-
-
-
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card shadow rounded-3 overflow-hidden mb-4" >
-
-           <!-- Wishlist Button -->
-            <button
-                type="button"
-                onclick="toggleWishlist(this, {{ car.id }})"
-                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
-                aria-label="Ajouter aux favoris"
-                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
-            </button>
-
-            <div class="position-relative">
-                {% if car.main_image %}
-                    <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
-                {% endif %}
-                {% if car.est_en_promotion %}
-                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
-                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                        PROMO
-                    </div>
-                </a>
-                {% endif %}
-            </div>      
-
-            <!-- Edit/Delete buttons for manager or superuser -->
-            {% if request.user.is_superuser or car.agence.manager == request.user %}
-                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-trash"></i>
-                            </a>
-                </div>
-            {% endif %}
-
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h4 class="mb-3">À propos de voiture</h4>
-                   
-                    <!-- Back Link -->
-                                    
-                     <div class="mt-2">
-                    <small class="text-muted">
-                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
-                        <i class="fas fa-store me-1"></i>
-                        <a href="{% url 'agence_detail' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
-                    </small>
-                </div>
-                    
-                    
-                </div>
-                <hr class="my-2">
-                <p class="lead text-muted">{{ car.description }}</p>
-            </div>
-        </div>
-    </div>
-
-
-
-
-    <!-- Sidebar Info -->
-    <div class="col-lg-4">
-        <div class="card shadow-sm rounded-3 mb-2">
-            <div class="card-body p-4">
-                <h4 class="mb-4">{{car.marque}} {{car.modele}} {{car.annee}}</h4>
-{% if car.moteur %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-tools text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block text-uppercase fw-bold">MOTEUR</small>
-                        <span>{{ car.moteur }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-
-
-
-                {% if car.energie %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-gas-pump text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block text-uppercase fw-bold">ÉNERGIE</small>
-                        <span>{{ car.get_energie_display }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if car.boite_de_vitesse %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-cogs text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">BOITE DE VITESSES</small>
-                        <span>{{ car.get_boite_de_vitesse_display }}</span>
-                    </div>
-                </div>
-                {% endif %}
-              
-                {% if car.couleur %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-palette text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">COULEUR</small>
-                        <span>{{ car.couleur }}</span>
-                    </div>
-                </div>
-                {% endif %}
-                {% if car.kilometrage %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-road text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">KILOMETRAGE</small>
-                        <span>{{ car.kilometrage|intcomma }} km</span>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if car.nouveau_prix %}
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="bg-light rounded-circle p-3 me-3">
-                        <i class="fas fa-money-bill-wave text-primary"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted d-block uppercase fw-bold">PRIX</small>
-                        {{ car.nouveau_prix|intcomma }} M
-
-                        {% if car.ancien_prix %}
-                        <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
-                            {{ car.ancien_prix|intcomma }}
-                        </span>
-                        {% endif %}
-
-                    </div>
-                </div>
-                {% endif %}
-
-                <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
-                    Contacter la boutique {{ car.agence.telephone }}
-                </a>
-
-             
-            </div>
-        </div>
-    </div>
-
-    <!-- Secondary images if any -->
-    {% if car.images.all %}
-        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
-                    {% for img in car.images.all %}
-                    <div style="position: relative; width: 150px; height: 120px; border-radius: 12px; overflow: hidden; border: 2px solid {% if img.is_main %}var(--accent){% else %}transparent{% endif %}; transition: border-color 0.3s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='{% if img.is_main %}var(--accent){% else %}transparent{% endif %}'">
-                        <img src="{{ img.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        
-                        {% if request.user.is_authenticated %}
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
-                            {% if not img.is_main %}
-                            <!-- Set Main Action -->
-                            <form method="post" action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
-                                {% csrf_token %}
-                                <button type="submit" title="Set as Main" style="background: none; border: none; color: #fff; cursor: pointer; padding: 2px; margin-bottom: 5px;">
-                                    <i class="fas fa-star" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                                </button>
-                            </form>
-                            {% else %}
-                            <i class="fas fa-star" style="color: var(--accent); font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                            {% endif %}
-                            
-                            <!-- Delete Action -->
-                            <form method="post" action="{% url 'car_image_delete' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
-                                {% csrf_token %}
-                                <button type="submit" title="Delete Image" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 2px;" onclick="return confirm('Are you sure you want to delete this image?');">
-                                    <i class="fas fa-trash-alt" style="font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                                </button>
-                            </form>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-        </div>
-    {% endif %}
-
-
- <!-- Video Tours Section -->
-    {% if car.video %}   
-        <div class="text-center mt-5 mb-5">
-            <h3 class="display-6 fw-bold mb-2">
-                Visite video
-            </h3>
-            <p class="text-muted mb-0">
-                Découvrez <strong>{{ car.marque }} {{ car.modele }} {{car.annee}}</strong> à travers nos présentations vidéo
-            </p>
-            <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
-                <div class="video-card">
-                    <div class="video-container">
-                        <video controls>
-                            <source src="{{ car.video.url }}" type="video/mp4">
-                            Votre navigateur ne supporte pas la lecture de vidéos.
-                        </video>
-                    </div>
-                    <div class="video-body">
-                        <h4>
-                            <i class="fas fa-video"></i>
-                            {{ car.legende|default:"Présentation générale" }}
-                        </h4>
-                    </div>
-                </div>
-        </div>
-    {% endif %}
-
-    <!-- Cars related -->
-    {% if cars_related %}
-    <div class="car-detail-card" style="margin-top: 40px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 class="car-detail-section-title" style="margin: 0;">Vous aimerez peut-être aussi </h2>
-        </div>
-          
-        <div class="row g-4">
-                    {% for car in cars_related %}
-                    <div class="col-sm-6 col-xl-4">
-                        <div class="car-card">
-
-                            <!-- Promo badge -->
-                            {% if car.est_en_promotion_valide %}
-                            <span class="promo-badge">
-                                -{{ car.discount_percentage }}%
-                            </span>
-                            {% endif %}
-
-                            <!-- Wishlist Button -->
-                            {% if request.user.is_authenticated %}  
-                                        <button
-                                            type="button"
-                                            onclick="toggleWishlist(this, {{ car.id }})"
-                                            class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
-                                            aria-label="Ajouter aux favoris"
-                                            title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                            <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-                                            <span class="wishlist-loader spinner-border spinner-border-sm"></span>
-                                        </button>
-
-                            {% endif %}
-    <!-- Image -->
-    <div class="car-card__img">
-        <a href="{% url 'car_detail' car.agence.slug car.id %}">
-
-            {% if car.main_image %}
-
-                <div class="position-relative w-100 h-100">
-
-                    <img src="{{ car.main_image.image.url }}"
-                        class="promo-image w-100 h-100"
-                        alt="{{ car.marque }} {{ car.modele }}"
-                        loading="lazy">
-
-                    <!-- PROMO - Bottom Left -->
-                    {% if car.est_en_promotion %}
-
-
-                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
-                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                            PROMO
-                        </div>
-                    </a>
-                    {% endif %}
-
-                </div>
-
-            {% else %}
-
-                <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-car fa-3x text-muted"></i>
-                </div>
-
-            {% endif %}
-
-        </a>
-    </div>
-                        
-                            <!-- Body -->
-                            <div class="car-card__body">
-                                <div class="car-card__brand">{{ car.marque }}</div>
-                                <div class="car-card__title">{{ car.modele }} {{ car.annee }}</div>
-                                <div class="car-card__meta">
-                                    <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ car.get_energie_display }}</span>
-                                    <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ car.get_boite_de_vitesse_display }}</span>
-                                    <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ car.kilometrage|intcomma }} km</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="car-card__price">{{ car.nouveau_prix|intcomma }} M</span>
-                                        {% if car.ancien_prix %}
-                                            <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
-                                        {% endif %}
-                                    </div>
-                                    <a href="{% url 'car_detail' car.agence.slug car.id %}"
-                                    class="btn btn-primary btn-sm rounded-pill px-3">
-                                        Voir
-                                    </a>
-                                </div>
-                                <div class="mt-2">
-                                    <small class="text-muted">
-                                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
-                                        <i class="fas fa-store me-1"></i>
-                                        <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% if is_paginated %}
-            <nav class="mt-5">
-                    <ul class="pagination justify-content-center gap-1">
-                        {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link rounded-pill" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        </li>
-                        {% endif %}
-                        {% for i in paginator.page_range %}
-                        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-                            <a class="page-link rounded-pill" href="?page={{ i }}&{{ request.GET.urlencode }}">{{ i }}</a>
-                        </li>
-                        {% endfor %}
-                        {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link rounded-pill" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-            </nav>
-        {% endif %}
-
-    </div>
-    {% endif %}
-       
-        <!-- / ── Car Grid ── -->
-
-
-</div>
 
 <!-- Custom Styles for Premium Experience -->
 <style>    
@@ -633,13 +266,356 @@
 
 
 
+<div class="row">
+    <!-- image -->
+    <div class="col-sm-7 col-md-7 col-lg-7">
+        <div class="card shadow rounded-3 overflow-hidden mb-4" >
+
+           <!-- Wishlist Button -->
+            <button
+                type="button"
+                onclick="toggleWishlist(this, {{ car.id }})"
+                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                aria-label="Ajouter aux favoris"
+                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+            </button>
+
+            <div class="position-relative">
+                {% if car.main_image %}
+                    <img src="{{ car.main_image.image.url }}" class="img-fluid" alt="{{ car.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+                {% endif %}
+                {% if car.est_en_promotion %}
+                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                        PROMO {{ car.prix_promo|intcomma }} <small>Million</small>
+                    </div>
+                </a>
+                {% endif %}
+            </div>      
+
+            <!-- Edit/Delete buttons for manager or superuser -->
+            {% if request.user.is_superuser or car.agence.manager == request.user %}
+                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                    <i class="fas fa-trash"></i>
+                            </a>
+                </div>
+            {% endif %}
+
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h4 class="mb-3">À propos de voiture</h4>
+                    <!-- Back Link -->
+                     <div class="mt-2">
+                    <small class="text-muted">
+                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                        <i class="fas fa-store me-1"></i>
+                        <a href="{% url 'agence_detail' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
+                    </small>
+                </div> 
+                </div>
+                <hr class="my-2">
+                <p class="text-muted mt-3"> {{ car.description_promo }} </p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-sm-5 col-md-5 col-lg-5">
+        <div class="card shadow-sm rounded-3 mb-2">
+            <div class="card-body p-4">
+                <h4 class="mb-4">{{car.marque}} {{car.modele}} {{car.annee}}</h4>
+                {% if car.moteur %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-tools text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block text-uppercase fw-bold">MOTEUR</small>
+                        <span>{{ car.moteur }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                {% if car.energie %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-gas-pump text-primary"></i>
+                    </div>
+                    <div>
+                        <!-- <small class="text-muted d-block text-uppercase fw-bold">ÉNERGIE</small> -->
+                        <span>{{ car.get_energie_display }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if car.boite_de_vitesse %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-cogs text-primary"></i>
+                    </div>
+                    <div>
+                        <!-- <small class="text-muted d-block uppercase fw-bold">BOITE DE VITESSES</small> -->
+                        <span>{{ car.get_boite_de_vitesse_display }}</span>
+                    </div>
+                </div>
+                {% endif %}
+              
+                {% if car.couleur %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-palette text-primary"></i>
+                    </div>
+                    <div>
+                        <!-- <small class="text-muted d-block uppercase fw-bold">COULEUR</small> -->
+                        <span>{{ car.couleur }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if car.kilometrage %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-road text-primary"></i>
+                    </div>
+                    <div>
+                        <!-- <small class="text-muted d-block uppercase fw-bold">KILOMETRAGE</small> -->
+                        <span>{{ car.kilometrage|intcomma }} km</span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if car.nouveau_prix %}
+                <div class="mb-2 d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-3 me-3">
+                        <i class="fas fa-money-bill-wave text-primary"></i>
+                    </div>
+                    <div>
+                        <!-- <small class="text-muted d-block uppercase fw-bold">PRIX</small> -->
+                        {% if car.est_en_promotion_valide %}
+                            {{ car.prix_promo|intcomma }} Million
+                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
+                                {{ car.nouveau_prix|intcomma }}
+                            </span>
+                            {% if car.ancien_prix %}
+                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
+                                {{ car.ancien_prix|intcomma }}
+                            </span>
+                            {% endif %}
+                        {% else %}
+                            {{ car.nouveau_prix|intcomma }} Million
+                            {% if car.ancien_prix %}
+                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
+                                {{ car.ancien_prix|intcomma }}
+                            </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <a href="{% url 'contact' %}?agence={{ agence.nom }}" class="btn btn-primary w-100 rounded-pill py-2">
+                    Envoyer un message ou appeler {{ car.agence.telephone }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary images if any -->
+    {% if car.images.all %}
+        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
+                    {% for img in car.images.all %}
+                    <div style="position: relative; width: 150px; height: 120px; border-radius: 12px; overflow: hidden; border: 2px solid {% if img.is_main %}var(--accent){% else %}transparent{% endif %}; transition: border-color 0.3s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='{% if img.is_main %}var(--accent){% else %}transparent{% endif %}'">
+                        <img src="{{ img.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        
+                        {% if request.user.is_authenticated %}
+                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                            {% if not img.is_main %}
+                            <!-- Set Main Action -->
+                            <form method="post" action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
+                                {% csrf_token %}
+                                <button type="submit" title="Set as Main" style="background: none; border: none; color: #fff; cursor: pointer; padding: 2px; margin-bottom: 5px;">
+                                    <i class="fas fa-star" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <i class="fas fa-star" style="color: var(--accent); font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+                            {% endif %}
+                            
+                            <!-- Delete Action -->
+                            <form method="post" action="{% url 'car_image_delete' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
+                                {% csrf_token %}
+                                <button type="submit" title="Delete Image" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 2px;" onclick="return confirm('Are you sure you want to delete this image?');">
+                                    <i class="fas fa-trash-alt" style="font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Video Tours Section -->
+    {% if car.video %}   
+        <div class="text-center mt-5 mb-5">
+            <h3 class="display-6 fw-bold mb-2">
+                Visite video
+            </h3>
+            <p class="text-muted mb-0">
+                Découvrez <strong>{{ car.marque }} {{ car.modele }} {{car.annee}}</strong> à travers nos présentations vidéo
+            </p>
+            <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+                <div class="video-card">
+                    <div class="video-container">
+                        <video controls>
+                            <source src="{{ car.video.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                    </div>
+                    <div class="video-body">
+                        <h4>
+                            <i class="fas fa-video"></i>
+                            {{ car.legende|default:"Présentation générale" }}
+                        </h4>
+                    </div>
+                </div>
+        </div>
+    {% endif %}
+
+    <!-- Cars related -->
+    {% if cars_related %}
+    <div class="car-detail-card" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 class="car-detail-section-title" style="margin: 0;">Vous aimerez peut-être aussi </h2>
+        </div>
+          
+        <div class="row g-4">
+                    {% for car in cars_related %}
+                    <div class="col-sm-4 col-xl-3">
+                        <div class="car-card">
+                            <!-- Wishlist Button -->
+                            {% if request.user.is_authenticated %}  
+                                <button
+                                            type="button"
+                                            onclick="toggleWishlist(this, {{ car.id }})"
+                                            class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                                            aria-label="Ajouter aux favoris"
+                                            title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                            <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                            <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+                                </button>
+                            {% endif %}
+                            <!-- Image -->
+                            <div class="car-card__img">
+                                <a href="{% url 'car_detail' car.agence.slug car.id %}">
+
+                                    {% if car.main_image %}
+
+                                        <div class="position-relative w-100 h-100">
+
+                                            <img src="{{ car.main_image.image.url }}"
+                                                class="promo-image w-100 h-100"
+                                                alt="{{ car.marque }} {{ car.modele }}"
+                                                loading="lazy">
+
+                                            <!-- PROMO - Bottom Left -->
+                                            {% if car.est_en_promotion_valide %}
+                                                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                                                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                                        PROMO {{ car.prix_promo|intcomma }} Million
+                                                    </div>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-car fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        
+                            <!-- Body -->
+                            <div class="car-card__body">
+                                <div class="car-card__brand">{{ car.marque }}</div>
+                                <div class="car-card__title">{{ car.modele }} {{ car.annee }}</div>
+                                <div class="car-card__meta">
+                                    <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ car.get_energie_display }}</span>
+                                    <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ car.get_boite_de_vitesse_display }}</span>
+                                    <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ car.kilometrage|intcomma }} km</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="car-card__price">{{ car.nouveau_prix|intcomma }} Million</span>
+                                        {% if car.ancien_prix %}
+                                            <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'car_detail' car.agence.slug car.id %}"
+                                    class="btn btn-primary btn-sm rounded-pill px-3">
+                                        Voir
+                                    </a>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                                        <i class="fas fa-store me-1"></i>
+                                        <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav class="mt-5">
+                    <ul class="pagination justify-content-center gap-1">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                            <a class="page-link rounded-pill" href="?page={{ i }}&{{ request.GET.urlencode }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+            </nav>
+        {% endif %}
+
+    </div>
+    {% endif %}
+    <!-- / ── Car Grid ── -->
+</div>
 
 
 
 
 
 <script>
-
 
 /* CSRF */
 function getCSRFToken() {
@@ -650,7 +626,6 @@ function getCSRFToken() {
 }
 
 /* wishlist */
-
 
 function updateBadge(count) {
 
@@ -666,7 +641,6 @@ function updateBadge(count) {
         badge.classList.add("d-none");
     }
 }
-
 
 function toggleWishlist(btn, carId) {
 

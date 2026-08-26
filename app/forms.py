@@ -8,10 +8,9 @@ class SignupForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, required=True, label="Prénom")
     last_name = forms.CharField(max_length=150, required=True, label="Nom")
     role = forms.ChoiceField(choices=Profile.USER_ROLES, initial='customer', label="Rôle")
-    phone = forms.CharField(max_length=20, required=False, label="Téléphone")
-    city = forms.ChoiceField(choices=[('', '---------')] + ALGERIA_CITIES, required=False, label="Wilaya")
+    telephone = forms.CharField(max_length=20, required=False, label="Téléphone")
+    ville = forms.ChoiceField(choices=[('', '---------')] + ALGERIA_CITIES, required=False, label="Wilaya")
     commune = forms.CharField(max_length=100, required=False, label="Commune")
-    address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False, label="Adresse")
     image = forms.ImageField(required=False, label="Photo de profil")
 
     class Meta(UserCreationForm.Meta):
@@ -23,11 +22,10 @@ class SignupForm(UserCreationForm):
             user.save()
             # The receiver post_save automatically creates the profile
             profile = user.profile
-            profile.role = self.cleaned_data.get('role', 'customer')
-            profile.telephone = self.cleaned_data.get('phone', '')
-            profile.ville = self.cleaned_data.get('city', '')
+            profile.role = self.cleaned_data.get('role', 'client')
+            profile.telephone = self.cleaned_data.get('telephone', '')
+            profile.ville = self.cleaned_data.get('ville', '')
             profile.commune = self.cleaned_data.get('commune', '')
-            profile.adresse = self.cleaned_data.get('address', '')
             if self.cleaned_data.get('image'):
                 profile.image = self.cleaned_data.get('image')
             profile.save()
@@ -45,9 +43,8 @@ class UserForm(forms.ModelForm):
         }
 
 class ProfileForm(forms.ModelForm):
-    phone = forms.CharField(max_length=20, required=False, label="Téléphone", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    city = forms.ChoiceField(choices=[('', '---------')] + ALGERIA_CITIES, required=False, label="Wilaya", widget=forms.Select(attrs={'class': 'form-select'}))
-    address = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False, label="Adresse")
+    telephone = forms.CharField(max_length=20, required=False, label="Téléphone", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    ville = forms.ChoiceField(choices=[('', '---------')] + ALGERIA_CITIES, required=False, label="Wilaya", widget=forms.Select(attrs={'class': 'form-select'}))
 
     class Meta:
         model = Profile
@@ -61,15 +58,13 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance:
-            self.fields['phone'].initial = self.instance.telephone
-            self.fields['city'].initial = self.instance.ville
-            self.fields['address'].initial = self.instance.adresse
+            self.fields['telephone'].initial = self.instance.telephone
+            self.fields['ville'].initial = self.instance.ville
 
     def save(self, commit=True):
         profile = super().save(commit=False)
-        profile.telephone = self.cleaned_data.get('phone', '')
-        profile.ville = self.cleaned_data.get('city', '')
-        profile.adresse = self.cleaned_data.get('address', '')
+        profile.telephone = self.cleaned_data.get('telephone', '')
+        profile.ville = self.cleaned_data.get('ville', '')
         if commit:
             profile.save()
         return profile
@@ -90,7 +85,7 @@ class MultipleFileField(forms.FileField):
             result = single_file_clean(data, initial)
         return result
 
-# ===================== Car forms ====================== 
+# ===================== Car forms ======================++ #
 
 class CarForm(forms.ModelForm):
     # Champs supplémentaires hors-modèle
@@ -149,9 +144,9 @@ class CarForm(forms.ModelForm):
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
 
-# ====================== / Car forms ====================== 
+# ====================== / Car forms ====================== #
 
-# ====================== Agence forms ====================== 
+# ====================== Agence forms ====================== #
 
 class AgenceForm(forms.ModelForm):
     class Meta:
@@ -222,17 +217,24 @@ class AgenceVideoForm(forms.ModelForm):
 class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
-        fields = ['nom', 'telephone','email', 'sujet', 'message', 'agence']
+        fields = ['nom', 'telephone', 'email', 'sujet', 'message', 'agence']
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre nom'}),
-            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre téléphone'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Votre email'}),
-            'sujet': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sujet'}),
-            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre message', 'rows': 5}),
+            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'votre nom'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '05 XX XX XX XX'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'votre@email.com'}),
+            'sujet': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Exp : Question sur une annonce, Problème'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Décrivez votre demande en détail ...', 'rows': 5}),
             'agence': forms.HiddenInput(),
         }
+        labels = {
+            'nom': 'Nom complet *',
+            'telephone': 'Téléphone *',
+            'email': 'Email (optionnel)',
+            'sujet': 'Sujet *',
+            'message': 'Message *',
+        }
 
-# ===================== / Agence forms ====================== 
+# ===================== / Agence forms =================== #
 
 class BrandForm(forms.ModelForm):
     class Meta:
@@ -244,7 +246,6 @@ class BrandForm(forms.ModelForm):
             'date_debut': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
             'date_fin': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
         }
-
 
 class PromotionForm(forms.ModelForm):
     # Champs supplémentaires hors-modèle
@@ -273,11 +274,6 @@ class PromotionForm(forms.ModelForm):
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
 
-
-
-
-
-
 # ===================== Events forms ===================== # 
 
 class EvenementForm(forms.ModelForm):
@@ -301,7 +297,7 @@ class EvenementForm(forms.ModelForm):
 
 # ===================== /Events forms ===================== # 
 
-# ===================== Blog forms ===================== # 
+# ===================== Blog forms ======================== # 
 
 class ArticleBlogForm(forms.ModelForm):
     class Meta:
@@ -315,4 +311,4 @@ class ArticleBlogForm(forms.ModelForm):
             'date_fin_publication': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
         }
 
-# ===================== / Blog forms ======================   
+# ===================== / Blog forms ======================= #   

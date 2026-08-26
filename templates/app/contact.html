@@ -1,12 +1,105 @@
 {% extends 'base.html' %}
 
-{% block title %}Contactez-nous - Elite Mall{% endblock %}
+{% block title %}Contactez-nous - BBcar{% endblock %}
 
 {% block content %}
 <div class="row g-5 align-items-center">
-    <div class="col-lg-6">
-        <h1 class="display-5 font-bold mb-4">{% if agence %} Contactez {{ agence.nom }}{% else %}Contactez toutes les agences{% endif %}</h1>
-        <p class="lead text-muted mb-5">Nous sommes là pour répondre à vos questions, vos suggestions ou vos besoins d'assistance. Notre équipe est disponible 7j/7 pour vous accompagner dans votre expérience shopping.</p>
+    
+    <div class="col-md-8 col-lg-6">
+        
+        <div class="card border-0 p-5 rounded-4 bg-white">
+            <h4 class="font-bold mb-4">{% if agence %} Contactez {{ agence.nom }}{% else %}Contactez toutes les agences{% endif %}</h4>
+            <h5 class="lead text-muted mb-4">Une question, une suggestion ou besoin d'aide ? Envoyez-nous un message.
+
+</h5>
+            <!-- <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill mt-4 shadow-sm">Envoyer le message</button>
+            </form> -->
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Nom -->
+                <div class="mb-3">
+                    <label for="{{ form.nom.id_for_label }}" class="form-label">
+                        {{ form.nom.label }}
+                    </label>
+                    {{ form.nom }}
+                    {% if form.nom.errors %}
+                        <div class="text-danger small">
+                            {{ form.nom.errors }}
+                        </div>
+                        {% endif %} 
+                    </div>
+
+                    <!-- Téléphone + Email -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telephone.id_for_label }}" class="form-label">
+                                {{ form.telephone.label }}
+                            </label>
+                            {{ form.telephone }}
+                            {% if form.telephone.errors %}
+                                <div class="text-danger small">
+                                    {{ form.telephone.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                {{ form.email.label }}
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">
+                                    {{ form.email.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Sujet -->
+                    <div class="mb-3">
+                        <label for="{{ form.sujet.id_for_label }}" class="form-label">
+                            {{ form.sujet.label }}
+                        </label>
+                        {{ form.sujet }}
+                        {% if form.sujet.errors %}
+                            <div class="text-danger small">
+                                {{ form.sujet.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Message -->
+                    <div class="mb-3">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">
+                            {{ form.message.label }}
+                        </label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <div class="text-danger small">
+                                {{ form.message.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Agence hidden -->
+                    {{ form.agence }}
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg w-100 rounded-pill mt-4 shadow-sm">
+                        Envoyer le message
+                    </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-6">
+        <p class="lead  mb-5">Nous sommes là pour répondre à vos questions, vos suggestions ou vos besoins d'assistance. Notre équipe est disponible 7j/7 pour vous accompagner dans votre expérience shopping.</p>
         {% if agence %}
         <div class="mb-4 d-flex align-items-center">
             <div class="bg-primary rounded-circle p-3 text-white me-4">
@@ -39,17 +132,6 @@
         </div>
         {% endif %}
 
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-lg p-5 rounded-4 bg-white">
-            <h3 class="mb-4">{% if agence %} Envoyez un message à {{ agence.nom }} {% else %}Envoyez un message à toutes les agences{% endif %}</h3>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill mt-4 shadow-sm">Envoyer le message</button>
-            </form>
-        </div>
     </div>
 </div>
 {% endblock %}

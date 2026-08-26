@@ -428,7 +428,6 @@ class Car(models.Model):
         #         if qs.exists():
         #             raise ValidationError("Cette agence a déjà une promotion active. Une seule promotion est autorisée par agence.")
     
-
 class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="cars/gallery/")
@@ -515,8 +514,6 @@ class Brand(models.Model):
         if self.date_fin:
             return self.date_debut <= now <= self.date_fin
         return self.date_debut <= now
-
-
 
 class Evenement(models.Model):
     titre = models.CharField(max_length=200)
@@ -632,8 +629,8 @@ class ContactMessage(models.Model):
 
 class Profile(models.Model):
     USER_ROLES = (
-        ('customer', 'Customer'),
-        ('agence_owner', 'Agence Owner'), 
+        ('client', 'Client'),
+        ('proprietaire_agence', 'Proprietaire d\'Agence'), 
         ('admin', 'Admin'),
         ('superadmin', 'Super Admin'),
     )
@@ -643,7 +640,6 @@ class Profile(models.Model):
     telephone = models.CharField(max_length=20, blank=True, null=True, default='-')
     ville = models.CharField(max_length=100, choices=ALGERIA_CITIES, blank=True, null=True, verbose_name="Wilaya")
     commune = models.CharField(max_length=100, blank=True, null=True, verbose_name="Commune")
-    adresse = models.TextField(blank=True, verbose_name="Adresse")
     image = models.ImageField(upload_to='profiles/', default='profiles/default.png')
     
     cree_le = models.DateTimeField(auto_now_add=True)

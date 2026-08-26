@@ -130,7 +130,7 @@
     <div class="row g-0">
 
         <!-- LEFT SIDE -->
-        <div class="col-lg-7">
+        <div class="col-md-6 col-lg-7">
             <div class="card-info d-flex flex-column h-100">
                 <span class="badge-promo"> {{ car.titre_promo }} </span>
                 <div class="position-relative">
@@ -151,9 +151,10 @@
                 <div class="mt-auto d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-baseline gap-2 mb-4">
 
-                        <div class="price-new"> {{ car.prix_promo|intcomma }} DA </div>
+                        <div class="price-new"> {{ car.prix_promo|intcomma }} Million </div>
+                        <div class="price-old"> {{ car.nouveau_prix|intcomma }}</div>
                         {% if car.ancien_prix %}
-                            <div class="price-old"> {{ car.ancien_prix|intcomma }} DA </div>
+                            <div class="price-old"> {{ car.ancien_prix|intcomma }} </div>
                         {% endif %}
                     </div>
                 </div>
@@ -182,7 +183,7 @@
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="col-lg-5">
+        <div class="col-md-6 col-lg-5">
 
             <div class="video-box">
 

@@ -70,6 +70,13 @@
 </head>
 <body>
 
+<style>
+    .container {
+    max-width: 1500px;
+}
+</style>
+
+
 <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcar</a>
@@ -98,40 +105,32 @@
                     {% endif %} -->
 
                    <!-- {% if request.user.is_authenticated %}
-<a class="nav-icon position-relative me-3"
-   href="{% url 'wishlist_list' %}"
-   id="wishlist-link">
+                    <a class="nav-icon position-relative me-3"
+                    href="{% url 'wishlist_list' %}"
+                    id="wishlist-link">
 
-    <i class="fa fa-heart text-dark"></i>
+                        <i class="fa fa-heart text-dark"></i>
 
-    <span
-        id="wishlist-count"
-        class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle {% if wishlist_count == 0 %}d-none{% endif %}">
-        {{ wishlist_count }}
-    </span>
+                        <span
+                            id="wishlist-count"
+                            class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle {% if wishlist_count == 0 %}d-none{% endif %}">
+                            {{ wishlist_count }}
+                        </span>
 
-</a>
-{% endif %} -->
-
-
-{% if request.user.is_authenticated %}
-<a class="nav-icon position-relative me-3" href="{% url 'wishlist_list' %}">
-    <i class="fa fa-heart text-dark"></i>
-
-    <span id="wishlist-count"
-          class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle">
-        {{ wishlist_count }}
-    </span>
-
-</a>
-{% endif %}
+                    </a>
+                    {% endif %} -->
 
 
+                    {% if request.user.is_authenticated %}
+                    <a class="nav-icon position-relative me-3" href="{% url 'wishlist_list' %}">
+                        <i class="fa fa-heart text-dark"></i>
 
-
-
-
-
+                        <span id="wishlist-count"
+                            class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle">
+                            {{ wishlist_count }}
+                        </span>
+                    </a>
+                    {% endif %}
 
                 </ul>
                 <form class="d-flex me-3" action="{% url 'car_list' %}" method="get">
@@ -140,7 +139,6 @@
                 </form>
                 <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
                     {% if request.user.is_authenticated %}
-                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if request.user.profile.image and request.user.profile.image.name != 'profiles/default.png' %}
@@ -192,9 +190,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5>BBcar</h5>
+                    <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcar</a>
                     <p>Achetez, vendez et trouvez votre prochaine voiture avec les meilleures agences automobiles.</p>
-                 </div>
+                </div>
                 <div class="col-md-4">
                     <h5>Liens utiles</h5>
                     <ul class="list-unstyled">
@@ -217,7 +215,8 @@
             </div>
             <hr class="my-4">
             <div class="text-center">
-                <p class="mb-0">&copy; 2026 BBcar. Tous droits réservés.</p>
+                <p class="mb-0">&copy; 2026 BBcar. Tous droits réservés | Plateforme pour les agences de véhicules en Algérie.</p>
+             
             </div>
         </div>
 </footer>

@@ -36,13 +36,14 @@
             <p class="lead mb-D">
                 Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.
             </p>
-
-           
            <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
         </div>
     </header>
-
-    <!-- Promotions en vedette -->
+    
+<!-- ═══════════════════════════════════════
+     4.5 Promotions en vedette
+═══════════════════════════════════════ -->
+ 
     {% if promotions %}
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -51,7 +52,7 @@
         </div>
         <div class="row g-4">
             {% for promo in promotions %}
-                <div class="col-md-6">
+                <div class="col-md-6 col-lg-6">
                     <div class="card h-100 promotion-card">
                         <div class="card-body">
                             <span class="badge bg-danger mb-2">{{ promo.titre_promo }}</span>
@@ -88,7 +89,9 @@
     </section>
     {% endif %}
 
-    <!-- agences en vedette -->
+<!-- ═══════════════════════════════════════
+     4.5 agences en vedette 
+═══════════════════════════════════════ -->
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>agences à la Une</h2>
@@ -139,10 +142,10 @@
         <h2 class="mb-4">Brands</h2>
         <div class="row g-4">
             {% for brand in brands %}
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-4 col-lg-3">
                 <div class="card h-100 border-0 shadow">
                     <div class="row g-0">
-                        <div class="col-4">
+                        <div class="col-5">
                             {% if brand.image %}
                             <img src="{{ brand.image.url }}" class="img-fluid rounded-start h-100" alt="{{ evenement.titre }}" style="object-fit: cover;">
                             {% else %}
@@ -151,13 +154,10 @@
                             </div>
                             {% endif %}
                         </div>
-                        <div class="col-8">
+                        <div class="col-7">
                             <div class="card-body">
                                 <h6 class="card-title mb-1">{{ brand.nom }}</h6>
-                                <p class="small text-danger mb-1"><i class="far fa-calendar-alt me-1"></i> 
-                                    <!-- {{ evenement.date_debut|date:"d F" }} -->
-                                 {{ evenement.date_debut|date:"d M Y" }} -  {{ evenement.date_fin|date:"d M Y" }}
-                                </p>
+                                <p>la gamme de</p>
                                 <p class="card-text small text-muted">{{ evenement.lieu }}</p>
                                 <a href="{{ evenement.get_absolute_url }}" class="btn btn-link btn-sm p-0 text-decoration-none">Détails <i class="fas fa-angle-right"></i></a>
                             </div>
@@ -171,15 +171,13 @@
             </div>
             {% endfor %}
         </div>
-    </section>
-
-
-
-
+</section>
 
  
-
-    <!-- Événements à venir -->
+<!-- ═══════════════════════════════════════
+     4.5 Événements à venir 
+═══════════════════════════════════════ -->
+    
     <section class="mb-5">
         <h2 class="mb-4">Événements Prochains</h2>
         <div class="row g-4">
@@ -218,7 +216,9 @@
         </div>
     </section>
 
-     <!-- Blog & articles -->
+<!-- ═══════════════════════════════════════
+     4.5 Blog & articles
+═══════════════════════════════════════ -->      
     <section class="mb-5">
         <h2 class="mb-4">Blog & articles</h2>
         <div class="row g-4">

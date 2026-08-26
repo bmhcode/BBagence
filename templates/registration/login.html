@@ -1,266 +1,629 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Login | {% if mall %}{{mall.name}}{% else %}BB Shopping{% endif %}
+Connexion | BBcar
 {% endblock title %}
 
 {% block extra_css %}
 <style>
+
 .auth-wrapper {
-  min-height: calc(100vh - 72px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  background: var(--color-bg);
-  position: relative;
-  overflow: hidden;
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: var(--color-bg);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Aesthetic floating blur blobs for a modern glassmorphism feel */
+/* Effets décoratifs */
+.auth-wrapper::before,
+.auth-wrapper::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
 .auth-wrapper::before {
-  content: '';
-  position: absolute;
-  top: -10vw; right: -5vw;
-  width: 45vw; height: 45vw;
-  background: var(--color-pink);
-  filter: blur(120px);
-  border-radius: 50%;
-  opacity: 0.12;
-  animation: floatBlobs 12s ease-in-out infinite alternate;
+    width: 500px;
+    height: 500px;
+    top: -200px;
+    right: -150px;
+    background: var(--color-pink);
+    filter: blur(120px);
+    opacity: 0.10;
+    animation: floatBlob 12s ease-in-out infinite alternate;
 }
 
 .auth-wrapper::after {
-  content: '';
-  position: absolute;
-  bottom: -10vw; left: -10vw;
-  width: 35vw; height: 35vw;
-  background: var(--color-accent);
-  filter: blur(100px);
-  border-radius: 50%;
-  opacity: 0.15;
-  animation: floatBlobs 10s ease-in-out infinite alternate-reverse;
+    width: 450px;
+    height: 450px;
+    bottom: -200px;
+    left: -150px;
+    background: var(--color-accent);
+    filter: blur(120px);
+    opacity: 0.12;
+    animation: floatBlob 10s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes floatBlobs {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(30px, 40px) scale(1.1); }
+@keyframes floatBlob {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(40px, 30px) scale(1.08);
+    }
 }
+
+
+/* Carte */
 
 .auth-card {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 480px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: var(--radius-xl);
-  padding: 56px 48px;
-  box-shadow: var(--shadow-xl);
-  transition: transform var(--transition);
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 500px;
+
+    padding: 50px 45px;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.10);
+
+    transition: transform 0.3s ease,
+                box-shadow 0.3s ease;
 }
+
 .auth-card:hover {
-  transform: translateY(-4px);
+    transform: translateY(-5px);
+    box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.14);
 }
+
+
+/* Header */
 
 .auth-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-.auth-header-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--color-primary);
-  color: var(--color-accent);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin: 0 auto 20px;
-  box-shadow: var(--shadow-md);
-}
-.auth-header h1 {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  color: var(--color-primary);
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
-}
-.auth-header p {
-  color: var(--color-muted);
-  font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 35px;
 }
 
+.auth-header-icon {
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--color-primary);
+    color: var(--color-accent);
+
+    border-radius: 18px;
+
+    font-size: 1.6rem;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+}
+
+.auth-header h1 {
+    font-family: var(--font-display);
+
+    font-size: 2.2rem;
+
+    color: var(--color-primary);
+
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    max-width: 380px;
+
+    margin: auto;
+
+    color: var(--color-muted);
+
+    font-size: 0.95rem;
+
+    line-height: 1.6;
+}
+
+
+/* Formulaire */
+
 .auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.form-group label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: 0.02em;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.auth-form input,
-.auth-form select,
-.auth-form textarea {
-  width: 100%;
-  padding: 14px 16px;
-  background: #fff;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.95rem;
-  color: var(--color-text);
-  transition: all var(--transition);
-  font-family: var(--font-body);
+.form-group label {
+    color: var(--color-primary);
+
+    font-size: 0.88rem;
+
+    font-weight: 600;
 }
-.auth-form input:focus,
-.auth-form select:focus,
-.auth-form textarea:focus {
-  outline: none;
-  border-color: var(--color-pink);
-  box-shadow: 0 0 0 4px rgba(233, 30, 140, 0.1);
+
+
+/* Input wrapper */
+
+.input-wrapper {
+    position: relative;
 }
-.auth-form input::placeholder {
-  color: #adb5bd;
+
+.input-icon {
+    position: absolute;
+
+    left: 16px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--color-muted);
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+.input-wrapper input {
+    width: 100%;
+
+    padding: 15px 16px 15px 46px;
+
+    border: 1.5px solid var(--color-border);
+
+    border-radius: 12px;
+
+    background: #fff;
+
+    font-size: 0.95rem;
+
+    transition: 0.25s ease;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+
+    border-color: var(--color-pink);
+
+    box-shadow:
+        0 0 0 4px rgba(233, 30, 140, 0.10);
+}
+
+
+/* Bouton mot de passe */
+
+.password-toggle {
+    position: absolute;
+
+    right: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--color-muted);
+
+    cursor: pointer;
+
+    font-size: 1rem;
+
+    padding: 5px;
+}
+
+.password-toggle:hover {
+    color: var(--color-pink);
+}
+
+
+/* Options */
+
+.auth-options {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    font-size: 0.85rem;
+}
+
+.remember-me {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--color-muted);
+
+    cursor: pointer;
+}
+
+.remember-me input {
+    accent-color: var(--color-pink);
+}
+
+.forgot-password {
+    color: var(--color-pink);
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    color: var(--color-primary);
+}
+
+
+/* Erreurs */
+
+.global-error {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px 16px;
+
+    background: rgba(230, 57, 70, .08);
+
+    color: #d62839;
+
+    border: 1px solid rgba(230, 57, 70, .2);
+
+    border-radius: 12px;
+
+    font-size: .88rem;
 }
 
 .form-error {
-  color: #e63946;
-  font-size: 0.8rem;
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    color: #d62839;
+
+    font-size: .8rem;
 }
 
-.global-error {
-  background: rgba(230, 57, 70, 0.08);
-  color: #e63946;
-  padding: 14px;
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
-  margin-bottom: 24px;
-  text-align: center;
-  border: 1px solid rgba(230, 57, 70, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
+
+/* Submit */
 
 .auth-submit {
-  width: 100%;
-  margin-top: 16px;
-  justify-content: center;
-  padding: 16px !important;
-  font-size: 1rem !important;
-  border-radius: var(--radius-md) !important;
-  box-shadow: 0 8px 20px rgba(26, 26, 46, 0.15);
+    width: 100%;
+
+    padding: 16px !important;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    font-size: 1rem !important;
+
+    border-radius: 12px !important;
+
+    transition: transform .25s ease;
 }
+
+.auth-submit:hover {
+    transform: translateY(-2px);
+}
+
+.auth-submit:active {
+    transform: translateY(0);
+}
+
+
+/* Footer */
 
 .auth-footer {
-  margin-top: 32px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--color-muted);
-}
-.auth-footer a {
-  color: var(--color-pink);
-  font-weight: 600;
-  transition: color var(--transition);
-  text-decoration: none;
-  position: relative;
-}
-.auth-footer a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 0; right: 0;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transition: transform var(--transition);
-  transform-origin: right;
-}
-.auth-footer a:hover {
-  color: var(--color-primary);
-}
-.auth-footer a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+    margin-top: 5px;
+
+    padding-top: 25px;
+
+    border-top: 1px solid var(--color-border);
+
+    text-align: center;
+
+    color: var(--color-muted);
+
+    font-size: .9rem;
 }
 
-.help-text {
-  font-size: 0.75rem;
-  color: var(--color-muted);
-  margin-top: 6px;
+.auth-footer a {
+    color: var(--color-pink);
+
+    font-weight: 700;
+
+    text-decoration: none;
 }
+
+.auth-footer a:hover {
+    color: var(--color-primary);
+}
+
+
+/* Responsive */
+
+@media (max-width: 576px) {
+
+    .auth-wrapper {
+        padding: 30px 15px;
+        align-items: flex-start;
+    }
+
+    .auth-card {
+        padding: 35px 22px;
+        border-radius: 20px;
+    }
+
+    .auth-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .auth-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}
+
 </style>
 {% endblock %}
 
+
 {% block content %}
+
 <div class="auth-wrapper">
-  <div class="auth-card">
-    
-    <div class="auth-header">
-      <div class="auth-header-icon">
-        <i class="fas fa-sign-in-alt"></i>
-      </div>
-      <h1>Welcome Back</h1>
-      <p>Login to your account to continue</p>
+
+    <div class="auth-card">
+
+        <!-- HEADER -->
+
+        <div class="auth-header">
+
+            <div class="auth-header-icon">
+                <i class="fas fa-car"></i>
+            </div>
+
+            <h1>Bienvenue</h1>
+
+            <p>
+                Connectez-vous à votre compte pour accéder à toutes les
+                fonctionnalités de BBcar.
+            </p>
+
+        </div>
+
+
+        <!-- ERREUR GLOBALE -->
+
+        {% if form.non_field_errors %}
+
+        <div class="global-error">
+
+            <i class="fas fa-circle-exclamation"></i>
+
+            <div>
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- FORMULAIRE -->
+
+        <form method="post" novalidate class="auth-form">
+
+            {% csrf_token %}
+
+
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
+
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label for="{{ form.username.id_for_label }}">
+                    Nom d'utilisateur
+                </label>
+
+                <div class="input-wrapper">
+
+                    <i class="fas fa-user input-icon"></i>
+
+                    {{ form.username }}
+
+                </div>
+
+                {% for error in form.username.errors %}
+
+                    <div class="form-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="{{ form.password.id_for_label }}">
+                    Mot de passe
+                </label>
+
+                <div class="input-wrapper">
+
+                    <i class="fas fa-lock input-icon"></i>
+
+                    {{ form.password }}
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="togglePassword"
+                        aria-label="Afficher le mot de passe"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+
+                </div>
+
+                {% for error in form.password.errors %}
+
+                    <div class="form-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- OPTIONS -->
+
+            <div class="auth-options">
+
+                <label class="remember-me">
+
+                    <input type="checkbox" name="remember_me">
+
+                    <span>Se souvenir de moi</span>
+
+                </label>
+
+
+                <!-- Ajoutez cette URL uniquement si vous utilisez PasswordResetView -->
+
+                {% comment %}
+                <a href="{% url 'password_reset' %}" class="forgot-password">
+                    Mot de passe oublié ?
+                </a>
+                {% endcomment %}
+
+            </div>
+
+
+            <!-- BOUTON -->
+
+            <button
+                type="submit"
+                class="ym-btn ym-btn--dark auth-submit"
+            >
+
+                <span>Se connecter</span>
+
+                <i class="fas fa-arrow-right"></i>
+
+            </button>
+
+
+            <!-- FOOTER -->
+
+            <div class="auth-footer">
+
+                Vous n'avez pas encore de compte ?
+
+                <br>
+
+                <a href="{% url 'signup' %}">
+                    Créer un compte gratuitement
+                </a>
+
+            </div>
+
+
+        </form>
+
     </div>
 
-    {% if form.errors %}
-    <div class="global-error">
-      <i class="fas fa-exclamation-circle"></i>
-      Invalid username or password
-    </div>
-    {% endif %}
-
-    <form method="post" novalidate class="auth-form">
-      {% csrf_token %}
-      
-      <!-- hidden next parameter for redirects if applicable -->
-      {% if next %}
-      <input type="hidden" name="next" value="{{ next }}" />
-      {% endif %}
-
-      <div class="form-group">
-        <label for="{{ form.username.id_for_label }}">
-          Username
-        </label>
-        {{ form.username }}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ form.password.id_for_label }}">
-          Password
-        </label>
-        {{ form.password }}
-      </div>
-
-      <button type="submit" class="ym-btn ym-btn--dark auth-submit">
-        Login <i class="fas fa-arrow-right ym-btn__icon"></i>
-      </button>
-
-      <div class="auth-footer">
-        Don't have an account? 
-        <a href="{% url 'signup' %}">Create one here</a>
-      </div>
-
-    </form>
-    
-  </div>
 </div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const passwordInput = document.getElementById(
+        "{{ form.password.id_for_label }}"
+    );
+
+    const togglePassword = document.getElementById(
+        "togglePassword"
+    );
+
+    if (passwordInput && togglePassword) {
+
+        togglePassword.addEventListener("click", function () {
+
+            const icon = this.querySelector("i");
+
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+
+                icon.classList.remove("fa-eye");
+
+                icon.classList.add("fa-eye-slash");
+
+            } else {
+
+                passwordInput.type = "password";
+
+                icon.classList.remove("fa-eye-slash");
+
+                icon.classList.add("fa-eye");
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
+
 {% endblock %}
