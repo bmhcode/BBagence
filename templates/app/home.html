@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+
 
 {% block title %} Accueil - BBcar {% endblock %}
 
@@ -24,6 +26,20 @@
         background-color: #ffeef6;
         border-left: 5px solid #d63384;
     }
+
+    
+.price-old{
+    text-decoration:line-through;
+    color:#6c757d;
+    font-size:1rem;
+}
+
+.price-new{
+    color:#dc3545;
+    font-size:2rem;
+    font-weight:700;
+}
+
 </style>
 {% endblock %}
 
@@ -58,7 +74,20 @@
                             <span class="badge bg-danger mb-2">{{ promo.titre_promo }}</span>
                             <h3>{{promo.marque}} {{promo.modele}} {{promo.annee}} </h3>
                             <p class="card-text text-truncate">{{ promo.description_promo }}</p>
-                            <h1>{{promo.prix_promo}} M</h1>
+                            
+                            <!-- Prix -->
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-baseline gap-2 mb-4">
+
+                                    <div class="price-new"> {{ promo.prix_promo|intcomma }} Million </div>
+                                    <div class="price-old"> {{ promo.nouveau_prix|intcomma }}</div>
+                                    {% if promo.ancien_prix %}
+                                        <div class="price-old"> {{ promo.ancien_prix|intcomma }} </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Dates -->
                             <i class="far fa-clock me-2"></i>
                             <strong>{{ promo.date_debut_promo|date:"d M Y" }}</strong>
                             -
@@ -133,12 +162,11 @@
             {% endfor %}
         </div>
     </section>
-
-
 <!-- ═══════════════════════════════════════
      4.5 NOS MARQUES / BRANDS  
 ═══════════════════════════════════════ -->
-<section class="mb-5">
+    {% if brands %}
+    <section class="mb-5">
         <h2 class="mb-4">Brands</h2>
         <div class="row g-4">
             {% for brand in brands %}
@@ -171,13 +199,13 @@
             </div>
             {% endfor %}
         </div>
-</section>
-
+    </section>
+    {% endif %}
  
 <!-- ═══════════════════════════════════════
      4.5 Événements à venir 
 ═══════════════════════════════════════ -->
-    
+    {% if evenements_prochains %}
     <section class="mb-5">
         <h2 class="mb-4">Événements Prochains</h2>
         <div class="row g-4">
@@ -215,10 +243,12 @@
             {% endfor %}
         </div>
     </section>
-
+    {% endif %}
+  
 <!-- ═══════════════════════════════════════
      4.5 Blog & articles
-═══════════════════════════════════════ -->      
+═══════════════════════════════════════ -->    
+  {% if articles_recent %}
     <section class="mb-5">
         <h2 class="mb-4">Blog & articles</h2>
         <div class="row g-4">
@@ -257,7 +287,7 @@
             {% endfor %}
         </div>
     </section>
-
+  {% endif %}
 
 
 

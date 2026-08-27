@@ -31,9 +31,9 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
-        context['evenements_prochains'] = Evenement.objects.all().order_by('date_debut')[:3]
-        context['articles_recent'] = ArticleBlog.objects.all().order_by('date_debut_publication')[:3]
-        context['brands'] = Brand.objects.all().order_by('date_debut')[:3]
+        context['brands'] = Brand.objects.filter(afficher=True).order_by('date_debut')[:3]
+        context['evenements_prochains'] = Evenement.objects.filter(afficher=True).order_by('date_debut')[:3]
+        context['articles_recent'] = ArticleBlog.objects.filter(afficher=True).order_by('date_debut_publication')[:3]
 
 
         # Active car promotions

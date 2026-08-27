@@ -110,7 +110,7 @@
 <div class="card promo-card mb-5">
     <div class="row g-0">
         <!-- LEFT SIDE -->
-        <div class="col-lg-7">
+        <div class="col-md-7 col-lg-7">
             <div class="card-info d-flex flex-column h-100">
                 <span class="badge-promo">
                     {{ object.titre_promo }}
@@ -134,51 +134,46 @@
                 </a>
             </div>
             {% endif %}
+
             <!--  / Edit/Delete buttons for superuser -->
-
-
-
-
-
-
-
-                    <a href="{% url 'car_promotion' object.agence.slug object.id %}">
-                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                            PROMO
-                        </div>
-                    </a>
-                </a>
+            <a href="{% url 'car_promotion' object.agence.slug object.id %}">
+                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                    PROMO
+                </div>
+            </a>
             </div>
 
             <h2 class="fw-bold mt-2"> {{object.marque}} {{object.modele}} {{object.annee}} </h2>
             <p class="text-muted mt-3"> {{ object.description_promo }} </p>
 
             <div class="mt-auto d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-baseline gap-2 mb-4">
+                <!-- Prix -->
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-baseline gap-2 mb-4">
 
-                    <div class="price-new"> {{ object.prix_promo|intcomma }} DA </div>
+                        <div class="price-new"> {{ object.prix_promo|intcomma }} Million </div>
+                        <div class="price-old"> {{ object.nouveau_prix|intcomma }}</div>
                         {% if object.ancien_prix %}
-                            <div class="price-old"> {{ object.ancien_prix|intcomma }} DA </div>
+                            <div class="price-old"> {{ object.ancien_prix|intcomma }} </div>
                         {% endif %}
                     </div>
-
                 </div>
 
-                <div class="mt-auto d-flex justify-content-between align-items-center">
+            </div>
 
-                    <div class="text-muted">
-                        <i class="far fa-clock me-2"></i>
-                        Valable du  
-                        <strong>{{ object.date_debut_promo|date:"d M Y" }}</strong>
-                        Jusqu'au
-                        <strong>{{ object.date_fin_promo|date:"d M Y" }}</strong>
-                    </div>
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+                <div class="text-muted">
+                    <i class="far fa-clock me-2"></i>
+                    <strong>{{ object.date_debut_promo|date:"d M Y" }}</strong>
+                    -
+                    <strong>{{ object.date_fin_promo|date:"d M Y" }}</strong>
+                </div>
 
-                    <a href="{{ object.get_absolute_url }}"
-                       class="btn btn-danger btn-offer">
-                        <i class="fas fa-tags me-2"></i>
-                        Voir la voiture
-                    </a>
+                <a href="{{ object.get_absolute_url }}"
+                    class="btn btn-danger btn-offer">
+                    <i class="fas fa-tags me-2"></i>
+                    Voir la voiture
+                </a>
                    
                 </div>
 
@@ -194,67 +189,44 @@
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="col-lg-5">
-
+        <div class="col-md-5 col-lg-5">
             <div class="video-box">
-
                 {% if object.video %}
-
                     <video controls preload="metadata">
-
                         <source src="{{ object.video.url }}" type="video/mp4">
-
                         Votre navigateur ne supporte pas la vidéo.
-
                     </video>
-
                 {% else %}
-
                     <div class="no-video">
-
                         <i class="fas fa-film"></i>
-
                         <h4>Aucune vidéo</h4>
-
                         <p class="mb-0">
                             Cette promotion ne possède pas encore de vidéo.
                         </p>
-
                     </div>
-
                 {% endif %}
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 {% empty %}
-
 <div class="text-center py-5">
-
     <i class="fas fa-percent fa-5x text-danger mb-4"></i>
-
     <h2 class="fw-bold">
         Aucune promotion disponible
     </h2>
-
     <p class="text-muted mb-4">
         Revenez bientôt pour découvrir les prochaines offres.
     </p>
-
     <a href="{% url 'car_list' %}"
        class="btn btn-danger rounded-pill px-5">
-
         Voir toutes les voitures
-
     </a>
-
 </div>
-
 {% endfor %}
+
+
+
+
 
 {% endblock %}

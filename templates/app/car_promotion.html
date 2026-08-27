@@ -147,7 +147,8 @@
                 <h2 class="fw-bold mt-2"> {{car.marque}} {{car.modele}} {{car.annee}} </h2>
 
                 <p class="text-muted mt-3"> {{ car.description_promo }} </p>
-
+                
+                <!-- Prix -->
                 <div class="mt-auto d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-baseline gap-2 mb-4">
 
@@ -162,8 +163,8 @@
                 <div class="mt-auto d-flex justify-content-between align-items-center">
                     <div class="text-muted">
                         <i class="far fa-clock me-2"></i>
-                        Valable du  <strong>{{ car.date_debut_promo|date:"d M Y" }}</strong>
-                        Jusqu'au    <strong>{{ car.date_fin_promo|date:"d M Y" }}</strong>
+                        <strong>{{ car.date_debut_promo|date:"d M Y" }}</strong>
+                         - <strong>{{ car.date_fin_promo|date:"d M Y" }}</strong>
                     </div>
                     <a href="{% url 'car_detail' car.agence.slug car.id %}"class="btn btn-danger btn-offer">
                         <i class="fas fa-tags me-2"></i>

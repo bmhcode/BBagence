@@ -475,6 +475,7 @@ class Brand(models.Model):
     image = models.ImageField(upload_to="brands/", blank=True, null=True)
     # image = CloudinaryField("image",blank=True,null=True)
 
+    afficher = models.BooleanField(default=False)
     cree_le = models.DateTimeField(auto_now_add=True)
     modifié_le = models.DateTimeField(auto_now=True)
 
@@ -525,6 +526,8 @@ class Evenement(models.Model):
     date_debut = models.DateField(null=True, blank=True)
     date_fin = models.DateField(null=True, blank=True)
     
+    afficher = models.BooleanField(default=False)
+
     cree_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -555,7 +558,8 @@ class ArticleBlog(models.Model):
     date_debut_publication = models.DateField(null=True, blank=True)
     date_fin_publication = models.DateField(null=True, blank=True)
 
-     
+    afficher = models.BooleanField(default=False)
+
     cree_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:

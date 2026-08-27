@@ -1,228 +1,1046 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %} BBcar {% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}BBcar{% endblock %}</title>
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet">
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
+
+        /* =========================================
+           VARIABLES
+        ========================================= */
         :root {
             --color-primary: #1e293b;
+            --color-primary-dark: #0f172a;
             --color-pink: #d63384;
-            --accent: #d63384;
-            --color-bg: #f8f9fa;
+            --color-pink-dark: #b02a6b;
+            --color-bg: #f8fafc;
             --color-muted: #64748b;
             --color-border: #e2e8f0;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 8px 30px rgba(15, 23, 42, 0.10);
+
             --transition: all 0.3s ease;
-            --transition-slow: all 0.5s ease;
-            --radius-lg: 12px;
-            --radius-xl: 20px;
-            --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
-            --font-display: 'Montserrat', sans-serif;
         }
+
+
+        /* =========================================
+           GLOBAL
+        ========================================= */
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--color-bg);
+            color: var(--color-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        h1, h2, h3, .navbar-brand {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
+
+        main {
+            flex: 1;
         }
-        .navbar {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            background-color: #fff !important;
-        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
         .navbar-brand {
-            color: #d63384 !important;
-            font-size: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
         }
-        .btn-primary {
-            background-color: #d63384;
-            border-color: #d63384;
+
+        a {
+            transition: var(--transition);
         }
-        .btn-primary:hover {
-            background-color: #b02a6b;
-            border-color: #b02a6b;
+
+        /* Large container */
+        .container-xxl-custom {
+            width: 100%;
+            max-width: 1500px;
+            margin: auto;
+            padding-left: 24px;
+            padding-right: 24px;
         }
-        .footer {
-            background-color: #212529;
+
+
+        /* =========================================
+           NAVBAR
+        ========================================= */
+        .main-navbar {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+            padding: 10px 0;
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--color-primary) !important;
+            white-space: nowrap;
+        }
+
+        .navbar-brand i {
+            color: var(--color-pink);
+        }
+
+        .navbar-brand span {
+            color: var(--color-pink);
+        }
+
+
+        /* Menu */
+        .navbar-nav .nav-link {
+            color: var(--color-primary);
+            font-weight: 500;
+            padding: 10px 12px;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--color-pink);
+        }
+
+        @media (min-width: 992px) {
+
+            .navbar-nav.main-menu .nav-link::after {
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 2px;
+                left: 50%;
+                bottom: 5px;
+                background: var(--color-pink);
+                transform: translateX(-50%);
+                transition: var(--transition);
+            }
+
+            .navbar-nav.main-menu .nav-link:hover::after,
+            .navbar-nav.main-menu .nav-link.active::after {
+                width: 55%;
+            }
+        }
+
+
+        /* =========================================
+           NAVBAR TOGGLER
+        ========================================= */
+        .navbar-toggler {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            box-shadow: none !important;
+        }
+
+        .navbar-toggler:focus {
+            border-color: var(--color-pink);
+        }
+
+
+        /* =========================================
+           SEARCH
+        ========================================= */
+        .navbar-search {
+            min-width: 230px;
+        }
+
+        .navbar-search .input-group {
+            border: 1px solid var(--color-border);
+            border-radius: 50px;
+            overflow: hidden;
+            background: #fff;
+            transition: var(--transition);
+        }
+
+        .navbar-search .input-group:focus-within {
+            border-color: var(--color-pink);
+            box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.08);
+        }
+
+        .navbar-search .form-control {
+            border: none;
+            box-shadow: none;
+            font-size: 0.9rem;
+            padding-left: 15px;
+        }
+
+        .search-btn {
+            background: var(--color-pink);
             color: #fff;
-            padding: 3rem 0;
-            margin-top: 5rem;
+            border: none;
+            padding: 0 15px;
         }
+
+        .search-btn:hover {
+            background: var(--color-pink-dark);
+            color: #fff;
+        }
+
+
+        /* =========================================
+           WISHLIST
+        ========================================= */
+        .wishlist-link {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff1f6;
+            color: var(--color-pink) !important;
+            position: relative;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .wishlist-link:hover {
+            background: var(--color-pink);
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
+
+        #wishlist-count {
+            min-width: 19px;
+            height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            border-radius: 50%;
+            background: var(--color-pink) !important;
+            color: #fff !important;
+            border: 2px solid #fff;
+        }
+
+
+        /* =========================================
+           USER
+        ========================================= */
+        .user-profile-image {
+            width: 34px;
+            height: 34px;
+            object-fit: cover;
+            border: 2px solid var(--color-border);
+        }
+
+        .user-menu {
+            padding: 7px 10px !important;
+            border-radius: 50px;
+        }
+
+        .user-menu:hover {
+            background: #f1f5f9;
+        }
+
+        .dropdown-menu {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: 8px;
+            min-width: 230px;
+        }
+
+        .dropdown-item {
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background: #fff1f6;
+            color: var(--color-pink);
+        }
+
+
+        /* =========================================
+           BUTTONS
+        ========================================= */
+        .btn-primary {
+            background-color: var(--color-pink);
+            border-color: var(--color-pink);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: var(--color-pink-dark);
+            border-color: var(--color-pink-dark);
+        }
+
+        .signup-btn {
+            border-radius: 50px;
+            padding: 9px 20px !important;
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           CARDS
+        ========================================= */
         .card {
             border: none;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 12px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
+            transition: var(--transition);
         }
+
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
+
+
+        /* =========================================
+           ALERTS
+        ========================================= */
+        .alert {
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+        .footer {
+            background: var(--color-primary-dark);
+            color: #cbd5e1;
+            margin-top: 80px;
+            padding: 70px 0 20px;
+        }
+
+        .footer-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .footer-brand span {
+            color: var(--color-pink);
+        }
+
+        .footer-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+            padding-left: 5px;
+        }
+
+        .social-link {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--color-pink);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 50px;
+            padding-top: 20px;
+        }
+
+
+        /* =========================================
+           MOBILE / LAPTOP
+        ========================================= */
+/* =========================================
+   NAVBAR - PETITS LAPTOPS
+========================================= */
+
+@media (min-width: 992px) and (max-width: 1399px) {
+
+    .main-navbar {
+        padding: 8px 0;
+    }
+
+    .container-xxl-custom {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Tout reste sur une seule ligne */
+    .navbar-collapse {
+        display: flex !important;
+        flex-basis: auto;
+        flex-grow: 1;
+        align-items: center;
+        min-width: 0;
+    }
+
+    /* Menu principal */
+    .navbar-nav.main-menu {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        margin-right: auto;
+    }
+
+    /* Réduire l'espace entre les éléments */
+    .navbar-nav .nav-link {
+        padding: 8px 7px;
+        font-size: 0.85rem;
+    }
+
+    .navbar-nav .nav-link i {
+        margin-right: 2px !important;
+    }
+
+    /* Réduire légèrement le logo */
+    .navbar-brand {
+        font-size: 1.35rem;
+        margin-right: 12px;
+    }
+
+    /* Recherche plus petite */
+    .navbar-search {
+        min-width: 160px;
+        max-width: 190px;
+        margin-left: 10px;
+    }
+
+    .navbar-search .form-control {
+        font-size: 0.8rem;
+    }
+
+    /* Actions utilisateur sur une ligne */
+    .navbar-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        margin-left: 10px;
+    }
+
+    .signup-btn {
+        padding: 8px 12px !important;
+        font-size: 0.85rem;
+    }
+
+    .user-menu {
+        padding: 5px 7px !important;
+    }
+
+    .user-menu span {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .wishlist-link {
+        width: 38px;
+        height: 38px;
+    }
+
+    /* Cacher le bouton hamburger */
+    .navbar-toggler {
+        display: none;
+    }
+}
+
+
+/* =========================================
+   TABLETTE / MOBILE
+========================================= */
+
+@media (max-width: 991px) {
+
+    .navbar-collapse {
+        background: #fff;
+        margin-top: 12px;
+        padding: 15px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Ici le menu reste vertical */
+    .navbar-nav.main-menu {
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 12px 10px;
+    }
+
+    .navbar-search {
+        width: 100%;
+        margin: 10px 0 !important;
+    }
+
+    .navbar-search .input-group {
+        width: 100%;
+    }
+
+    .navbar-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+    }
+}
     </style>
+
     {% block extra_css %}{% endblock %}
+
 </head>
+
 <body>
 
-<style>
-    .container {
-    max-width: 1500px;
-}
-</style>
+
+<!-- =========================================
+     NAVBAR
+========================================= -->
+
+<nav class="navbar navbar-expand-xl main-navbar sticky-top">
+
+    <div class="container-xxl-custom">
+
+        <!-- LOGO -->
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-car me-2"></i>
+            BB<span>car</span>
+        </a>
+
+        <!-- MOBILE BUTTON -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Ouvrir le menu">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- MAIN MENU -->
+            <ul class="navbar-nav main-menu me-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       href="{% url 'home' %}">
+                        <i class="fas fa-home me-1"></i>
+                        Accueil
+                    </a>
+                </li>
 
 
-<nav class="navbar navbar-expand-lg navbar-light sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'agence_list' %}">Agences</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'car_list' %}">Voitures</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'promotion_list' %}">Promotions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'evenement_list' %}">Événements</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'blog_list' %}">Blog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
-                    <!-- {% if request.user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{% url 'wishlist_list' %}">
-                            <i class="fa fa-heart text-dark"></i>
-                           
-                            <span class="badge rounded-pill bg-danger wishlist-badge ms-1" style="{% if wishlist_count == 0 %}display: none;{% endif %}">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'agence_list' %}active{% endif %}"
+                       href="{% url 'agence_list' %}">
+                        <i class="fas fa-building me-1"></i>
+                        Agences
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'car_list' %}active{% endif %}"
+                       href="{% url 'car_list' %}">
+                        <i class="fas fa-car me-1"></i>
+                        Voitures
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'promotion_list' %}active{% endif %}"
+                       href="{% url 'promotion_list' %}">
+                        <i class="fas fa-tags me-1"></i>
+                        Promotions
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'evenement_list' %}active{% endif %}"
+                       href="{% url 'evenement_list' %}">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        Événements
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}"
+                       href="{% url 'blog_list' %}">
+                        <i class="fas fa-newspaper me-1"></i>
+                        Blog
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
+                       href="{% url 'contact' %}">
+                        <i class="fas fa-envelope me-1"></i>
+                        Contact
+                    </a>
+                </li>
+
+            </ul>
+
+            <!-- USER ACTIONS -->
+            <div class="navbar-actions">
+
+                {% if request.user.is_authenticated %}
+
+                    <!-- WISHLIST -->
+                    <a class="wishlist-link me-2"
+                       href="{% url 'wishlist_list' %}"
+                       title="Mes favoris">
+
+                        <i class="fas fa-heart"></i>
+
+                        {% if wishlist_count > 0 %}
+                            <span id="wishlist-count"
+                                  class="position-absolute top-0 start-100 translate-middle">
                                 {{ wishlist_count }}
                             </span>
+                        {% else %}
+                            <span id="wishlist-count"
+                                  class="position-absolute top-0 start-100 translate-middle"
+                                  style="display: none;">
+                                0
+                            </span>
+                        {% endif %}
+
+                    </a>
+
+
+                    <!-- USER MENU -->
+                    <div class="dropdown">
+
+                        <a class="nav-link dropdown-toggle user-menu d-flex align-items-center"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+
+                            {% if request.user.profile.image and request.user.profile.image.name != 'profiles/default.png' %}
+
+                                <img src="{{ request.user.profile.image.url }}"
+                                     class="rounded-circle user-profile-image me-2"
+                                     alt="{{ request.user.username }}">
+
+                            {% else %}
+
+                                <i class="fas fa-user-circle fa-2x me-2 text-secondary"></i>
+
+                            {% endif %}
+
+                            <span>{{ request.user.username }}</span>
+
                         </a>
-                    </li>
-                    {% endif %} -->
-
-                   <!-- {% if request.user.is_authenticated %}
-                    <a class="nav-icon position-relative me-3"
-                    href="{% url 'wishlist_list' %}"
-                    id="wishlist-link">
-
-                        <i class="fa fa-heart text-dark"></i>
-
-                        <span
-                            id="wishlist-count"
-                            class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle {% if wishlist_count == 0 %}d-none{% endif %}">
-                            {{ wishlist_count }}
-                        </span>
-
-                    </a>
-                    {% endif %} -->
 
 
-                    {% if request.user.is_authenticated %}
-                    <a class="nav-icon position-relative me-3" href="{% url 'wishlist_list' %}">
-                        <i class="fa fa-heart text-dark"></i>
+                        <ul class="dropdown-menu dropdown-menu-end">
 
-                        <span id="wishlist-count"
-                            class="badge bg-light text-dark position-absolute top-0 start-100 translate-middle">
-                            {{ wishlist_count }}
-                        </span>
-                    </a>
-                    {% endif %}
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'profile' %}">
 
-                </ul>
-                <form class="d-flex me-3" action="{% url 'car_list' %}" method="get">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Rechercher une voiture..." aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit">Rechercher</button>
-                </form>
-                <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
-                    {% if request.user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% if request.user.profile.image and request.user.profile.image.name != 'profiles/default.png' %}
-                                    <img src="{{ request.user.profile.image.url }}" class="rounded-circle me-1" style="width: 30px; height: 30px; object-fit: cover;">
-                                {% else %}
-                                    <i class="fas fa-user-circle fa-lg me-1"></i>
-                                {% endif %}
-                                {{ request.user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card me-2"></i> Mon Profil</a></li>
-                                {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
-                                    <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-chart-line me-2"></i> Mon Dashboard</a></li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider"></li>
+                                    <i class="fas fa-id-card me-2"></i>
+                                    Mon profil
+
+                                </a>
+                            </li>
+
+
+                            {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
+
                                 <li>
-                                    <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0; padding:0;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</button>
-                                    </form>
+                                    <a class="dropdown-item"
+                                       href="{% url 'dashboard' %}">
+
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        Mon Dashboard
+
+                                    </a>
                                 </li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Connexion</a></li>
-                        <li class="nav-item"><a class="btn btn-primary rounded-pill px-3" href="{% url 'signup' %}">Inscription</a></li>
-                    {% endif %}
-                </ul>
+
+                            {% endif %}
+
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+
+                            <li>
+
+                                <form method="post"
+                                      action="{% url 'logout' %}">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="dropdown-item text-danger">
+
+                                        <i class="fas fa-sign-out-alt me-2"></i>
+                                        Déconnexion
+
+                                    </button>
+
+                                </form>
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                {% else %}
+
+                    <a class="nav-link me-2"
+                       href="{% url 'login' %}">
+
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Connexion
+
+                    </a>
+
+
+                    <a class="btn btn-primary signup-btn"
+                       href="{% url 'signup' %}">
+
+                        <i class="fas fa-user-plus me-1"></i>
+                        Inscription
+
+                    </a>
+
+                {% endif %}
+
             </div>
+
+            <!-- SEARCH -->
+            <form class="navbar-search me-xl-3"
+                  action="{% url 'car_list' %}"
+                  method="get">
+
+                <div class="input-group">
+
+                    <input class="form-control"
+                           type="search"
+                           name="q"
+                           value="{{ request.GET.q }}"
+                           placeholder="Rechercher une voiture..."
+                           aria-label="Rechercher une voiture">
+
+                    <button class="search-btn"
+                            type="submit"
+                            aria-label="Rechercher">
+
+                        <i class="fas fa-search"></i>
+
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
+        
+    </div>
 </nav>
 
-<main class="container py-4">
+
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<main class="flex-grow-1">
+
+    <div class="container-xxl-custom py-4">
+
         {% if messages %}
+
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                     role="alert">
+
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Fermer">
+                    </button>
+
                 </div>
+
             {% endfor %}
+
         {% endif %}
 
+
         {% block content %}
-        
         {% endblock %}
+
+    </div>
+
 </main>
 
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
 <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-car me-2"></i>BBcar</a>
-                    <p>Achetez, vendez et trouvez votre prochaine voiture avec les meilleures agences automobiles.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Liens utiles</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'agence_list' %}" class="text-white text-decoration-none">agences</a></li>
-                        <li><a href="{% url 'car_list' %}" class="text-white text-decoration-none">Toutes les voitures</a></li>
-                        <li><a href="{% url 'promotion_list' %}" class="text-white text-decoration-none">Toutes les promotions</a></li>
-                        <li><a href="{% url 'evenement_list' %}" class="text-white text-decoration-none">Événements</a></li>
-                        <li><a href="{% url 'blog_list' %}" class="text-white text-decoration-none">Blog & Articles</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-white text-decoration-none">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Suivez-nous</h5>
-                    <div class="d-flex gap-3 fs-4">
-                        <a href="#" class="text-white"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
+
+    <div class="container-xxl-custom">
+
+        <div class="row g-5">
+
+            <!-- ABOUT -->
+            <div class="col-lg-4 col-md-6">
+
+                <a class="footer-brand"
+                   href="{% url 'home' %}">
+
+                    <i class="fas fa-car me-2"></i>
+                    BB<span>car</span>
+
+                </a>
+
+                <p class="mt-3 mb-0">
+
+                    Achetez, vendez et trouvez votre prochaine voiture
+                    avec les meilleures agences automobiles en Algérie.
+
+                </p>
+
             </div>
-            <hr class="my-4">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2026 BBcar. Tous droits réservés | Plateforme pour les agences de véhicules en Algérie.</p>
-             
+
+
+            <!-- LINKS -->
+            <div class="col-lg-4 col-md-6">
+
+                <h5 class="footer-title">
+                    Navigation
+                </h5>
+
+                <ul class="footer-links">
+
+                    <li>
+                        <a href="{% url 'agence_list' %}">
+                            <i class="fas fa-angle-right me-2"></i>
+                            Agences
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'car_list' %}">
+                            <i class="fas fa-angle-right me-2"></i>
+                            Toutes les voitures
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'promotion_list' %}">
+                            <i class="fas fa-angle-right me-2"></i>
+                            Promotions
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'evenement_list' %}">
+                            <i class="fas fa-angle-right me-2"></i>
+                            Événements
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'blog_list' %}">
+                            <i class="fas fa-angle-right me-2"></i>
+                            Blog
+                        </a>
+                    </li>
+
+                </ul>
+
             </div>
+
+
+            <!-- SOCIAL -->
+            <div class="col-lg-4 col-md-12">
+
+                <h5 class="footer-title">
+                    Suivez-nous
+                </h5>
+
+                <p>
+                    Restez informé des nouvelles voitures,
+                    promotions et événements.
+                </p>
+
+                <div class="d-flex gap-3">
+
+                    <a href="#"
+                       class="social-link"
+                       aria-label="Facebook">
+
+                        <i class="fab fa-facebook-f"></i>
+
+                    </a>
+
+                    <a href="#"
+                       class="social-link"
+                       aria-label="Instagram">
+
+                        <i class="fab fa-instagram"></i>
+
+                    </a>
+
+                    <a href="#"
+                       class="social-link"
+                       aria-label="Twitter">
+
+                        <i class="fab fa-twitter"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
+
+
+        <!-- FOOTER BOTTOM -->
+
+        <div class="footer-bottom">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-6 text-center text-md-start">
+
+                    <p class="mb-0">
+                        © 2026 BBcar. Tous droits réservés.
+                    </p>
+
+                </div>
+
+
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+
+                    <small>
+                        Plateforme des agences automobiles en Algérie
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </footer>
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
+
+
+<!-- =========================================
+     WISHLIST BADGE UPDATE
+========================================= -->
+
+<script>
+function updateBadge(count) {
+
+    const badge = document.getElementById("wishlist-count");
+
+    if (!badge) return;
+
+    badge.textContent = count;
+
+    if (count > 0) {
+        badge.style.display = "flex";
+    } else {
+        badge.style.display = "none";
+    }
+}
+</script>
+
+
+{% block extra_js %}
+{% endblock %}
+
 </body>
 </html>

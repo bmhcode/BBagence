@@ -398,24 +398,13 @@
                     </div>
                     <div>
                         <!-- <small class="text-muted d-block uppercase fw-bold">PRIX</small> -->
-                        {% if car.est_en_promotion_valide %}
-                            {{ car.prix_promo|intcomma }} Million
-                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
-                                {{ car.nouveau_prix|intcomma }}
-                            </span>
-                            {% if car.ancien_prix %}
-                            <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
-                                {{ car.ancien_prix|intcomma }}
-                            </span>
-                            {% endif %}
-                        {% else %}
                             {{ car.nouveau_prix|intcomma }} Million
                             {% if car.ancien_prix %}
                             <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
                                 {{ car.ancien_prix|intcomma }}
                             </span>
                             {% endif %}
-                        {% endif %}
+                        
                     </div>
                 </div>
                 {% endif %}

@@ -234,18 +234,6 @@ class ContactForm(forms.ModelForm):
             'message': 'Message *',
         }
 
-# ===================== / Agence forms =================== #
-
-class BrandForm(forms.ModelForm):
-    class Meta:
-        model = Brand
-        fields = ['nom', 'date_debut', 'date_fin', 'image']
-        widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nom de la marque'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-file'}),
-            'date_debut': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
-            'date_fin': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
-        }
 
 class PromotionForm(forms.ModelForm):
     # Champs supplémentaires hors-modèle
@@ -274,24 +262,35 @@ class PromotionForm(forms.ModelForm):
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
 
+
+# ===================== / Agence forms =================== #
+
+class BrandForm(forms.ModelForm):
+    class Meta:
+        model = Brand
+        fields = ['image','nom', 'date_debut', 'date_fin','afficher' ]
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nom de la marque'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-file'}),
+            'date_debut': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
+            'date_fin': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
+            'afficher': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
 # ===================== Events forms ===================== # 
 
 class EvenementForm(forms.ModelForm):
     class Meta:
         model = Evenement
-        fields = ['titre', 'description', 'date_debut', 'date_fin', 'lieu', 'image']
+        fields = ['titre', 'description', 'date_debut', 'date_fin', 'lieu', 'image','afficher']
         widgets = {
             'titre': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'lieu': forms.TextInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            # 'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            # 'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-
             'date_debut': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
             'date_fin': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
-
-
+            'afficher': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
 
         }
 
@@ -302,13 +301,14 @@ class EvenementForm(forms.ModelForm):
 class ArticleBlogForm(forms.ModelForm):
     class Meta:
         model = ArticleBlog
-        fields = ['titre', 'contenu', 'image', 'date_debut_publication', 'date_fin_publication']
+        fields = ['titre', 'contenu', 'image', 'date_debut_publication', 'date_fin_publication','afficher']
         widgets = {
             'titre': forms.TextInput(attrs={'class': 'form-control'}),
             'contenu': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'date_debut_publication': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
             'date_fin_publication': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'afficher': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 # ===================== / Blog forms ======================= #   
