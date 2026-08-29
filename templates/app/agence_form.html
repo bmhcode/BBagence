@@ -29,155 +29,508 @@
 {% endblock %}
 
 {% block content %}
+
 <!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'agence_list' %}">Agences</a></li>
-        <li class="breadcrumb-item active">
-            {% if object %}Modifier{% else %}Créer{% endif %} une agence
-        </li>
-    </ol>
-</nav>
-
-<form method="post" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-
-    <div class="row g-4">
-        <div class="col-lg-8">
-
-            <!-- Informations principales -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-building"></i> Informations de l'agence</div>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Nom de l'agence *</label>
-                        {{ form.nom }}
-                        {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Description *</label>
-                        {{ form.description }}
-                    </div>
-                  
-                </div>
-            </div>
-
-            <!-- Contact -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-address-book"></i> Coordonnées</div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Téléphone</label>
-                        {{ form.telephone }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Email</label>
-                        {{ form.email }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Site web</label>
-                        {{ form.site_web }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Wilaya</label>
-                        {{ form.ville }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Commune</label>
-                        {{ form.commune }}
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Adresse</label>
-                        {{ form.adresse }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Horaires -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-clock"></i> Horaires d'ouverture</div>
-                <div class="row g-3">
-                    <div class="col-md-5">
-                        <label class="form-label fw-semibold">Heure ouverture</label>
-                        {{ form.heure_ouverture }}
-                    </div>
-                    <div class="col-md-5">
-                        <label class="form-label fw-semibold">Heure fermeture</label>
-                        {{ form.heure_fermeture }}
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <div class="form-check form-switch">
-                            {{ form.est_ferme }}
-                            <label class="form-check-label" for="{{ form.est_ferme.id_for_label }}">Fermée</label>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Observation (fermeture exceptionnelle…)</label>
-                        {{ form.observation }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Localisation -->
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-map-marked-alt"></i> Localisation Google Maps</div>
-                <label class="form-label fw-semibold">URL embed Google Maps</label>
-                {{ form.google_map }}
-                <small class="text-muted">Ex&nbsp;: <code>https://www.google.com/maps/embed?pb=…</code></small>
-            </div>
-
-            <!-- Réseaux sociaux -->
-            {% if social_form %}
-            <div class="form-section">
-                <div class="form-section-title"><i class="fas fa-share-alt"></i> Réseaux sociaux</div>
-                <div class="row g-3">
-                    {% for field in social_form %}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            <i class="fab fa-{{ field.name }} me-1"></i>{{ field.label }}
-                        </label>
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Buttons -->
-            <div class="d-flex gap-3">
-                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
-                    <i class="fas fa-save me-2"></i>{% if object %}Enregistrer{% else %}Créer{% endif %}
-                </button>
-                <a href="{% url 'agence_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
-            </div>
-        </div>
-
-        <!-- Preview card -->
-        {% if object %}
-        <div class="col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body p-4 text-center">
-                    {% if object.main_image %}
-                    <img src="{{ object.main_image.image.url }}" class="rounded-3 mb-3 img-fluid" alt="{{ object.nom }}" style="max-height:140px; object-fit:cover;">
-                    {% endif %}
-                    <h5 class="mb-1">{{ object.nom }}</h5>
-                    <p class="text-muted small">{{ object.ville }}</p>
-                    <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm rounded-pill">
-                        <i class="fas fa-eye me-1"></i>Voir la page
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+<section class="" style="padding: 10px 0; ">
+    <div class="container" style="position: relative; z-index: 2;">
+        <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
+            
+            <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            {% if object %} 
+                <a href="{% url 'agence_detail' agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence }}</a>
+                <span style="margin: 0 8px; opacity: 0.5;">/</span>
+                <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Modifier</span>
+            {% else %}
+                <a href="{% url 'agence_list' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">agences</a>
+                <span style="margin: 0 8px; opacity: 0.5;">/</span>
+                <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Créer une agence</span>
+            {% endif %} 
+        
+        </nav>
     </div>
-</form>
+</section>
+
+<div class="row">
+    <!-- left -->
+   <div class="col-10 mx-auto">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-4">
+
+                <!-- FORMULAIRE -->
+                <div class="{% if object %}col-lg-8{% else %}col-12{% endif %}">
+
+                    <!-- Onglets -->
+                    <div class="form-tabs-card">
+
+                        <ul class="nav nav-tabs form-tabs mb-4" id="agencyFormTabs" role="tablist">
+
+                            <!-- Informations -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active"
+                                        id="info-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#info"
+                                        type="button"
+                                        role="tab">
+                                    <i class="fas fa-building"></i>
+                                    <span>Informations</span>
+                                </button>
+                            </li>
+
+                            <!-- Contact -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link"
+                                        id="contact-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#contact"
+                                        type="button"
+                                        role="tab">
+                                    <i class="fas fa-address-book"></i>
+                                    <span>Coordonnées</span>
+                                </button>
+                            </li>
+
+                            <!-- Horaires -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link"
+                                        id="horaires-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#horaires"
+                                        type="button"
+                                        role="tab">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Horaires</span>
+                                </button>
+                            </li>
+
+                            <!-- Localisation -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link"
+                                        id="localisation-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#localisation"
+                                        type="button"
+                                        role="tab">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Localisation</span>
+                                </button>
+                            </li>
+
+                            <!-- Réseaux sociaux -->
+                            {% if social_form %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link"
+                                        id="social-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#social"
+                                        type="button"
+                                        role="tab">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>Réseaux</span>
+                                </button>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+
+                        <!-- Contenu des onglets -->
+                        <div class="tab-content" id="agencyFormTabsContent">
+
+                            <!-- =========================
+                                ONGLET INFORMATIONS
+                            ========================== -->
+                            <div class="tab-pane fade show active"
+                                id="info"
+                                role="tabpanel">
+
+                                <div class="form-section">
+
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Informations de l'agence</h5>
+                                            <p>Informations principales de votre agence</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">
+                                                Nom de l'agence <span class="text-danger">*</span>
+                                            </label>
+
+                                            {{ form.nom }}
+
+                                            {% if form.nom.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.nom.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">
+                                                Description <span class="text-danger">*</span>
+                                            </label>
+
+                                            {{ form.description }}
+
+                                            {% if form.description.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.description.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- =========================
+                                ONGLET CONTACT
+                            ========================== -->
+                            <div class="tab-pane fade"
+                                id="contact"
+                                role="tabpanel">
+
+                                <div class="form-section">
+
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-address-book"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Coordonnées</h5>
+                                            <p>Informations de contact de votre agence</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Téléphone
+                                            </label>
+                                            {{ form.telephone }}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Email
+                                            </label>
+                                            {{ form.email }}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Site web
+                                            </label>
+                                            {{ form.site_web }}
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Wilaya
+                                            </label>
+                                            {{ form.ville }}
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Commune
+                                            </label>
+                                            {{ form.commune }}
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">
+                                                Adresse
+                                            </label>
+                                            {{ form.adresse }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- =========================
+                                ONGLET HORAIRES
+                            ========================== -->
+                            <div class="tab-pane fade"
+                                id="horaires"
+                                role="tabpanel">
+
+                                <div class="form-section">
+
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Horaires d'ouverture</h5>
+                                            <p>Configurez les horaires de votre agence</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-4">
+
+                                        <div class="col-md-5">
+                                            <label class="form-label fw-semibold">
+                                                Heure d'ouverture
+                                            </label>
+                                            {{ form.heure_ouverture }}
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <label class="form-label fw-semibold">
+                                                Heure de fermeture
+                                            </label>
+                                            {{ form.heure_fermeture }}
+                                        </div>
+
+                                        <div class="col-md-2 d-flex align-items-end">
+
+                                            <div class="form-check form-switch mb-2">
+                                                {{ form.est_ferme }}
+
+                                                <label class="form-check-label fw-semibold"
+                                                    for="{{ form.est_ferme.id_for_label }}">
+                                                    Fermée
+                                                </label>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">
+                                                Observation
+                                            </label>
+
+                                            {{ form.observation }}
+
+                                            <div class="form-text">
+                                                Exemple : fermeture exceptionnelle,
+                                                congés, travaux...
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- =========================
+                                ONGLET LOCALISATION
+                            ========================== -->
+                            <div class="tab-pane fade"
+                                id="localisation"
+                                role="tabpanel">
+
+                                <div class="form-section">
+
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Localisation</h5>
+                                            <p>Ajoutez la localisation Google Maps</p>
+                                        </div>
+                                    </div>
+
+                                    <label class="form-label fw-semibold">
+                                        URL Embed Google Maps
+                                    </label>
+
+                                    {{ form.google_map }}
+
+                                    <div class="alert alert-light border mt-3 mb-0">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>
+
+                                        Exemple :
+                                        <code>
+                                            https://www.google.com/maps/embed?pb=...
+                                        </code>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- =========================
+                                ONGLET RÉSEAUX SOCIAUX
+                            ========================== -->
+                            {% if social_form %}
+                            <div class="tab-pane fade"
+                                id="social"
+                                role="tabpanel">
+
+                                <div class="form-section">
+
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-share-alt"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Réseaux sociaux</h5>
+                                            <p>Ajoutez les liens de vos réseaux sociaux</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                        {% for field in social_form %}
+                                        <div class="col-md-6">
+
+                                            <label class="form-label fw-semibold">
+
+                                                {% if field.name == "facebook" %}
+                                                    <i class="fab fa-facebook text-primary me-1"></i>
+
+                                                {% elif field.name == "instagram" %}
+                                                    <i class="fab fa-instagram text-danger me-1"></i>
+
+                                                {% elif field.name == "youtube" %}
+                                                    <i class="fab fa-youtube text-danger me-1"></i>
+
+                                                {% elif field.name == "tiktok" %}
+                                                    <i class="fab fa-tiktok me-1"></i>
+
+                                                {% else %}
+                                                    <i class="fas fa-link me-1"></i>
+                                                {% endif %}
+
+                                                {{ field.label }}
+                                            </label>
+
+                                            {{ field }}
+
+                                            {% if field.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ field.errors.0 }}
+                                                </div>
+                                            {% endif %}
+
+                                        </div>
+                                        {% endfor %}
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- BOUTONS -->
+                        <div class="form-actions d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+
+                            <a href="{% url 'agence_list' %}"
+                            class="btn btn-light rounded-pill px-4">
+                                <i class="fas fa-times me-2"></i>
+                                Annuler
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary rounded-pill px-5 py-2 fw-bold">
+                                <i class="fas fa-save me-2"></i>
+
+                                {% if object %}
+                                    Enregistrer les modifications
+                                {% else %}
+                                    Créer l'agence
+                                {% endif %}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                    PREVIEW CARD
+                ========================== -->
+                {% if object %}
+                <div class="col-lg-4">
+
+                    <div class="card shadow-sm border-0 preview-card sticky-lg-top"
+                        style="top: 100px;">
+
+                        <div class="card-body p-4 text-center">
+
+                            {% if object.main_image %}
+                                <img src="{{ object.main_image.image.url }}"
+                                    class="rounded-4 mb-3 img-fluid preview-image"
+                                    alt="{{ object.nom }}">
+                            {% else %}
+                                <div class="preview-placeholder mb-3">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                            {% endif %}
+
+                            <h5 class="fw-bold mb-1">
+                                {{ object.nom }}
+                            </h5>
+
+                            <p class="text-muted small">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ object.ville }}
+                            </p>
+
+                            <hr>
+
+                            <a href="{{ object.get_absolute_url }}"
+                            class="btn btn-outline-primary btn-sm rounded-pill px-4">
+
+                                <i class="fas fa-eye me-1"></i>
+                                Voir la page
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                {% endif %}
+
+            </div>
+        </form>
+    </div>
+
+    
+</div>
+
+
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
 
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
     const villeNames = [
         'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa',
         'Biskra', 'Béchar', 'Blida', 'Bouira', 'Tamanrasset', 'Tébessa',
@@ -310,4 +663,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
+
+
 {% endblock extra_js %}

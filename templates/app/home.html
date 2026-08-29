@@ -124,14 +124,31 @@
     <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>agences à la Une</h2>
+            {% if request.user.is_superuser %}
+                <a href="{% url 'agence_create' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-plus"></i> Ajouter une agence
+                </a>
+            {% endif %}
             <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir toutes les agences <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="row g-4">
-            {% for agence in agences_vedette %}
+            {% for object in agences_vedette %}
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm">
-                    {% if agence.main_image %}
-                    <img src="{{ agence.main_image.image.url }}" class="card-img-top" alt="{{ agence.nom }}" style="height: 200px; object-fit: cover;">
+                    {% if object.main_image %}
+                    <img src="{{ object.main_image.image.url }}" class="card-img-top" alt="{{ object.nom }}" style="height: 200px; object-fit: cover;">
+                     <!-- Edit/Delete buttons for superuser -->
+                        {% if request.user.is_superuser %}
+                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                            <a href="{% url 'agence_update' object.slug %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'agence_delete' object.slug %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                        <!--  / Edit/Delete buttons for superuser -->
                     {% else %}
                     <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                         <i class="fas fa-store fa-3x text-muted"></i>
@@ -139,18 +156,17 @@
                     {% endif %}
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title">{{ agence.nom }}</h5>
-                        <!-- <span class="badge bg-light text-dark">{{ agence.get_categorie_display }}</span> -->
-                        <a href="{{ agence.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
+                        <h5 class="card-title">{{ object.nom }}</h5>
+                        <!-- <span class="badge bg-light text-dark">{{ object.get_categorie_display }}</span> -->
+                        <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
 
                         </div>
-                        <p class="card-text text-muted">{{ agence.description|truncatechars:30 }}</p>
+                        <p class="card-text text-muted">{{ object.description|truncatechars:30 }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                             <a href="{% url 'agence_localisation_acces' agence.slug %}"><small><span><i class="fas fa-map-marker-alt"></i> {{agence.ville}} {% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%} </span></a>
-                            </small>
-                                <small><span><i class="fas fa-clock"></i> 09:00 - 22:00</span> 
-                            </small>
-
+                            <span><i class="fas fa-map-marker-alt"></i> 
+                                <small> <a href="{% url 'agence_localisation_acces' object.slug %}">{{ object.ville }}</a> {% if object.ville != object.commune%} - {{object.commune}} {%endif%}</small>
+                            </span>                            </small>
+                            <small><span><i class="fas fa-clock"></i> {{object.heure_ouverture|time:"H:i"}} - {{object.heure_fermeture}}</span> </small>
                         </div>
                     </div>
                 </div>

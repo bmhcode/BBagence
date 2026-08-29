@@ -1,0 +1,608 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ agence.nom }} - BBCARS{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+    /* =====================================
+   SOCIAL MEDIA BUTTONS
+===================================== */
+
+.social-links {
+    align-items: center;
+}
+
+.social-btn {
+    width: 46px;
+    height: 46px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ff4f9a;
+    border-radius: 50%;
+
+    color: #ff4f9a;
+    background: #fff;
+
+    text-decoration: none;
+    font-size: 1.2rem;
+
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    background: #ff4f9a;
+    color: #fff;
+
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(255, 79, 154, 0.25);
+}
+
+.social-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Focus accessible */
+.social-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(255, 79, 154, 0.2);
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .social-links {
+        justify-content: center;
+    }
+
+    .social-btn {
+        width: 44px;
+        height: 44px;
+    }
+}
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+
+<h3 class="">{{ agence.nom }}</h3>
+
+<div class="row">
+    <div class="col-md-8 col-lg-8">
+        <!-- agence -->
+        <div class="card shadow rounded-3 overflow-hidden mb-4">
+         
+            {% if agence.main_image %}
+                <img src="{{ agence.main_image.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="fas fa-store fa-3x text-muted"></i>
+                </div>
+            {% endif %}
+
+            <!-- Edit/Delete buttons -->
+            <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                            {% if request.user.is_superuser or object.manager == request.user %}
+                            <a href="{% url 'agence_update' object.slug %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                            {% if request.user.is_superuser %}
+                            <a href="{% url 'agence_delete' object.slug %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            {% endif %}
+            </div>
+            <!--  / Edit/Delete buttons -->
+
+        <div class="card-body p-4 p-lg-5">
+
+    <!-- Navigation rapide -->
+    <div class="agency-actions mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-between">
+
+            <a href="{% url 'agence_localisation_acces' agence.slug %}"
+               class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>Localisation & Accès</span>
+            </a>
+
+            <a href="{% url 'agence_video' agence.slug %}"
+               class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <i class="fas fa-video me-2"></i>
+                <span>Visites Vidéo</span>
+            </a>
+
+            <a href="{% url 'agence_photos' agence.slug %}"
+               class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <i class="fas fa-images me-2"></i>
+                <span>Galerie Photos</span>
+            </a>
+
+            {% if request.user.is_superuser or agence.manager == request.user %}
+
+                <a href="{% url 'agence_messages' agence.slug %}"
+                   class="btn btn-outline-primary rounded-pill px-4 py-2 position-relative">
+                    <i class="fas fa-envelope me-2"></i>
+                    <span>Messages</span>
+                </a>
+
+                <a href="{% url 'agence_presentation_manage' agence.slug %}"
+                   class="btn btn-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-gear me-2"></i>
+                    <span>Gérer l'agence</span>
+                </a>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- À propos -->
+    <div class="row align-items-center g-4">
+
+        <!-- Icône -->
+        <div class="col-auto">
+            <div class="about-icon">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col">
+            <h4 class="fw-bold mb-2">
+                À propos de nous
+            </h4>
+
+            <p class="text-muted mb-0 about-description">
+                {{ agence.description|truncatewords:20 }}
+            </p>
+        </div>
+
+        <!-- Bouton de détails -->
+        <div class="col-12 col-lg-auto text-lg-end">
+
+            <a href="{% url 'agence_presentation' agence.slug %}"
+               class="btn btn-light border rounded-pill px-4 py-2">
+                Découvrir l'agence
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+        </div>
+        <!-- end agence -->
+    </div>
+    <!-- Agence infos  -->
+    <div class="col-md-4 col-lg-4">
+        <div class="card shadow-sm rounded-3 mb-4">
+            <div class="card-body p-4">
+                <!-- <h5 class="mb-4">Informations Pratiques</h5> -->
+                 <div class="d-flex justify-content-between align-items-center mb-3">
+                        <!-- <h4 style="margin: 0;">Infos Pratiques</h4> -->
+                      {% if agence.est_ouvert_maintenant %}
+                        <span style="display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; color: #166534; font-size: 0.8rem; font-weight: 700; padding: 8px 16px; border-radius: 50px; border: 1px solid #bbf7d0; box-shadow: var(--shadow-sm);">
+                            <span class="pulse-indicator green"></span> Ouvert Actuellement
+                        </span>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 8px; background: #fef2f2; color: #991b1b; font-size: 0.8rem; font-weight: 700; padding: 8px 16px; border-radius: 50px; border: 1px solid #fecaca; box-shadow: var(--shadow-sm);">
+                            <span class="pulse-indicator red"></span> Fermé Actuellement
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                <!-- <h3 class="display-5 mb-0">{{ agence.nom }} </h3> -->
+                <div class="card border-0 shadow-sm rounded-3 mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+
+                                {% if agence.manager.profile.image %}
+                                    <img src="{{ agence.manager.profile.imageURL }}"
+                                        alt="{{ agence.manager.username }}"
+                                        class="rounded-circle border shadow-sm me-3"
+                                        style="width:80px; height:80px; object-fit:cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                        style="width:80px; height:80px; font-size:30px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold">
+                                        {{ agence.manager.first_name }} {{ agence.manager.last_name }}
+                                    </h6>
+
+                                    <small class="text-muted d-block mb-2">
+                                        @{{ agence.manager.username }}
+                                    </small>
+
+                                    {% if agence.manager.profile.telephone %}
+                                        <div class="small">
+                                            <i class="fas fa-phone-alt text-success me-2"></i>
+                                            {{ agence.manager.profile.telephone }}
+                                        </div>
+                                    {% else %}
+                                        <div class="small text-muted">
+                                            <i class="fas fa-phone-alt me-2"></i>
+                                            Non renseigné
+                                        </div>
+                                    {% endif %}
+                                </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                        </div>
+                       
+
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <a href="{% url 'agence_localisation_acces' agence.slug %}">{{ agence.ville }}</a> , {{ agence.commune }}
+                            <br>{% if agence.adresse %}<span class="text-muted m-0">{{ agence.adresse }}</span>{% endif %}
+                        </small>
+                    </div>
+
+                    </div>
+
+                    {% if agence.telephone %}
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-phone text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">TÉLÉPHONE</small> -->
+                            <span>{{ agence.telephone }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if agence.heure_ouverture and agence.heure_fermeture %}
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-clock text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">HORAIRES</small> -->
+                            <span>{{ agence.get_ouvert_ferme_display }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                
+                    {% if agence.email %}
+                    <div class="mb-2 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-envelope text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">Email</small> -->
+                            <a href="mailto:{{ agence.email }}" target="_blank" class="text-decoration-none">{{ agence.email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if agence.site_web %}
+                    <div class="mb-2 d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-globe text-primary"></i>
+                        </div>
+                        <div>
+                            <!-- <small class="text-muted d-block uppercase fw-bold">SITE INTERNET</small> -->
+                            <a href="{{ agence.site_web }}" target="_blank" class="text-decoration-none">Visiter le site internet</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Réseaux sociaux -->
+                    {% if agence.social.facebook or agence.social.instagram or agence.social.twitter %}
+                    <div class="social-links d-flex flex-wrap gap-2 mb-4">
+
+                        {% if agence.social.facebook %}
+                        <a href="{{ agence.social.facebook }}"
+                        class="social-btn facebook"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Facebook"
+                        title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if agence.social.instagram %}
+                        <a href="{{ agence.social.instagram }}"
+                        class="social-btn instagram"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram"
+                        title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if agence.social.twitter %}
+                        <a href="{{ agence.social.twitter }}"
+                        class="social-btn twitter"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Twitter / X"
+                        title="Twitter / X">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <a href="{% url 'contact' %}?agence={{ agence.nom }}"
+                        class="btn btn-primary rounded-pill py-2 flex-fill">
+                            Envoyer un message
+                        </a>
+                   
+                    </div>
+                </div>
+
+             
+
+
+                <!-- <div class="bg-white p-4 shadow-sm rounded-3">
+                    <h5 class="mb-3">Partagez l'expérience</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-facebook-f me-2"></i>Partager</button>
+                        <button class="btn btn-outline-secondary btn-sm flex-fill"><i class="fab fa-twitter me-2"></i>Tweet</button>
+                    </div>
+                </div> -->
+                <!-- end sidebar -->
+            </div>
+        <!-- end Agence infos -->
+        </div>
+    </div>
+    <!-- / Agence infos  -->
+
+    <!-- ── Car Grid ── -->
+    <div class="col-lg-12">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 class="section-title" style="margin: 0;">Nos voitures</h2>
+
+            <a href="{% url 'agence_carlist' agence.slug %}" class="btn btn-outline-primary btn-sm">
+              Voir tout <i class="fas fa-arrow-right"></i>
+            </a>
+
+            {% if request.user.is_superuser or agence.manager == request.user %}
+            <a href="{% url 'car_create' agence.slug %}" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-plus"></i> Ajouter une voiture
+            </a>
+            {% endif %}
+            
+        </div>
+            {% if agence.cars.all %}
+                <div class="row g-4">
+                    {% for car in agence.cars.all|slice:":6" %}
+                        <div class="col-sm-4 col-xl-3">
+                            <div class="car-card">
+                                <!-- Wishlist Button -->
+                                {% if request.user.is_authenticated %}  
+                                    <button
+                                                type="button"
+                                                onclick="toggleWishlist(this, {{ car.id }})"
+                                                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                                                aria-label="Ajouter aux favoris"
+                                                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+                                    </button>
+                                {% endif %}
+                                <!-- Image -->
+                                <div class="car-card__img">
+                                    <a href="{% url 'car_detail' car.agence.slug car.id %}">
+
+                                        {% if car.main_image %}
+
+                                            <div class="position-relative w-100 h-100">
+
+                                                <img src="{{ car.main_image.image.url }}"
+                                                    class="promo-image w-100 h-100"
+                                                    alt="{{ car.marque }} {{ car.modele }}"
+                                                    loading="lazy">
+
+                                                <!-- PROMO - Bottom Left -->
+                                                {% if car.est_en_promotion_valide %}
+                                                    <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                                                        <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                                            PROMO {{ car.prix_promo|intcomma }} Million
+                                                        </div>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-car fa-3x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <!-- Edit/Delete buttons for manager or superuser -->
+                                {% if request.user.is_superuser or car.agence.manager == request.user %}
+                                    <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                                            <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                    </div>
+                                {% endif %}
+                                <!-- Body -->
+                                <div class="car-card__body">
+                                    <div class="car-card__brand">{{ car.marque }}</div>
+                                    <div class="car-card__title">{{ car.modele }} {{ car.annee }}</div>
+                                    <div class="car-card__meta">
+                                        <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ car.get_energie_display }}</span>
+                                        <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ car.get_boite_de_vitesse_display }}</span>
+                                        <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ car.kilometrage|intcomma }} km</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="car-card__price">{{ car.nouveau_prix|intcomma }} Million</span>
+                                            {% if car.ancien_prix %}
+                                                <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <a href="{% url 'car_detail' car.agence.slug car.id %}"
+                                        class="btn btn-primary btn-sm rounded-pill px-3">
+                                            Voir
+                                        </a>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                                            <i class="fas fa-store me-1"></i>
+                                            <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center gap-1">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                            <a class="page-link rounded-pill" href="?page={{ i }}&{{ request.GET.urlencode }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-car-crash"></i>
+                    <h4>Aucune voiture trouvée</h4>
+                    <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                    <a href="{% url 'car_list' %}" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-undo me-2"></i>Réinitialiser la recherche
+                    </a>
+                </div>
+            {% endif %}
+
+
+    </div>
+    <!-- / ── Car Grid ── -->
+
+
+
+
+<script>
+
+/* CSRF */
+function getCSRFToken() {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+/* wishlist */
+
+function updateBadge(count) {
+
+    const badge = document.getElementById("wishlist-count");
+
+    if (!badge) return;
+
+    badge.textContent = count;
+
+    if (count > 0) {
+        badge.classList.remove("d-none");
+    } else {
+        badge.classList.add("d-none");
+    }
+}
+
+function toggleWishlist(btn, carId) {
+
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    fetch(`/wishlist/toggle/${carId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (!data.success) return;
+
+        const icon = btn.querySelector("i");
+
+        if (data.in_wishlist) {
+            btn.classList.add("active");
+            icon.classList.remove("far");
+            icon.classList.add("fas");
+        } else {
+            btn.classList.remove("active");
+            icon.classList.remove("fas");
+            icon.classList.add("far");
+        }
+
+        updateBadge(data.wishlist_count);
+    }
+)
+    .catch(console.error)
+    .finally(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+    });
+}
+
+</script>
+
+
+
+
+
+
+{% endblock %}

@@ -1,3 +1,7 @@
+
+
+
+
 /* ============================================================
    YES MALL — Main JavaScript
    ============================================================ */
@@ -164,5 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+/* =========================================
+   WISHLIST BADGE UPDATE
+========================================= */
+function updateBadge(count) {
+    const badge = document.getElementById("wishlist-count");
+    if (!badge) return;
+    badge.textContent = count;
+    if (count > 0) {
+        badge.style.display = "flex";
+    } else {
+        badge.style.display = "none";
+    }
+}
 
 

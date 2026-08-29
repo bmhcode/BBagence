@@ -415,7 +415,7 @@
    NAVBAR - PETITS LAPTOPS
 ========================================= */
 
-@media (min-width: 992px) and (max-width: 1399px) {
+@media (min-width: 900px) and (max-width: 1399px) {
 
     .main-navbar {
         padding: 8px 0;
@@ -429,7 +429,7 @@
     /* Tout reste sur une seule ligne */
     .navbar-collapse {
         display: flex !important;
-        flex-basis: auto;
+        flex-basis: auto !important;
         flex-grow: 1;
         align-items: center;
         min-width: 0;
@@ -445,8 +445,8 @@
 
     /* Réduire l'espace entre les éléments */
     .navbar-nav .nav-link {
-        padding: 8px 7px;
-        font-size: 0.85rem;
+        padding: 8px 5px;
+        font-size: 0.8rem;
     }
 
     .navbar-nav .nav-link i {
@@ -561,9 +561,8 @@
      NAVBAR
 ========================================= -->
 
-<nav class="navbar navbar-expand-xl main-navbar sticky-top">
-
-    <div class="container-xxl-custom">
+<nav class="navbar navbar-expand-lg main-navbar sticky-top">
+    <div class="container-xxl-custom d-flex flex-nowrap align-items-center">
 
         <!-- LOGO -->
         <a class="navbar-brand" href="{% url 'home' %}">
@@ -651,6 +650,32 @@
                 </li>
 
             </ul>
+
+            <!-- SEARCH -->
+            <!-- <form class="navbar-search me-xl-3"
+                  action="{% url 'car_list' %}"
+                  method="get">
+
+                <div class="input-group">
+
+                    <input class="form-control"
+                           type="search"
+                           name="q"
+                           value="{{ request.GET.q }}"
+                           placeholder="Rechercher une voiture..."
+                           aria-label="Rechercher une voiture">
+
+                    <button class="search-btn"
+                            type="submit"
+                            aria-label="Rechercher">
+
+                        <i class="fas fa-search"></i>
+
+                    </button>
+
+                </div>
+
+            </form> -->
 
             <!-- USER ACTIONS -->
             <div class="navbar-actions">
@@ -785,37 +810,35 @@
                 {% endif %}
 
             </div>
-
-            <!-- SEARCH -->
-            <form class="navbar-search me-xl-3"
-                  action="{% url 'car_list' %}"
-                  method="get">
-
-                <div class="input-group">
-
-                    <input class="form-control"
-                           type="search"
-                           name="q"
-                           value="{{ request.GET.q }}"
-                           placeholder="Rechercher une voiture..."
-                           aria-label="Rechercher une voiture">
-
-                    <button class="search-btn"
-                            type="submit"
-                            aria-label="Rechercher">
-
-                        <i class="fas fa-search"></i>
-
-                    </button>
-
-                </div>
-
-            </form>
-
         </div>
-        
     </div>
+    
 </nav>
+<!-- SEARCH -->
+ <form class="navbar-search me-xl-3"
+      action="{% url 'car_list' %}"
+      method="get">
+
+    <div class="input-group">
+
+        <input class="form-control"
+               type="search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Rechercher une voiture..."
+               aria-label="Rechercher une voiture">
+
+        <button class="search-btn"
+                type="submit"
+                aria-label="Rechercher">
+
+            <i class="fas fa-search"></i>
+
+        </button>
+
+    </div>
+
+</form> 
 
 
 <!-- =========================================

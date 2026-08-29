@@ -6,9 +6,9 @@
 
 <div class="row mb-3">
     <div class="col-12 text-center">
-        <h1 class="display-5 text-center mb-4">Nos agences de voitures</h1>
+        <h1 class="display-6 text-center mb-3">Nos agences de voitures</h1>
         <p class="text-center text-muted col-md-8 mx-auto">Explorez une vaste sélection d'agences de vente de voiture.</p>
-    {% if request.user.is_superuser %}
+        {% if request.user.is_superuser %}
             <a href="{% url 'agence_create' %}" class="btn btn-outline-primary btn-sm">
               <i class="fas fa-plus"></i> Ajouter une agence
             </a>
@@ -16,62 +16,60 @@
     </div>
 </div>
 
-<!-- Filter by City -->
-    <div class="card-body">
+<!-- Filter by Ville -->
+    <div class="card-body mb-4">
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-search"></i></span>
             <input type="text" id="citySearch" class="form-control" placeholder="Rechercher par ville...">
         </div>
     </div>
 <!-- end filter by city -->
-<br>
+
 <!-- liste des agences -->
 <div class="row">
-     <!-- Agence List -->
+
+    <!-- Agence List -->
     <div class="col-lg-12">
         <div class="row g-4">
             {% for object in agences %}
-           <div class="col-md-4 col-xl-3 agence-card" data-city="{{ object.ville|lower }}">
+            <div class="col-md-4 col-xl-3 agence-card" data-city="{{ object.ville|lower }}">
                 <div class="card h-100 shadow-sm">
                     {% if object.main_image %}
-                    <img src="{{ object.main_image.image.url }}" class="card-img-top" alt="{{ object.nom }}" style="height: 180px; object-fit: cover;">
-                    
-                     <!-- Edit/Delete buttons for superuser -->
-            {% if request.user.is_superuser %}
-            <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                <a href="{% url 'agence_update' object.slug %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href="{% url 'agence_delete' object.slug %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-trash"></i>
-                </a>
-            </div>
-            {% endif %}
-            <!--  / Edit/Delete buttons for superuser -->
-         
-                    
+                        <img src="{{ object.main_image.image.url }}" class="card-img-top" alt="{{ object.nom }}" style="height: 180px; object-fit: cover;">
+                        
+                        <!-- Edit/Delete buttons -->
+                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                            {% if request.user.is_superuser or object.manager == request.user %}
+                            <a href="{% url 'agence_update' object.slug %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                            {% if request.user.is_superuser %}
+                            <a href="{% url 'agence_delete' object.slug %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        <!--  / Edit/Delete buttons -->
+
                     {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                        <i class="fas fa-store fa-3x text-muted"></i>
-                    </div>
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                            <i class="fas fa-store fa-3x text-muted"></i>
+                        </div>
                     {% endif %}
                     <div class="card-body">
-                       <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title">{{ object.nom }}</h5>
-                        <!-- <span class="badge bg-light text-dark">{{ object.get_categorie_display }}</span> -->
-                        <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
-
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">{{ object.nom }}</h5>
+                            <!-- <span class="badge bg-light text-dark">{{ object.get_categorie_display }}</span> -->
+                            <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
                         </div>
                         <p class="card-text small">{% if object.description %}{{ object.description|truncatechars:30 }}{% else %} No description available {% endif %}</p>
-                       <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-map-marker-alt"></i> 
-                                <small> <a href="{% url 'agence_localisation_acces' object.slug %}">{{ object.ville }}</a> ,{{ object.commune }}</small>
+                                <small> <a href="{% url 'agence_localisation_acces' object.slug %}">{{ object.ville }}</a> {% if object.ville != object.commune%} - {{object.commune}} {%endif%}</small>
                             </span>
-
-                            
-                            <small><span><i class="fas fa-clock"></i> 09:00 - 22:00</span></small>
+                            <small><span><i class="fas fa-clock"></i> {{object.heure_ouverture|time:"H:i"}} - {{object.heure_fermeture}}</span></small>
                         </div>  
-                        
                     </div>
                 </div>
             </div>
@@ -101,21 +99,12 @@
         {% endif %}
     </div>
 </div>
-<!-- end liste des agences -->
+<!-- end list of agences -->
 
 
 
 
-
-
-
-
-
-
-
-
-
-
+<!-- Script search by city -->
 <script>
 const search = document.getElementById("citySearch");
 const cards = document.querySelectorAll(".agence-card");
@@ -138,4 +127,8 @@ search.addEventListener("input", function () {
 
 });
 </script>
+<!-- end script search by city -->
+
+
+
 {% endblock %}

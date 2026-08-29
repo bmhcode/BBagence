@@ -4,6 +4,7 @@
 {% block title %}Ma Wishlist – BBcars{% endblock %}
 
 {% block extra_css %}
+
 <style>
 .wishlist-hero {
     background: linear-gradient(135deg, #be185d 0%, #9d174d 100%);
@@ -144,7 +145,7 @@
 {% block content %}
 <div class="text-center mb-5">
     <h3 class="display-5 fw-bold mb-2">
-        Ma Wishlist
+        Ma liste de souhaits
     </h3>
     <p class="text-muted mb-0">
         <strong class="text-danger"> {{ page_obj.paginator.count }}</strong>
@@ -154,13 +155,11 @@
     <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
 </div>
 
-
-
-<div class="container">
+<div class="container-xxl py-4">
     {% if cars %}
     <div class="row g-4">
         {% for car in cars %}
-        <div class="col-sm-6 col-lg-4" id="car-{{ car.id }}">
+        <div class="col-sm-4 col-lg-4" id="car-{{ car.id }}">
             <div class="car-card">
                 <!-- Remove heart -->
                 <button class="remove-btn"

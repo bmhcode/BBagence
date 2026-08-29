@@ -21,534 +21,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
-
-        /* =========================================
-           VARIABLES
-        ========================================= */
-        :root {
-            --color-primary: #1e293b;
-            --color-primary-dark: #0f172a;
-            --color-pink: #d63384;
-            --color-pink-dark: #b02a6b;
-            --color-bg: #f8fafc;
-            --color-muted: #64748b;
-            --color-border: #e2e8f0;
-
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 18px;
-            --radius-xl: 24px;
-
-            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-            --shadow-md: 0 8px 30px rgba(15, 23, 42, 0.10);
-
-            --transition: all 0.3s ease;
-        }
-
-
-        /* =========================================
-           GLOBAL
-        ========================================= */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        .navbar-brand {
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        a {
-            transition: var(--transition);
-        }
-
-        /* Large container */
-        .container-xxl-custom {
-            width: 100%;
-            max-width: 1500px;
-            margin: auto;
-            padding-left: 24px;
-            padding-right: 24px;
-        }
-
-
-        /* =========================================
-           NAVBAR
-        ========================================= */
-        .main-navbar {
-            background: rgba(255, 255, 255, 0.97);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--color-border);
-            box-shadow: var(--shadow-sm);
-            padding: 10px 0;
-            z-index: 1030;
-        }
-
-        .navbar-brand {
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: var(--color-primary) !important;
-            white-space: nowrap;
-        }
-
-        .navbar-brand i {
-            color: var(--color-pink);
-        }
-
-        .navbar-brand span {
-            color: var(--color-pink);
-        }
-
-
-        /* Menu */
-        .navbar-nav .nav-link {
-            color: var(--color-primary);
-            font-weight: 500;
-            padding: 10px 12px;
-            position: relative;
-            white-space: nowrap;
-        }
-
-        .navbar-nav .nav-link:hover,
-        .navbar-nav .nav-link.active {
-            color: var(--color-pink);
-        }
-
-        @media (min-width: 992px) {
-
-            .navbar-nav.main-menu .nav-link::after {
-                content: "";
-                position: absolute;
-                width: 0;
-                height: 2px;
-                left: 50%;
-                bottom: 5px;
-                background: var(--color-pink);
-                transform: translateX(-50%);
-                transition: var(--transition);
-            }
-
-            .navbar-nav.main-menu .nav-link:hover::after,
-            .navbar-nav.main-menu .nav-link.active::after {
-                width: 55%;
-            }
-        }
-
-
-        /* =========================================
-           NAVBAR TOGGLER
-        ========================================= */
-        .navbar-toggler {
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-sm);
-            padding: 8px 10px;
-            box-shadow: none !important;
-        }
-
-        .navbar-toggler:focus {
-            border-color: var(--color-pink);
-        }
-
-
-        /* =========================================
-           SEARCH
-        ========================================= */
-        .navbar-search {
-            min-width: 230px;
-        }
-
-        .navbar-search .input-group {
-            border: 1px solid var(--color-border);
-            border-radius: 50px;
-            overflow: hidden;
-            background: #fff;
-            transition: var(--transition);
-        }
-
-        .navbar-search .input-group:focus-within {
-            border-color: var(--color-pink);
-            box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.08);
-        }
-
-        .navbar-search .form-control {
-            border: none;
-            box-shadow: none;
-            font-size: 0.9rem;
-            padding-left: 15px;
-        }
-
-        .search-btn {
-            background: var(--color-pink);
-            color: #fff;
-            border: none;
-            padding: 0 15px;
-        }
-
-        .search-btn:hover {
-            background: var(--color-pink-dark);
-            color: #fff;
-        }
-
-
-        /* =========================================
-           WISHLIST
-        ========================================= */
-        .wishlist-link {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff1f6;
-            color: var(--color-pink) !important;
-            position: relative;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .wishlist-link:hover {
-            background: var(--color-pink);
-            color: #fff !important;
-            transform: translateY(-2px);
-        }
-
-        #wishlist-count {
-            min-width: 19px;
-            height: 19px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            border-radius: 50%;
-            background: var(--color-pink) !important;
-            color: #fff !important;
-            border: 2px solid #fff;
-        }
-
-
-        /* =========================================
-           USER
-        ========================================= */
-        .user-profile-image {
-            width: 34px;
-            height: 34px;
-            object-fit: cover;
-            border: 2px solid var(--color-border);
-        }
-
-        .user-menu {
-            padding: 7px 10px !important;
-            border-radius: 50px;
-        }
-
-        .user-menu:hover {
-            background: #f1f5f9;
-        }
-
-        .dropdown-menu {
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            padding: 8px;
-            min-width: 230px;
-        }
-
-        .dropdown-item {
-            border-radius: var(--radius-sm);
-            padding: 10px 12px;
-            font-weight: 500;
-        }
-
-        .dropdown-item:hover {
-            background: #fff1f6;
-            color: var(--color-pink);
-        }
-
-
-        /* =========================================
-           BUTTONS
-        ========================================= */
-        .btn-primary {
-            background-color: var(--color-pink);
-            border-color: var(--color-pink);
-        }
-
-        .btn-primary:hover,
-        .btn-primary:focus {
-            background-color: var(--color-pink-dark);
-            border-color: var(--color-pink-dark);
-        }
-
-        .signup-btn {
-            border-radius: 50px;
-            padding: 9px 20px !important;
-            font-weight: 600;
-        }
-
-
-        /* =========================================
-           CARDS
-        ========================================= */
-        .card {
-            border: none;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-        }
-
-
-        /* =========================================
-           ALERTS
-        ========================================= */
-        .alert {
-            border: none;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-        }
-
-
-        /* =========================================
-           FOOTER
-        ========================================= */
-        .footer {
-            background: var(--color-primary-dark);
-            color: #cbd5e1;
-            margin-top: 80px;
-            padding: 70px 0 20px;
-        }
-
-        .footer-brand {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .footer-brand span {
-            color: var(--color-pink);
-        }
-
-        .footer-title {
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .footer-links {
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: #94a3b8;
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            color: #fff;
-            padding-left: 5px;
-        }
-
-        .social-link {
-            width: 42px;
-            height: 42px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            background: var(--color-pink);
-            color: #fff;
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            margin-top: 50px;
-            padding-top: 20px;
-        }
-
-
-        /* =========================================
-           MOBILE / LAPTOP
-        ========================================= */
-/* =========================================
-   NAVBAR - PETITS LAPTOPS
-========================================= */
-
-@media (min-width: 900px) and (max-width: 1399px) {
-
-    .main-navbar {
-        padding: 8px 0;
-    }
-
-    .container-xxl-custom {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    /* Tout reste sur une seule ligne */
-    .navbar-collapse {
-        display: flex !important;
-        flex-basis: auto !important;
-        flex-grow: 1;
-        align-items: center;
-        min-width: 0;
-    }
-
-    /* Menu principal */
-    .navbar-nav.main-menu {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-        margin-right: auto;
-    }
-
-    /* Réduire l'espace entre les éléments */
-    .navbar-nav .nav-link {
-        padding: 8px 5px;
-        font-size: 0.8rem;
-    }
-
-    .navbar-nav .nav-link i {
-        margin-right: 2px !important;
-    }
-
-    /* Réduire légèrement le logo */
-    .navbar-brand {
-        font-size: 1.35rem;
-        margin-right: 12px;
-    }
-
-    /* Recherche plus petite */
-    .navbar-search {
-        min-width: 160px;
-        max-width: 190px;
-        margin-left: 10px;
-    }
-
-    .navbar-search .form-control {
-        font-size: 0.8rem;
-    }
-
-    /* Actions utilisateur sur une ligne */
-    .navbar-actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-        margin-left: 10px;
-    }
-
-    .signup-btn {
-        padding: 8px 12px !important;
-        font-size: 0.85rem;
-    }
-
-    .user-menu {
-        padding: 5px 7px !important;
-    }
-
-    .user-menu span {
-        max-width: 80px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .wishlist-link {
-        width: 38px;
-        height: 38px;
-    }
-
-    /* Cacher le bouton hamburger */
-    .navbar-toggler {
-        display: none;
-    }
-}
-
-
-/* =========================================
-   TABLETTE / MOBILE
-========================================= */
-
-@media (max-width: 991px) {
-
-    .navbar-collapse {
-        background: #fff;
-        margin-top: 12px;
-        padding: 15px;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-md);
-    }
-
-    /* Ici le menu reste vertical */
-    .navbar-nav.main-menu {
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-    }
-
-    .navbar-nav .nav-link {
-        padding: 12px 10px;
-    }
-
-    .navbar-search {
-        width: 100%;
-        margin: 10px 0 !important;
-    }
-
-    .navbar-search .input-group {
-        width: 100%;
-    }
-
-    .navbar-actions {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 10px;
-    }
-}
-    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
     {% block extra_css %}{% endblock %}
 
@@ -587,14 +60,13 @@
             <!-- MAIN MENU -->
             <ul class="navbar-nav main-menu me-auto">
 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
                        href="{% url 'home' %}">
                         <i class="fas fa-home me-1"></i>
                         Accueil
                     </a>
-                </li>
-
+                </li> -->
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'agence_list' %}active{% endif %}"
@@ -604,7 +76,6 @@
                     </a>
                 </li>
 
-
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'car_list' %}active{% endif %}"
                        href="{% url 'car_list' %}">
@@ -612,7 +83,6 @@
                         Voitures
                     </a>
                 </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'promotion_list' %}active{% endif %}"
@@ -622,7 +92,6 @@
                     </a>
                 </li>
 
-
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'evenement_list' %}active{% endif %}"
                        href="{% url 'evenement_list' %}">
@@ -631,7 +100,6 @@
                     </a>
                 </li>
 
-
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}"
                        href="{% url 'blog_list' %}">
@@ -639,7 +107,6 @@
                         Blog
                     </a>
                 </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
@@ -650,9 +117,8 @@
                 </li>
 
             </ul>
-
             <!-- SEARCH -->
-            <!-- <form class="navbar-search me-xl-3"
+            <form class="navbar-search me-xl-3"
                   action="{% url 'car_list' %}"
                   method="get">
 
@@ -675,20 +141,16 @@
 
                 </div>
 
-            </form> -->
+            </form>
 
             <!-- USER ACTIONS -->
             <div class="navbar-actions">
-
                 {% if request.user.is_authenticated %}
-
                     <!-- WISHLIST -->
                     <a class="wishlist-link me-2"
                        href="{% url 'wishlist_list' %}"
                        title="Mes favoris">
-
                         <i class="fas fa-heart"></i>
-
                         {% if wishlist_count > 0 %}
                             <span id="wishlist-count"
                                   class="position-absolute top-0 start-100 translate-middle">
@@ -701,9 +163,7 @@
                                 0
                             </span>
                         {% endif %}
-
                     </a>
-
 
                     <!-- USER MENU -->
                     <div class="dropdown">
@@ -786,27 +246,19 @@
                         </ul>
 
                     </div>
-
-
                 {% else %}
 
                     <a class="nav-link me-2"
                        href="{% url 'login' %}">
-
                         <i class="fas fa-sign-in-alt me-1"></i>
                         Connexion
-
                     </a>
-
-
                     <a class="btn btn-primary signup-btn"
                        href="{% url 'signup' %}">
-
                         <i class="fas fa-user-plus me-1"></i>
                         Inscription
 
                     </a>
-
                 {% endif %}
 
             </div>
@@ -814,32 +266,6 @@
     </div>
     
 </nav>
-<!-- SEARCH -->
- <form class="navbar-search me-xl-3"
-      action="{% url 'car_list' %}"
-      method="get">
-
-    <div class="input-group">
-
-        <input class="form-control"
-               type="search"
-               name="q"
-               value="{{ request.GET.q }}"
-               placeholder="Rechercher une voiture..."
-               aria-label="Rechercher une voiture">
-
-        <button class="search-btn"
-                type="submit"
-                aria-label="Rechercher">
-
-            <i class="fas fa-search"></i>
-
-        </button>
-
-    </div>
-
-</form> 
-
 
 <!-- =========================================
      MAIN CONTENT
@@ -890,7 +316,7 @@
         <div class="row g-5">
 
             <!-- ABOUT -->
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-4 col-sm-6">
 
                 <a class="footer-brand"
                    href="{% url 'home' %}">
@@ -909,9 +335,8 @@
 
             </div>
 
-
             <!-- LINKS -->
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-4 col-sm-6">
 
                 <h5 class="footer-title">
                     Navigation
@@ -958,9 +383,8 @@
 
             </div>
 
-
             <!-- SOCIAL -->
-            <div class="col-lg-4 col-md-12">
+            <div class="col-lg-4 col-md-4 col-sm-6">
 
                 <h5 class="footer-title">
                     Suivez-nous
@@ -1003,7 +427,6 @@
 
         </div>
 
-
         <!-- FOOTER BOTTOM -->
 
         <div class="footer-bottom">
@@ -1039,27 +462,7 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<!-- =========================================
-     WISHLIST BADGE UPDATE
-========================================= -->
-
-<script>
-function updateBadge(count) {
-
-    const badge = document.getElementById("wishlist-count");
-
-    if (!badge) return;
-
-    badge.textContent = count;
-
-    if (count > 0) {
-        badge.style.display = "flex";
-    } else {
-        badge.style.display = "none";
-    }
-}
-</script>
+<script src="{% static 'js/main.js' %}"></script>
 
 
 {% block extra_js %}
