@@ -436,7 +436,6 @@ class CarImages(models.Model):
 
     order = models.PositiveIntegerField(default=0) 
 
-    
     class Meta:
         verbose_name_plural = "Images des voitures" 
         ordering = ['order', 'cree_le']

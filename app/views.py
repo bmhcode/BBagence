@@ -635,7 +635,7 @@ class CarDeleteView(AgenceManagerRequiredMixin, DeleteView):
     pk_url_kwarg = 'car_id'
 
     def get_success_url(self):
-        return reverse_lazy('cars_agence_list', kwargs={'agence_slug': self.object.agence.slug})
+        return reverse_lazy('agence_carlist', kwargs={'agence_slug': self.object.agence.slug})
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "La voiture a été supprimée.")
@@ -653,7 +653,7 @@ def car_image_delete(request, agence_slug, car_id, image_id):
         
     image.delete()
     messages.success(request, "L'image a été supprimée.")
-    return redirect('car_update', agence_slug=agence_slug, car_id=car.id)
+    return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
 
 @login_required
 @require_POST

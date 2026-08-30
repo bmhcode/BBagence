@@ -222,55 +222,16 @@
 </section>
 
 <div class="text-center mb-1">
-    <h1 class="display-4 mb-2"> Gérer la Présentation </h1>
+    <h1 class="display-6 mb-2"> Gérer la Présentation </h1>
     <p class="lead">
         Mettez à jour les photos, les vidéos et la localisation de <strong>{{ agence.nom }}</strong>.
     </p>
 </div>
 
-<section class="abc-section abc-section--gray" style="padding: 60px 0;">
+<section class="abc-section abc-section--gray" style="padding: 20px 0;">
     <div class="abc-container">
         <div class="dashboard-grid">
-            <!-- ================= SIDEBAR (LEFT) ================= -->
-            <div>
-                <!-- Google Map Card -->
-                <div class="manage-card">
-                    <h3><i class="fas fa-map-marked-alt"></i> Google Maps Embed</h3>
-                    <p class="card-desc">Collez le lien URL d'intégration Google Maps pour afficher la carte de localisation sur le portail.</p>
-                    
-                    {% if agence.google_map %}
-                        <div class="map-preview-container">
-                            <iframe 
-                                src="{{ agence.google_map }}" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
-                        </div>
-                    {% else %}
-                        <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 30px; text-align: center; color: var(--color-muted); border: 1.5px dashed var(--color-border); margin-bottom: 20px;">
-                            <i class="fas fa-map-signs fa-2x" style="margin-bottom: 10px;"></i>
-                            <p style="font-size: 0.85rem; margin: 0;">Aucune carte configurée.</p>
-                        </div>
-                    {% endif %}
-                    
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="id_google_map">URL de la carte (iframe src)</label>
-                            {{ map_form.google_map }}
-                        </div>
-                        <button type="submit" name="update_map" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">
-                            <i class="fas fa-save"></i> Enregistrer
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Back Link -->
-                <a href="{% url 'agence_detail' agence.slug %}" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; border-color: var(--color-border); color: var(--color-primary); background: #fff; height: 48px;">
-                    <i class="fas fa-arrow-left"></i> Retour à l'agence
-                </a>
-            </div>
+           
 
             <!-- ================= MAIN CONTENT (RIGHT) ================= -->
             <div style="display: flex; flex-direction: column; gap: 0;">
@@ -410,6 +371,48 @@
                 </div>
 
             </div>
+
+            <!-- ================= SIDEBAR (LEFT) ================= -->
+            <div>
+                <!-- Google Map Card -->
+                <div class="manage-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> Google Maps Embed</h3>
+                    <p class="card-desc">Collez le lien URL d'intégration Google Maps pour afficher la carte de localisation sur le portail.</p>
+                    
+                    {% if agence.google_map %}
+                        <div class="map-preview-container">
+                            <iframe 
+                                src="{{ agence.google_map }}" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    {% else %}
+                        <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 30px; text-align: center; color: var(--color-muted); border: 1.5px dashed var(--color-border); margin-bottom: 20px;">
+                            <i class="fas fa-map-signs fa-2x" style="margin-bottom: 10px;"></i>
+                            <p style="font-size: 0.85rem; margin: 0;">Aucune carte configurée.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_google_map">URL de la carte (iframe src)</label>
+                            {{ map_form.google_map }}
+                        </div>
+                        <button type="submit" name="update_map" class="btn btn-primary rounded-pill py-2" style="justify-content: center; height: 48px;">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Back Link -->
+                <a href="{% url 'agence_detail' agence.slug %}" class="btn btn-primary btn-outline-secondary w-100 rounded-pill py-2" style="justify-content: center; border-color: var(--color-border); color: var(--color-primary); background: #fff; height: 48px;">
+                    <i class="fas fa-arrow-left"></i> Retour à l'agence
+                </a>
+            </div>
+
 
         </div>
 
