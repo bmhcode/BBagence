@@ -81,7 +81,7 @@ class Agence(models.Model):
     
     nom = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField()
+    description = models.TextField(blank=True, default="")
    
     # ── Relation ──
     manager = models.ForeignKey(User,on_delete=models.CASCADE, related_name='agences')
@@ -132,7 +132,7 @@ class Agence(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('agence_detail', kwargs={'agence_slug': self.slug})
+        return reverse('agence', kwargs={'agence_slug': self.slug})
 
     @property
     def logoURL(self):
@@ -290,7 +290,7 @@ class Car(models.Model):
         ("Other", "Other"),
     ]
 
-    CONDITION_CHOICES = [
+    STATUT_CAR = [
         ("neuf", "Neuf"),
         ("moins_de_3ans", "Moins de 3 ans"),
         ("occasion", "Occasion"),
@@ -311,22 +311,23 @@ class Car(models.Model):
     ]
 
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name="cars")
-      
-    etat = models.CharField(max_length=20, choices=CONDITION_CHOICES, default="neuf")
+    statut = models.CharField(max_length=20, choices=STATUT_CAR, default="neuf")
 
-    annee = models.PositiveIntegerField()
     marque = models.CharField(max_length=20, choices=MARQUE_CHOICES, default="")
     modele = models.CharField(max_length=100)
-    couleur = models.CharField(max_length=100, default="",blank=True, null=True)
-    finition = models.CharField(max_length=100, default="Full options",blank=True, null=True)
+    annee = models.PositiveIntegerField()
+    
     moteur = models.CharField(max_length=100, default="1.5 181ch 16v turbo",blank=True, null=True)
-    energie = models.CharField(max_length=20, choices=FUEL_CHOICES, default="essence")
     boite_de_vitesse = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES, default="manuelle")
+    finition = models.CharField(max_length=100, default="Full options",blank=True, null=True)
+    energie = models.CharField(max_length=20, choices=FUEL_CHOICES, default="essence")
     kilometrage = models.PositiveIntegerField(default=0, help_text="Kilométrage en km")
-    description = models.TextField(blank=True)
+    
+    couleur = models.CharField(max_length=100, default="",blank=True, null=True)
+    description = models.TextField(blank=True, default="")
 
-    ancien_prix = models.DecimalField(max_digits=12, decimal_places=1, null=True, blank=True)
-    nouveau_prix = models.DecimalField(max_digits=12, decimal_places=1)
+    prix_ancien = models.DecimalField(max_digits=12, decimal_places=1, null=True, blank=True)
+    prix_actuel = models.DecimalField(max_digits=12, decimal_places=1)
 
     # Promotion
     est_en_promotion = models.BooleanField(default=False)
@@ -335,7 +336,7 @@ class Car(models.Model):
     prix_promo = models.DecimalField(max_digits=12, decimal_places=1, null=True, blank=True)
     date_debut_promo = models.DateField(null=True, blank=True)
     date_fin_promo = models.DateField(null=True, blank=True)
-
+    date_debut_publication_promo = models.DateField(null=True, blank=True)
 
     video = models.FileField(upload_to='cars/videos/', blank=True, null=True, verbose_name="Video")
 
@@ -356,7 +357,7 @@ class Car(models.Model):
         return f"{self.marque} {self.modele} ({self.annee})"
 
     def get_absolute_url(self):
-        return reverse("car_detail", kwargs={"agence_slug": self.agence.slug, "car_id": self.id})
+        return reverse("car", kwargs={"agence_slug": self.agence.slug, "car_id": self.id})
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -379,15 +380,15 @@ class Car(models.Model):
 
     @property
     def discount_amount(self):
-        if self.ancien_prix:
-            return self.ancien_prix - self.nouveau_prix
+        if self.prix_ancien:
+            return self.prix_ancien - self.prix_actuel
         return Decimal("0.00")
 
     @property
     def discount_percentage(self):
-        if self.ancien_prix and self.ancien_prix > 0:
+        if self.prix_ancien and self.prix_ancien > 0:
             return round(
-                ((self.ancien_prix - self.nouveau_prix) / self.ancien_prix) * 100,
+                ((self.prix_ancien - self.prix_actuel) / self.prix_ancien) * 100,
                 1
             )
         return 0
@@ -395,8 +396,8 @@ class Car(models.Model):
     @property
     def has_discount(self):
         return (
-            self.ancien_prix is not None
-            and self.ancien_prix > self.nouveau_prix
+            self.prix_ancien is not None
+            and self.prix_ancien > self.prix_actuel
         )
         
     @property
@@ -404,7 +405,7 @@ class Car(models.Model):
         """Retourne le prix promo s'il est actif, sinon le prix normal"""
         if self.est_en_promotion and self.prix_promo and self.est_en_promotion_valide:
             return self.prix_promo
-        return self.nouveau_prix
+        return self.prix_actuel
 
     @property
     def est_en_promotion_valide(self):
@@ -415,6 +416,8 @@ class Car(models.Model):
             and self.date_debut_promo
             and self.date_fin_promo
             and self.date_debut_promo <= timezone.now().date() <= self.date_fin_promo
+            and self.date_debut_publication_promo
+            and self.date_debut_publication_promo <= timezone.now().date(),
         )      
 
 

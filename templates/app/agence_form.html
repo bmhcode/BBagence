@@ -38,7 +38,7 @@
             <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
             <span style="margin: 0 8px; opacity: 0.5;">/</span>
             {% if object %} 
-                <a href="{% url 'agence_detail' agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence }}</a>
+                <a href="{% url 'agence' agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence }}</a>
                 <span style="margin: 0 8px; opacity: 0.5;">/</span>
                 <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Modifier</span>
             {% else %}
@@ -176,19 +176,20 @@
                                         </div>
 
 
-                                        <div class="col-12">
-                                            <label class="form-label fw-semibold">
-                                                Description <span class="text-danger">*</span>
-                                            </label>
+                                  <div class="col-12">
+    <label class="form-label fw-semibold">
+        Description
+        <span class="text-muted small">(facultatif)</span>
+    </label>
 
-                                            {{ form.description }}
+    {{ form.description }}
 
-                                            {% if form.description.errors %}
-                                                <div class="text-danger small mt-1">
-                                                    {{ form.description.errors.0 }}
-                                                </div>
-                                            {% endif %}
-                                        </div>
+    {% if form.description.errors %}
+        <div class="text-danger small mt-1">
+            {{ form.description.errors.0 }}
+        </div>
+    {% endif %}
+</div>
 
                                     </div>
 

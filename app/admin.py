@@ -23,8 +23,8 @@ class CarImageInline(admin.TabularInline):
     
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
-    list_display = ('agence', 'marque', 'annee','nouveau_prix', 'est_en_vedette')
-    list_filter = ('agence', 'marque')
+    list_display = ('agence', 'marque', 'annee','prix_actuel', 'est_en_vedette', 'est_en_promotion')
+    list_filter = ('agence', 'marque', 'est_en_promotion')
     search_fields = ('marque','annee')
     # prepopulated_fields = {'slug': ('marque',)}
     inlines = [CarImageInline]
@@ -36,10 +36,13 @@ class CarAdmin(admin.ModelAdmin):
             'fields': ('couleur', 'finition', 'moteur', 'kilometrage', 'energie', 'boite_de_vitesse')
         }),
         ('Prix', {
-            'fields': ('ancien_prix', 'nouveau_prix')
+            'fields': ('prix_ancien', 'prix_actuel')
+        }),
+        ('Promotion', {
+            'fields': ('est_en_promotion', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'date_debut_publication_promo')
         }),
     ]
-    list_editable = ['nouveau_prix', 'est_en_vedette']
+    list_editable = ['prix_actuel', 'est_en_vedette', 'est_en_promotion',]
 
     def get_thumbnail(self, obj):
         image = obj.main_image

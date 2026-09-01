@@ -60,63 +60,232 @@
      4.5 Promotions en vedette
 ═══════════════════════════════════════ -->
  
-    {% if promotions %}
-    <section class="mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-4">Offres Spéciales</h2>
-            <a href="{% url 'promotion_list' %}" class="text-decoration-none"> Voir toutes les promotions <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="row g-4">
-            {% for promo in promotions %}
-                <div class="col-md-6 col-lg-6">
-                    <div class="card h-100 promotion-card">
-                        <div class="card-body">
-                            <span class="badge bg-danger mb-2">{{ promo.titre_promo }}</span>
-                            <h3>{{promo.marque}} {{promo.modele}} {{promo.annee}} </h3>
-                            <p class="card-text text-truncate">{{ promo.description_promo }}</p>
-                            
-                            <!-- Prix -->
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-baseline gap-2 mb-4">
+{% if cars_promotion %}
+<section class="mb-5">
 
-                                    <div class="price-new"> {{ promo.prix_promo|intcomma }} Million </div>
-                                    <div class="price-old"> {{ promo.nouveau_prix|intcomma }}</div>
-                                    {% if promo.ancien_prix %}
-                                        <div class="price-old"> {{ promo.ancien_prix|intcomma }} </div>
-                                    {% endif %}
-                                </div>
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Offres spéciales</h2>
+            <p class="text-muted mb-0">
+                Profitez de nos meilleures promotions
+            </p>
+        </div>
+
+        <a href="{% url 'promotion_list' %}"
+           class="btn btn-outline-danger rounded-pill px-3">
+            Voir toutes
+            <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+
+    <!-- ================= CARS ================= -->
+    <div class="row g-4">
+
+        {% for object in cars_promotion %}
+
+        <div class="col-12 col-md-4 col-lg-4">
+
+            <div class="card h-100 border-0 shadow-sm promotion-card overflow-hidden">
+
+                <!-- ================= IMAGE ================= -->
+                <div class="position-relative">
+
+                    {% if object.main_image %}
+                        <a href="{% url 'car_promotion' object.agence.slug object.id %}">
+                            <img
+                                src="{{ object.main_image.image.url }}"
+                                class="w-100 promo-image"
+                                alt="{{ object.marque }} {{ object.modele }}"
+                                loading="lazy">
+                        </a>
+                    {% else %}
+                        <div class="promo-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-car fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+
+
+                    <!-- Badge promotion -->
+                    <span class="position-absolute top-0 start-0 m-3 badge bg-danger px-3 py-2 rounded-pill shadow-sm">
+                        <i class="fas fa-tag me-1"></i>
+                        PROMO
+                    </span>
+
+
+                    <!-- Titre promo -->
+                    {% if object.titre_promo %}
+                        <span class="position-absolute bottom-0 start-0 m-3
+                                     bg-dark bg-opacity-75 text-white
+                                     px-3 py-2 rounded-pill small">
+                            {{ object.titre_promo }}
+                        </span>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================= BODY ================= -->
+                <div class="card-body d-flex flex-column p-4">
+
+                    <!-- Car title -->
+                    <a href="{% url 'car_promotion' object.agence.slug object.id %}"
+                       class="text-decoration-none text-dark">
+
+                        <h4 class="fw-bold mb-2">
+                            {{ object.marque }}
+                            {{ object.modele }}
+                            <span class="text-muted fw-normal">
+                                {{ object.annee }}
+                            </span>
+                        </h4>
+
+                    </a>
+
+
+                    <!-- Description -->
+                    {% if object.description_promo %}
+                        <p class="card-text text-muted small mb-3"
+                           style="display: -webkit-box;
+                                  -webkit-line-clamp: 2;
+                                  -webkit-box-orient: vertical;
+                                  overflow: hidden;">
+                            {{ object.description_promo }}
+                        </p>
+                    {% endif %}
+
+
+                    <!-- ================= PRICE ================= -->
+                    <div class="mb-3">
+
+                        <div class="d-flex align-items-baseline gap-2 flex-wrap">
+
+                            {% if object.prix_promo %}
+                                <span class="price-new fw-bold text-danger fs-4">
+                                    {{ object.prix_promo|intcomma }}
+                                    <small class="fs-6">Million</small>
+                                </span>
+                            {% endif %}
+
+
+                            {% if object.prix_actuel %}
+                                <span class="price-old text-muted text-decoration-line-through">
+                                    {{ object.prix_actuel|intcomma }}
+                                </span>
+                            {% endif %}
+
+
+                            {% if object.prix_ancien %}
+                                <span class="price-old text-muted text-decoration-line-through">
+                                    {{ object.prix_ancien|intcomma }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= PROMOTION DATES ================= -->
+                    <div class="promotion-dates bg-light rounded-3 p-3 mb-3">
+
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="far fa-clock text-danger me-2"></i>
+
+                            <span class="small fw-semibold">
+                                Promotion
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between small">
+
+                            <div>
+                                <span class="text-muted d-block">
+                                    Du
+                                </span>
+
+                                <strong>
+                                    {{ object.date_debut_promo|date:"d M Y" }}
+                                </strong>
                             </div>
 
-                            <!-- Dates -->
-                            <i class="far fa-clock me-2"></i>
-                            <strong>{{ promo.date_debut_promo|date:"d M Y" }}</strong>
-                            -
-                            <strong>{{ promo.date_fin_promo|date:"d M Y" }}</strong>                    
+                            <div class="text-end">
+                                <span class="text-muted d-block">
+                                    Au
+                                </span>
+
+                                <strong>
+                                    {{ object.date_fin_promo|date:"d M Y" }}
+                                </strong>
+                            </div>
+
                         </div>
-                        <div class="position-relative">
-                            {% if promo.main_image %}
-                                <img src="{{ promo.main_image.image.url }}"
-                                    class="promo-image mb-0"
-                                    alt="{{ promo.titre_promo }}">
-                            {% endif %}
-                            <a href="{% url 'car_promotion' promo.agence.slug promo.id %}">
-                                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                                    PROMO
-                                </div>
-                            </a>
-                        </div>
-                        <div class="mt-2 ">
-                            <small class="text-muted ">
-                                <i class="fas fa-store me-1"></i>
-                                <a href="{% url 'agence_detail' promo.agence.slug %}">{{ promo.agence.nom }}</a> — {{ promo.agence.ville }}
-                            </small>
-                        </div>
+
                     </div>
+
+
+                    <!-- ================= PUBLICATION ================= -->
+                    {% if object.date_debut_publication_promo %}
+                        <small class="text-muted mb-3">
+                            <i class="far fa-calendar-alt me-1"></i>
+                            Publié le
+                            {{ object.date_debut_publication_promo|date:"d M Y" }}
+                        </small>
+                    {% endif %}
+
+
+                    <!-- ================= CTA ================= -->
+                    <div class="mt-auto">
+
+                        <a href="{% url 'car_promotion' object.agence.slug object.id %}"
+                           class="btn btn-danger w-100 rounded-pill">
+
+                            Voir l'offre
+
+                            <i class="fas fa-arrow-right ms-2"></i>
+
+                        </a>
+
+                    </div>
+
                 </div>
-            {% endfor %}
+
+
+                <!-- ================= AGENCY ================= -->
+                <div class="border-top px-4 py-3 bg-light">
+
+                    <small class="text-muted d-flex align-items-center">
+
+                        <i class="fas fa-store text-danger me-2"></i>
+
+                        <a href="{% url 'agence' object.agence.slug %}"
+                           class="text-decoration-none fw-semibold text-dark">
+
+                            {{ object.agence.nom }}
+
+                        </a>
+
+                        {% if object.agence.ville %}
+                            <span class="ms-1">
+                                — {{ object.agence.ville }}
+                            </span>
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
         </div>
-    </section>
-    {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</section>
+{% endif %}
 
 <!-- ═══════════════════════════════════════
      4.5 agences en vedette 

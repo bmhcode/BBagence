@@ -504,12 +504,6 @@
                         </label>
                         {{ form.date_fin_promo }}
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">
-                            Date de publication
-                        </label>
-                        {{ form.date_debut_publication_promo }}
-                    </div>
 
                 </div>
 
@@ -798,10 +792,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 4. Aperçu de la Vidéo
     const videoInput = document.getElementById("id_video");
-    
-    const uploadVideoBox = videoInput
-    ? videoInput.closest("#media").querySelector(".upload-video-box")
-    : null;
+    const uploadVideoBox = document.querySelector(".upload-video-box");
     
     if (videoInput && uploadVideoBox) {
         videoInput.addEventListener("change", function () {

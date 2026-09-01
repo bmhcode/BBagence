@@ -97,12 +97,28 @@
 }
 </style>
 
+<!-- Breadcrumb -->
+<section class="" style="padding: 10px 0; ">
+    <div class="container" style="position: relative; z-index: 2;">
+        <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
+            
+            <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <a href="{% url 'agence' agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence }}</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Promotions</span>
+            
+        </nav>
+    </div>
+</section>
+
+
 <div class="text-center mb-5">
-    <h1 class="display-5 mb-3">
+    <h1 class="display-6 mb-3">
         Offres et Promotions
     </h1>
     <p class="lead">
-        Découvrez les meilleures offres proposées par les concessionnaires <strong>BBcar</strong> partout en Algérie.
+        les offres qui vont être proposées par <strong>agence {{ agence.nom }}</strong>.
     </p>
 </div>
 
@@ -168,17 +184,17 @@
                     -
                     <strong>{{ object.date_fin_promo|date:"d M Y" }}</strong>
                 </div>
-
+                
                 <a href="{{ object.get_absolute_url }}"
-                    class="btn btn-danger btn-offer">
-                    <i class="fas fa-tags me-2"></i>
-                    Voir la voiture
-                </a>
-                   
-            </div>
+                class="btn btn-danger btn-offer">
+                <i class="fas fa-tags me-2"></i>
+                Voir la voiture
+            </a>
+            
+        </div>
         <small class="text-muted"> Publié le {{ object.date_debut_publication_promo|date:"d M Y" }}</small>  
 
-            <div class="mt-2">
+                <div class="mt-2">
                     <small class="text-muted">
                         <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
                         <i class="fas fa-store me-1"></i>

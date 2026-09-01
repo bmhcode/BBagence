@@ -103,34 +103,37 @@ class CarForm(forms.ModelForm):
     class Meta:
         model = Car
         fields = [
-            'marque', 'modele', 'annee', 'etat', 'couleur', 'finition', 'moteur', 
+            'marque', 'modele', 'annee', 'statut', 'couleur', 'finition', 'moteur', 
             'energie', 'boite_de_vitesse', 'kilometrage', 'description', 
-            'ancien_prix', 'nouveau_prix', 
-            'est_en_promotion', 'titre_promo', 'description_promo', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'video',
+            'prix_ancien', 'prix_actuel', 
+            'est_en_promotion', 'titre_promo', 'description_promo', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'date_debut_publication_promo',
+            'video',
             'est_en_vedette', 'est_disponible'
         ]
         widgets = {
             'marque': forms.Select(attrs={'class': 'form-select'}),
             'modele': forms.TextInput(attrs={'class': 'form-control'}),
             'annee': forms.NumberInput(attrs={'class': 'form-control'}),
-            'etat': forms.Select(attrs={'class': 'form-select'}),
+            'statut': forms.Select(attrs={'class': 'form-select'}),
             'couleur': forms.TextInput(attrs={'class': 'form-control'}),
             'finition': forms.TextInput(attrs={'class': 'form-control'}),
             'moteur': forms.TextInput(attrs={'class': 'form-control'}),
             'energie': forms.Select(attrs={'class': 'form-select'}),
             'boite_de_vitesse': forms.Select(attrs={'class': 'form-select'}),
             'kilometrage': forms.NumberInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'ancien_prix': forms.NumberInput(attrs={'class': 'form-control'}),
-            'nouveau_prix': forms.NumberInput(attrs={'class': 'form-control'}),
+            
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez le véhicule (facultatif)...'}),
+
+            'prix_ancien': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prix_actuel': forms.NumberInput(attrs={'class': 'form-control'}),
 
             'est_en_promotion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'titre_promo': forms.TextInput(attrs={'class': 'form-control'}),
             'description_promo': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'prix_promo': forms.NumberInput(attrs={'class': 'form-control'}),
-
             'date_debut_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
             'date_fin_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'date_debut_publication_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
 
             'video': forms.ClearableFileInput(attrs={'class': 'form-control','accept': 'video/*',}),
 
@@ -140,9 +143,10 @@ class CarForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.fields['description'].required = False
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
+        self.fields['date_debut_publication_promo'].input_formats = ['%Y-%m-%d']
 
 # ====================== / Car forms ====================== #
 
@@ -158,7 +162,8 @@ class AgenceForm(forms.ModelForm):
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez l\'agence (facultatif)...'}),
+            
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
             'site_web': forms.URLInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),

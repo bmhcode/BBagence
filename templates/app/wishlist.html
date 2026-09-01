@@ -171,7 +171,7 @@
 
                 <!-- Image -->
                 <div class="car-card__img">
-                    <a href="{% url 'car_detail' car.agence.slug car.id %}">
+                    <a href="{% url 'car' car.agence.slug car.id %}">
 
                         {% if car.main_image %}
                             <img src="{{ car.main_image.image.url }}" alt="{{ car.marque }} {{ car.modele }}" loading="lazy">
@@ -207,7 +207,7 @@
                             {% endif %}
                         </div>
                        
-                        <a href="{% url 'car_detail' car.agence.slug car.id %}"
+                        <a href="{% url 'car' car.agence.slug car.id %}"
                             class="btn btn-primary btn-sm rounded-pill px-3">
                             Voir
                         </a>
@@ -216,7 +216,7 @@
                     <div class="mt-2">
                         <small class="text-muted">
                             <i class="fas fa-store me-1"></i>
-                            <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
+                            <a href="{% url 'agence' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
                         </small>
                     </div>
                 </div>

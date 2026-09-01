@@ -5,12 +5,13 @@
 
 {% block content %}
 
+
 <section class="" style="padding: 10px 0 10px; ">
     <div class="container" style="position: relative; z-index: 2;">
         <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
             <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
             <span style="margin: 0 8px; opacity: 0.5;">/</span>
-            <a href="{% url 'agence_detail' car.agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ car.agence.nom }}</a>
+            <a href="{% url 'agence' car.agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ car.agence.nom }}</a>
             <span style="margin: 0 8px; opacity: 0.5;">/</span>
             <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">{{ car.marque }} {{ car.modele }} - {{ car.annee }}</span>
         </nav>
@@ -18,7 +19,7 @@
 </section>
 
 <div class="row">
-    <!-- image -->
+    <!-- Car image -->
     <div class="col-sm-7 col-md-7 col-lg-7">
         <div class="card shadow rounded-3 overflow-hidden mb-4" >
 
@@ -67,28 +68,46 @@
             {% endif %}
 
             <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="mb-3">À propos de véhicule</h5>
-                    <!-- Back Link -->
-                     <div class="mt-2">
-                    <small class="text-muted">
-                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
-                        <i class="fas fa-store me-1"></i>
-                        <a href="{% url 'agence_detail' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
-                    </small>
+                <!-- Back Link -->
+                <div class="mt-2">
+                        <small class="text-muted">
+                            <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                            <i class="fas fa-store me-1"></i>
+                            <a href="{% url 'agence' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
+                        </small>
                 </div> 
+                <!-- Actions -->
+                <div class="d-flex gap-3 mt-3 mb-3">
+                    <a href="{% url 'contact' %}?agence={{ agence.nom|urlencode }}"
+                    class="btn btn-outline-primary action-btn">
+                        <i class="fas fa-envelope me-2"></i>
+                        <span>Envoyer un message</span>
+                    </a>
+                    <a href="tel:{{ car.agence.telephone }}"
+                    class="btn btn-primary action-btn">
+                        <i class="fas fa-phone-alt me-2"></i>
+                        <span>Appeler {{ car.agence.telephone }}</span>
+                    </a>
                 </div>
-                <hr class="my-2">
-                <p class="text-muted mt-3"> {{ car.description_promo }} </p>
-            </div>
-        </div>
 
-        <!-- Sidebar Info -->
+                {% if car.description %}
+                <div class="d-flex align-items-center mt-3 mb-2">
+                    <h6 class="me-2 mb-0">À propos de véhicule</h6>
+                    <hr class="text-primary flex-grow-1 mb-0" style="height: 2px;" >
+                </div>
+                <p class=""> {{ car.description }} </p>
+                {% endif %}
+                
+            </div>           
+        </div>
+    </div>
+
+    <!-- Car infos -->
+    <div class="col-sm-5 col-md-5 col-lg-5">
         <div class="card shadow-sm rounded-3 mb-2">
             <div class="card-body p-4">
                 <h4 class="mb-4">{{car.marque}} {{car.modele}} - {{car.annee}}</h4>
-                <div class="row">
-                    <div class="col-sm-6 col-md-6 col-lg-6">
+               
                         {% if car.moteur %}
                         <div class="mb-2 d-flex align-items-center">
                             <div class="bg-light rounded-circle p-3 me-3">
@@ -124,8 +143,7 @@
                             </div>
                         </div>
                         {% endif %}
-                    </div>
-                    <div class="col-sm-6 col-md-6 col-lg-6">
+                  
                         {% if car.couleur %}
                         <div class="mb-2 d-flex align-items-center">
                             <div class="bg-light rounded-circle p-3 me-3">
@@ -137,6 +155,7 @@
                             </div>
                         </div>
                         {% endif %}
+
                         {% if car.kilometrage %}
                         <div class="mb-2 d-flex align-items-center">
                             <div class="bg-light rounded-circle p-3 me-3">
@@ -149,107 +168,495 @@
                         </div>
                         {% endif %}
                 
-                        {% if car.nouveau_prix %}
+                        {% if car.prix_actuel %}
                         <div class="mb-2 d-flex align-items-center">
                             <div class="bg-light rounded-circle p-3 me-3">
                                 <i class="fas fa-money-bill-wave text-primary"></i>
                             </div>
                             <div>
-                                <!-- <small class="text-muted d-block uppercase fw-bold">PRIX</small> -->
-                                {{ car.nouveau_prix|intcomma }} Million
-                                {% if car.ancien_prix %}
-                                    <span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem; font-weight: 400; margin-left: 5px;">
-                                        {{ car.ancien_prix|intcomma }}
-                                    </span>
+                               <span class="car-card__price">{{ car.prix_actuel|intcomma }} Million</span>
+                                {% if car.prix_ancien %}
+                                    <span class="car-card__price-old">{{ car.prix_ancien|intcomma }}</span>
                                 {% endif %}
                             </div>
                         </div>
                         {% endif %}
-                    </div>
-                </div>
-                <!-- Actions -->
-                <div class="d-flex gap-3 mt-3">
-                    <a href="{% url 'contact' %}?agence={{ agence.nom|urlencode }}"
-                    class="btn btn-outline-primary action-btn">
-                        <i class="fas fa-envelope me-2"></i>
-                        <span>Envoyer un message</span>
-                    </a>
-                    <a href="tel:{{ car.agence.telephone }}"
-                    class="btn btn-primary action-btn">
-                        <i class="fas fa-phone-alt me-2"></i>
-                        <span>Appeler {{ car.agence.telephone }}</span>
-                    </a>
-                </div>
-
             </div>
         </div>
-
-
-    </div>
-
-    <!-- Secondary images if any -->
-    <div class="col-sm-5 col-md-5 col-lg-5">
-        {% if car.images.all %}
-            <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
-                {% for img in car.images.all %}
-                    <div style="position: relative; width: 150px; height: 120px; border-radius: 12px; overflow: hidden; border: 2px solid {% if img.is_main %}var(--accent){% else %}transparent{% endif %}; transition: border-color 0.3s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='{% if img.is_main %}var(--accent){% else %}transparent{% endif %}'">
-                        <img src="{{ img.image.url }}"
-                            class="secondary-car-image"
-                            onclick="changeMainImage(this)"
-                            style="width: 100%;
-                                    height: 100%;
-                                    object-fit: cover;
-                                    cursor: pointer;">                        
-                            {% if request.user.is_authenticated %}
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
-                                {% if not img.is_main %}
-                                <!-- Set Main Action -->
-                                <form method="post" action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
-                                    {% csrf_token %}
-                                    <button type="submit" title="Set as Main" style="background: none; border: none; color: #fff; cursor: pointer; padding: 2px; margin-bottom: 5px;">
-                                        <i class="fas fa-star" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                                    </button>
-                                </form>
-                                {% else %}
-                                <i class="fas fa-star" style="color: var(--accent); font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                                {% endif %}
-                                
-                                <!-- Delete Action -->
-                                <form method="post" action="{% url 'car_image_delete' car.agence.slug car.id img.id %}" style="margin:0; padding:0; line-height: 1;">
-                                    {% csrf_token %}
-                                    <button type="submit" title="Delete Image" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 2px;" onclick="return confirm('Are you sure you want to delete this image?');">
-                                        <i class="fas fa-trash-alt" style="font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
     </div>
 </div>
 
+<!-- ==================== Galerie Photos ==================== -->
+<section class="car-gallery-section">
+    <div class="container">
+
+        {% if car.images.all %}
+        <!-- Header -->
+        <div class="gallery-header">
+            <div>
+                <h2 class="gallery-title">
+                    <i class="fas fa-images"></i>
+                    Galerie Photos
+                </h2>
+
+                <p class="gallery-subtitle">
+                    Découvrez les photos de <strong>{{ car.marque }} {{ car.modele }} - {{ car.annee }}</strong>
+                </p>
+            </div>
+
+            <a href="{% url 'agence_photos' agence.slug %}"
+               class="gallery-link">
+                <i class="fas fa-images"></i>
+                Voir toute la galerie
+            </a>
+        </div>
+        <!-- Gallery Grid -->
+        <div class="gallery-grid">
+
+            {% for img in car.images.all %}
+
+            <div class="gallery-card {% if img.is_main %}is-main{% endif %}">
+
+                <!-- Image -->
+                <img
+                    src="{{ img.image.url }}"
+                    alt="{{ img.caption|default:'Photo de la voiture' }}"                    class="gallery-image"
+                    loading="lazy"
+                    onclick="window.open('{{ img.image.url }}', '_blank')"
+                >
+
+                <!-- Main Badge -->
+                {% if img.is_main %}
+                <div class="main-badge">
+                    <i class="fas fa-star"></i>
+                    Principale
+                </div>
+                {% endif %}
+
+                <!-- View Button -->
+                <button
+                    type="button"
+                    class="gallery-view-btn"
+                    title="Voir l'image"
+                    onclick="event.stopPropagation(); window.open('{{ img.image.url }}', '_blank')"
+                >
+                    <i class="fas fa-expand-alt"></i>
+                </button>
+
+                <!-- ==================== ADMIN ACTIONS ==================== -->
+                {% if request.user.is_superuser or car.agence.manager == request.user %}
+
+                <div class="gallery-admin-actions">
+
+                    <!-- Set Main -->
+                    {% if not img.is_main %}
+
+                    <form
+                        method="post"
+                        action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="gallery-action-btn set-main-btn"
+                            title="Définir comme image principale"
+                        >
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </form>
+
+                    {% else %}
+
+                    <div
+                        class="gallery-action-btn main-active"
+                        title="Image principale"
+                    >
+                        <i class="fas fa-star"></i>
+                    </div>
+
+                    {% endif %}
 
 
+                    <!-- Delete -->
+                    <form
+                        method="post"
+                        action="{% url 'car_image_delete' car.agence.slug car.id img.id %}"
+                    >
+                        {% csrf_token %}
 
-    
+                        <button
+                            type="submit"
+                            class="gallery-action-btn delete-btn"
+                            title="Supprimer l'image"
+                            onclick="return confirm('Voulez-vous vraiment supprimer cette image ?');"
+                        >
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- ==================== CSS ==================== -->
+<style>
+
+.car-gallery-section {
+    background: var(--color-bg);
+    padding: 40px 0;
+}
+
+/* ==================== HEADER ==================== */
+
+.gallery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.gallery-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.gallery-title i {
+    margin-right: 8px;
+    color: var(--color-pink);
+}
+
+.gallery-subtitle {
+    margin: 8px 0 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+}
+
+.gallery-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    background: #fff;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    transition: all .25s ease;
+    white-space: nowrap;
+}
+
+.gallery-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.10);
+    color: var(--color-pink);
+}
 
 
+/* ==================== GRID ==================== */
 
-    <!-- Video Tours Section -->
-    {% if car.video %}   
-        <div class="text-center mt-5 mb-5">
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+
+/* ==================== CARD ==================== */
+
+.gallery-card {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #eee;
+    border: 2px solid transparent;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        border-color .3s ease;
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+}
+
+.gallery-card.is-main {
+    border-color: var(--accent);
+}
+
+
+/* ==================== IMAGE ==================== */
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform .5s ease;
+}
+
+.gallery-card:hover .gallery-image {
+    transform: scale(1.05);
+}
+
+
+/* ==================== MAIN BADGE ==================== */
+
+.main-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 12px;
+    border-radius: 50px;
+
+    background: var(--accent);
+    color: #fff;
+
+    font-size: .75rem;
+    font-weight: 700;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.main-badge i {
+    font-size: .7rem;
+}
+
+
+/* ==================== VIEW BUTTON ==================== */
+
+.gallery-view-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 4;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(6px);
+
+    color: #fff;
+    cursor: pointer;
+
+    opacity: 0;
+    transform: translateY(-5px);
+
+    transition: all .25s ease;
+}
+
+.gallery-card:hover .gallery-view-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.gallery-view-btn:hover {
+    background: rgba(0,0,0,.85);
+    transform: scale(1.1) !important;
+}
+
+
+/* ==================== ADMIN ACTIONS ==================== */
+
+.gallery-admin-actions {
+    position: absolute;
+    left: 50%;
+    bottom: 15px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    transform: translate(-50%, 15px);
+    opacity: 0;
+
+    transition: all .25s ease;
+}
+
+.gallery-card:hover .gallery-admin-actions {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* ==================== ACTION BUTTON ==================== */
+
+.gallery-action-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(6px);
+
+    color: #fff;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    transition: all .25s ease;
+}
+
+.gallery-action-btn:hover {
+    transform: scale(1.12);
+}
+
+
+/* Set Main */
+
+.set-main-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+
+/* Already Main */
+
+.main-active {
+    background: var(--accent);
+    color: #fff;
+    cursor: default;
+}
+
+
+/* Delete */
+
+.delete-btn {
+    color: #ff6b6b;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 768px) {
+
+    .car-gallery-section {
+        padding: 30px 0;
+    }
+
+    .gallery-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gallery-title {
+        font-size: 1.7rem;
+    }
+
+    .gallery-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .gallery-card {
+        height: 240px;
+        border-radius: 12px;
+    }
+
+    /* Sur mobile, afficher les boutons */
+    .gallery-view-btn,
+    .gallery-admin-actions {
+        opacity: 1;
+        transform: none;
+    }
+
+    .gallery-admin-actions {
+        left: auto;
+        right: 10px;
+        bottom: 10px;
+        transform: none;
+    }
+
+    .gallery-action-btn,
+    .gallery-view-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery-card {
+        height: 280px;
+    }
+}
+
+</style>
+<!-- ==================== Fin Galerie Photos ==================== -->
+
+<!-- Présentation video -->
+ <div class="container">
+{% if car.video %}   
+    <div class="text-center mt-5 mb-5">
             <h3 class="display-6 fw-bold mb-2">
+                 <i class="fas fa-play-circle"></i>
                 Visite video
             </h3>
             <p class="text-muted mb-0">
-                Découvrez <strong>{{ car.marque }} {{ car.modele }} {{car.annee}}</strong> à travers nos présentations vidéo
+                Découvrez <strong>{{ car.marque }} {{ car.modele }} - {{car.annee}}</strong> à travers nos présentations vidéo
             </p>
             <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
-        </div>
+    </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
                 <div class="video-card">
                     <div class="video-container">
                         <video controls>
@@ -260,16 +667,22 @@
                     <div class="video-body">
                         <h4>
                             <i class="fas fa-video"></i>
-                            {{ car.legende|default:"Présentation générale" }}
+                            {% if car.legende %}
+                                {{ car.legende }}
+                            {% else %}
+                                Présentation de la <strong>{{ car.marque }} {{ car.modele }} - {{ car.annee }}</strong>
+                            {% endif %}
                         </h4>
                     </div>
                 </div>
-        </div>
-    {% endif %}
+    </div>
+{% endif %}
+</div>
+<!-- Fin Présentation video -->
 
-    <!-- Cars related -->
-    {% if cars_related %}
-        <div class="car-detail-card" style="margin-top: 40px;">
+<!-- Cars related -->
+{% if cars_related %}
+    <div class="car-detail-card" style="margin-top: 40px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h3 class="car-detail-section-title" style="margin: 0;">Vous aimerez peut-être aussi </h3>
         </div>
@@ -287,7 +700,7 @@
                             {% endif %}
                             <!-- Image -->
                             <div class="car-card__img">
-                                <a href="{% url 'car_detail' car.agence.slug car.id %}">
+                                <a href="{% url 'car' car.agence.slug car.id %}">
                                     {% if car.main_image %}
                                         <div class="position-relative w-100 h-100">
                                             <img src="{{ car.main_image.image.url }}"
@@ -338,12 +751,12 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span class="car-card__price">{{ car.nouveau_prix|intcomma }} Million</span>
-                                        {% if car.ancien_prix %}
-                                            <span class="car-card__price-old">{{ car.ancien_prix|intcomma }}</span>
+                                        <span class="car-card__price">{{ car.prix_actuel|intcomma }} Million</span>
+                                        {% if car.prix_ancien %}
+                                            <span class="car-card__price-old">{{ car.prix_ancien|intcomma }}</span>
                                         {% endif %}
                                     </div>
-                                    <a href="{% url 'car_detail' car.agence.slug car.id %}"
+                                    <a href="{% url 'car' car.agence.slug car.id %}"
                                     class="btn btn-primary btn-sm rounded-pill px-3">
                                         Voir
                                     </a>
@@ -352,7 +765,7 @@
                                     <small class="text-muted">
                                         <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
                                         <i class="fas fa-store me-1"></i>
-                                        <a href="{% url 'agence_detail' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
+                                        <a href="{% url 'agence' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
                                     </small>
                                 </div>
                             </div>
@@ -388,9 +801,9 @@
             </nav>
         {% endif %}
 
-        </div>
-    {% endif %}
-    <!-- / ── Car related ── -->
+    </div>
+{% endif %}
+<!-- / ── Car related ── -->
 
 
 

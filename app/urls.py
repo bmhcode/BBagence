@@ -28,8 +28,13 @@ urlpatterns = [
 
     # =========================== Agences CRUD =============================
     path('agences/', views.AgenceListView.as_view(), name='agence_list'),
+    
+    path('agence/<slug:agence_slug>/promotions/', views.AgenceListPromotionView.as_view(), name='agence_list_promotion'),
+
+    
+    
     path('agence/create/', views.AgenceCreateView.as_view(), name='agence_create'),
-    path('agence/<slug:agence_slug>/', views.AgenceDetailView.as_view(), name='agence_detail'),
+    path('agence/<slug:agence_slug>/', views.AgenceDetailView.as_view(), name='agence'),
     path('agence/<slug:agence_slug>/edit/', views.AgenceUpdateView.as_view(), name='agence_update'),
     path('agence/<slug:agence_slug>/delete/', views.AgenceDeleteView.as_view(), name='agence_delete'),
     path('agence/<slug:agence_slug>/messages/', views.AgenceMessagesListView.as_view(), name='agence_messages'),
@@ -37,7 +42,7 @@ urlpatterns = [
     # =========================== Cars CRUD ================================
     path('cars/', views.CarListView.as_view(), name='car_list'),
     path('agence/<slug:agence_slug>/car/create/', views.CarCreateView.as_view(), name='car_create'),
-    path('agence/<slug:agence_slug>/car/<int:car_id>/', views.CarDetailView.as_view(), name='car_detail'),
+    path('agence/<slug:agence_slug>/car/<int:car_id>/', views.CarDetailView.as_view(), name='car'),
     path('agence/<slug:agence_slug>/car/<int:car_id>/edit/', views.CarUpdateView.as_view(), name='car_update'),
     path('agence/<slug:agence_slug>/car/<int:car_id>/delete/', views.CarDeleteView.as_view(), name='car_delete'),
 
@@ -47,7 +52,7 @@ urlpatterns = [
 
 
     # =========================== Agence Media Manage ======================
-    path('agence/<slug:agence_slug>/cars/', views.AgenceCarListView.as_view(), name='agence_carlist'),
+    path('agence/<slug:agence_slug>/cars/', views.AgenceCarListView.as_view(), name='agence_car_list'),
     path('agence/<slug:agence_slug>/presentation/manage/', views.AgencePresentationManageView.as_view(), name='agence_presentation_manage'),
     path('agence/image/<int:pk>/delete/', views.AgenceImageDeleteView.as_view(), name='agence_image_delete'),
     path('agence/video/<int:pk>/delete/', views.AgenceVideoDeleteView.as_view(), name='agence_video_delete'),

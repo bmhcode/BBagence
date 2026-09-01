@@ -37,11 +37,13 @@ class HomeView(TemplateView):
 
 
         # Active car promotions
-        context['promotions'] = Car.objects.filter(
+        context['cars_promotion'] = Car.objects.filter(
             est_en_promotion=True,
             date_debut_promo__lte=timezone.now().date(),
-            date_fin_promo__gte=timezone.now().date()
-        ).select_related('agence').prefetch_related('images')[:6]
+            date_fin_promo__gte=timezone.now().date(),
+        )
+            # date_debut_publication_promo__lte=timezone.now().date())
+        
         return context
 
 
@@ -160,7 +162,7 @@ class AgenceUpdateView(AgenceManagerRequiredMixin, UpdateView):
                 self.object = form.save()
                 social_form.save()
             messages.success(self.request, "Le profil de l'agence a été mis à jour.")
-            return redirect('agence_detail', agence_slug=self.object.slug)
+            return redirect('agence', agence_slug=self.object.slug)
         else:
             return self.form_invalid(form)
 
@@ -198,9 +200,34 @@ class AgenceListView(ListView):
         context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
         return context
 
+class AgenceListPromotionView(ListView):
+    model = Car
+    template_name = 'app/agence_list_promotion.html'
+    context_object_name = 'cars_promotion'
+    slug_url_kwarg = 'agence_slug'
+    ordering = ['date_debut_promo']
+    paginate_by = 12
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            agence__slug=self.kwargs['agence_slug'],
+            est_en_promotion=True,
+            
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['agence'] = get_object_or_404(
+            Agence,
+            slug=self.kwargs['agence_slug']
+        )
+
+        return context
+
 class AgenceDetailView(DetailView):
     model = Agence
-    template_name = 'app/agence_detail.html'
+    template_name = 'app/agence.html'
     context_object_name = 'agence'
     slug_url_kwarg = 'agence_slug'
 
@@ -210,6 +237,10 @@ class AgenceDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['videos'] = self.object.videos.all()
+        context['cars_promotion'] = self.object.cars.filter(est_en_promotion=True,date_debut_publication_promo__lte=timezone.now())
+        context['vehicules_neufs'] = self.object.cars.filter(statut='neuf').exclude(est_en_promotion=True)
+        context['vehicules_moins_de_3ans'] = self.object.cars.filter(statut='moins_de_3ans')#.exclude(est_en_promotion=True)
+        context['vehicules_occasions'] = self.object.cars.filter(statut='occasion')#.exclude(est_en_promotion=True)
         return context
 
 # AGENCE PRESENTATION & MEDIA MANAGEMENT
@@ -335,7 +366,7 @@ class AgencePhotosView(DetailView):
 
 class AgenceCarListView(ListView):
     model = Car
-    template_name = 'app/agence_carlist.html'
+    template_name = 'app/agence_car_list.html'
     context_object_name = 'cars'
     ordering = ['-cree_le']
 
@@ -347,7 +378,6 @@ class AgenceCarListView(ListView):
         context = super().get_context_data(**kwargs)
         context['agence'] = Agence.objects.get(slug=self.kwargs.get('agence_slug'))
         return context
-
 
 
 # =========================================
@@ -439,7 +469,7 @@ class CarListView(ListView):
 
 class CarDetailView(DetailView):
     model = Car
-    template_name = 'app/car_detail.html'
+    template_name = 'app/car.html'
     context_object_name = 'car'
     pk_url_kwarg = 'car_id'
     slug_url_kwarg = 'agence_slug'
@@ -622,12 +652,10 @@ class CarUpdateView(AgenceManagerRequiredMixin, UpdateView):
         )
 
         return redirect(
-            "car_detail",
+            "car",
             agence_slug=car.agence.slug,
             car_id=car.pk,
         )
-
-
 
 class CarDeleteView(AgenceManagerRequiredMixin, DeleteView):
     model = Car
@@ -653,7 +681,7 @@ def car_image_delete(request, agence_slug, car_id, image_id):
         
     image.delete()
     messages.success(request, "L'image a été supprimée.")
-    return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
+    return redirect('car', agence_slug=agence_slug, car_id=car.id)
 
 @login_required
 @require_POST
@@ -678,18 +706,28 @@ def car_image_set_main(request, agence_slug, car_id, image_id):
     CarImages.objects.bulk_update(other_images, ['order'])
 
     messages.success(request, "Image principale mise à jour.")
-    return redirect('car_detail', agence_slug=agence_slug, car_id=car.id)
+    return redirect('car', agence_slug=agence_slug, car_id=car.id)
 
 # =========================== Promotion CRUD =============================
 
 class PromotionListView(ListView):
     model = Car
     template_name = 'app/promotion_list.html'
-    context_object_name = 'promotions'
+    context_object_name = 'cars_promotion'
     ordering = ['-cree_le']
 
-    def get_queryset(self):
-        return super().get_queryset().filter(est_en_promotion=True)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Active car promotions
+        context['cars_promotion'] = Car.objects.filter(
+            est_en_promotion=True,
+            date_debut_promo__lte=timezone.now().date(),
+            date_fin_promo__gte=timezone.now().date(),
+            # date_debut_publication_promo__lte=timezone.now().date(),
+            
+        ).select_related('agence').prefetch_related('images')
+        
+        return context
 
 class CarPromotionView(DetailView):
     model = Car
@@ -711,8 +749,6 @@ class PromotionUpdateView(LoginRequiredMixin, UpdateView):
                                                     "agence_slug": self.object.agence.slug,
                                                     "car_id": self.object.pk,
         })
-
- 
 
 # =========================================
 # WISHLIST VIEWS
@@ -794,7 +830,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         })
         return context
 
-
 # =========================================
 # OTHER VIEWS
 # =========================================
@@ -851,9 +886,6 @@ class ArticleBlogCreateView(LoginRequiredMixin, CreateView):
             kwargs={'pk': self.object.pk}
         )
 
-
-
-
 class ArticleBlogUpdateView(UpdateView):
     model = ArticleBlog
     template_name = 'app/blog_form.html'
@@ -865,10 +897,6 @@ class ArticleBlogDeleteView(DeleteView):
     template_name = 'app/blog_confirm_delete.html'
     context_object_name = 'article'
     success_url = reverse_lazy('blog_list')
-
-
-
-
 
 class ArticleBlogDetailView(DetailView):
     model = ArticleBlog
