@@ -1,14 +1,7 @@
 
-
-
-
 /* ============================================================
    YES MALL — Main JavaScript
    ============================================================ */
-
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── 1. Navbar scroll effect ── */
@@ -182,5 +175,3 @@ function updateBadge(count) {
         badge.style.display = "none";
     }
 }
-
-

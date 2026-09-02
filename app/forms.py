@@ -156,23 +156,28 @@ class AgenceForm(forms.ModelForm):
     class Meta:
         model = Agence
         fields = [
-            'nom', 'description', 'telephone', 'site_web', 
+            'nom', 'description', 'manager','telephone', 'site_web', 
             'email', 'ville', 'commune', 'adresse', 'google_map', 
             'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation'
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez l\'agence (facultatif)...'}),
+            'manager': forms.Select(attrs={'class': 'form-select'}),
             
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
             'site_web': forms.URLInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+
             'ville': forms.Select(attrs={'class': 'form-select'}),
             'commune': forms.Select(attrs={'class': 'form-select'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+
             'google_map': forms.URLInput(attrs={'class': 'form-control'}),
+
             'heure_ouverture': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'heure_fermeture': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            
             'est_ferme': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observation': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }

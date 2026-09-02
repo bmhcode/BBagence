@@ -47,8 +47,6 @@ class HomeView(TemplateView):
         return context
 
 
-
-
 # def _get_agence():
 #     """
 #     Retrieves the first agence object from the database.
@@ -383,6 +381,7 @@ class AgenceCarListView(ListView):
 # =========================================
 # CAR CRUD VIEWS
 # =========================================
+
 class CarListView(ListView):
     model = Car
     template_name = 'app/car_list.html'
@@ -753,6 +752,7 @@ class PromotionUpdateView(LoginRequiredMixin, UpdateView):
 # =========================================
 # WISHLIST VIEWS
 # =========================================
+
 class WishlistToggleView(LoginRequiredMixin, View):
     def post(self, request, car_id):
         car = get_object_or_404(Car, id=car_id)

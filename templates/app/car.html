@@ -23,7 +23,8 @@
     <div class="col-sm-7 col-md-7 col-lg-7">
         <div class="card shadow rounded-3 overflow-hidden mb-4" >
 
-           <!-- Wishlist Button -->
+            <!-- Wishlist Button -->
+            {% if request.user.is_authenticated %}
             <button
                 type="button"
                 onclick="toggleWishlist(this, {{ car.id }})"
@@ -33,7 +34,10 @@
                 <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                 <span class="wishlist-loader spinner-border spinner-border-sm"></span>
             </button>
+            {% endif %}
+            <!-- / Wishlist Button -->
 
+            <!-- Car image -->
             <div class="position-relative">
                 {% if car.main_image %}
                     <img id="mainCarImage"
@@ -41,7 +45,7 @@
                         class="img-fluid"
                         alt="{{ car.nom }}"
                         style="width: 100%;
-                        max-height: 300px;
+                        max-height: 250px;
                         object-fit: cover;
                         transition: opacity 0.3s ease;">
                 {% endif %}
@@ -54,27 +58,29 @@
                 </a>
                 {% endif %}
             </div>      
+            <!-- / Car image -->
 
             <!-- Edit/Delete buttons for manager or superuser -->
             {% if request.user.is_superuser or car.agence.manager == request.user %}
                 <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
-                    <i class="fas fa-trash"></i>
-                            </a>
+                    <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-trash"></i>
+                    </a>
                 </div>
             {% endif %}
+            <!-- /Edit/Delete buttons for manager or superuser -->
 
             <div class="card-body p-4">
                 <!-- Back Link -->
                 <div class="mt-2">
-                        <small class="text-muted">
-                            <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
-                            <i class="fas fa-store me-1"></i>
-                            <a href="{% url 'agence' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
-                        </small>
+                    <small class="text-muted">
+                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                        <i class="fas fa-store me-1"></i>
+                        <a href="{% url 'agence' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
+                    </small>
                 </div> 
                 <!-- Actions -->
                 <div class="d-flex gap-3 mt-3 mb-3">
@@ -189,7 +195,6 @@
 <!-- ==================== Galerie Photos ==================== -->
 <section class="car-gallery-section">
     <div class="container">
-
         {% if car.images.all %}
         <!-- Header -->
         <div class="gallery-header">
@@ -204,19 +209,17 @@
                 </p>
             </div>
 
-            <a href="{% url 'agence_photos' agence.slug %}"
+            <!-- <a href="{% url 'agence_photos' agence.slug %}"
                class="gallery-link">
                 <i class="fas fa-images"></i>
                 Voir toute la galerie
-            </a>
+            </a> -->
         </div>
         <!-- Gallery Grid -->
         <div class="gallery-grid">
 
             {% for img in car.images.all %}
-
             <div class="gallery-card {% if img.is_main %}is-main{% endif %}">
-
                 <!-- Image -->
                 <img
                     src="{{ img.image.url }}"
@@ -224,7 +227,6 @@
                     loading="lazy"
                     onclick="window.open('{{ img.image.url }}', '_blank')"
                 >
-
                 <!-- Main Badge -->
                 {% if img.is_main %}
                 <div class="main-badge">
@@ -245,18 +247,14 @@
 
                 <!-- ==================== ADMIN ACTIONS ==================== -->
                 {% if request.user.is_superuser or car.agence.manager == request.user %}
-
                 <div class="gallery-admin-actions">
-
                     <!-- Set Main -->
                     {% if not img.is_main %}
-
                     <form
                         method="post"
                         action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}"
                     >
                         {% csrf_token %}
-
                         <button
                             type="submit"
                             class="gallery-action-btn set-main-btn"
@@ -277,7 +275,6 @@
 
                     {% endif %}
 
-
                     <!-- Delete -->
                     <form
                         method="post"
@@ -294,19 +291,13 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </form>
-
                 </div>
-
                 {% endif %}
-
+            {{img.caption}}
             </div>
-
             {% endfor %}
-
         </div>
-
         {% endif %}
-
     </div>
 </section>
 

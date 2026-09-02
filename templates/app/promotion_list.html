@@ -115,6 +115,10 @@
                 <span class="badge-promo">
                     {{ object.titre_promo }}
                 </span>
+
+            <h2 class="fw-bold mt-2"> {{object.marque}} {{object.modele}} {{object.annee}} </h2>
+
+
             <div class="position-relative">
                 <a href="{% url 'car' object.agence.slug object.id %}">
                     {% if object.main_image %}
@@ -143,7 +147,6 @@
             </a>
             </div>
 
-            <h2 class="fw-bold mt-2"> {{object.marque}} {{object.modele}} {{object.annee}} </h2>
             <p class="text-muted mt-3"> {{ object.description_promo }} </p>
 
             <div class="mt-auto d-flex justify-content-between align-items-center">

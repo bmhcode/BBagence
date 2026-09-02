@@ -161,35 +161,48 @@
 
                                     <div class="row g-3">
 
-                                        <div class="col-12">
+                                        <div class="col-6">
                                             <label class="form-label fw-semibold">
                                                 Nom de l'agence <span class="text-danger">*</span>
                                             </label>
-
                                             {{ form.nom }}
-
                                             {% if form.nom.errors %}
                                                 <div class="text-danger small mt-1">
                                                     {{ form.nom.errors.0 }}
                                                 </div>
                                             {% endif %}
                                         </div>
+ <!-- Manager -->
+                                        <div class="col-6">
+                                            <label class="form-label fw-semibold">
+                                                Manager <span class="text-danger">*</span>
+                                            </label>
 
+                                            {{ form.manager }}
 
-                                  <div class="col-12">
-    <label class="form-label fw-semibold">
-        Description
-        <span class="text-muted small">(facultatif)</span>
-    </label>
+                                            {% if form.manager.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.manager.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
 
-    {{ form.description }}
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">
+                                                Description
+                                                <span class="text-muted small">(facultatif)</span>
+                                            </label>
 
-    {% if form.description.errors %}
-        <div class="text-danger small mt-1">
-            {{ form.description.errors.0 }}
-        </div>
-    {% endif %}
-</div>
+                                            {{ form.description }}
+
+                                            {% if form.description.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.description.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                       
 
                                     </div>
 
