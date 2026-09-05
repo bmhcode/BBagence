@@ -299,7 +299,7 @@ class AgenceImageDeleteView(LoginRequiredMixin, View):
             raise PermissionDenied
         image.delete()
         messages.success(request, "Image supprimée.")
-        return redirect('agence_presentation_manage', agence_slug=agence.slug)
+        return redirect('agence', agence_slug=agence.slug)
 
 class AgenceVideoDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -346,21 +346,46 @@ class AgenceVideoView(DetailView):
         context = super().get_context_data(**kwargs)
         context['videos'] = self.object.videos.all()
         return context
+@login_required
+def agence_photos(request, agence_slug):
 
-class AgencePhotosView(DetailView):
-    model = Agence
-    template_name = 'app/agence_galerie_photos.html'
-    context_object_name = 'agence'
-    slug_url_kwarg = 'agence_slug'
+    agence = get_object_or_404(
+        Agence,
+        slug=agence_slug
+    )
 
-    def get_object(self):
-        slug = self.kwargs.get('agence_slug')
-        return get_object_or_404(Agence, slug=slug)
+    if not (
+        request.user.is_superuser
+        or agence.manager == request.user
+    ):
+        return redirect("agence", agence.slug)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['images'] = self.object.images.all()
-        return context
+    if request.method == "POST":
+
+        photos = request.FILES.getlist("photos")
+
+        for index, photo in enumerate(photos):
+
+            legende = request.POST.get(
+                f"legende_{index}",
+                ""
+            ).strip()
+
+            AgenceImages.objects.create(
+                agence=agence,
+                image=photo,
+                legende=legende
+            )
+
+        return redirect(
+            "agence",
+            agence.slug
+        )
+
+    return redirect(
+        "agence",
+        agence.slug
+    )
 
 class AgenceCarListView(ListView):
     model = Car
@@ -977,3 +1002,113 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
                 "agence_slug": self.kwargs["agence_slug"]
             }
         )
+
+
+# =========================================
+# Modifier l'image et sa légende
+# =========================================
+
+def agence_image_edit(request, agence_slug, pk):
+
+    image = get_object_or_404(
+        AgenceImages,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and image.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=image.agence.slug
+        )
+
+    if request.method == 'POST':
+
+        # Ancienne image
+        ancienne_image = image.image
+
+        # Nouvelle légende
+        image.legende = request.POST.get('legende', '').strip()
+
+        # Nouvelle photo
+        nouvelle_image = request.FILES.get('image')
+
+        if nouvelle_image:
+            image.image = nouvelle_image
+
+        # Sauvegarder
+        image.save()
+
+        # Supprimer l'ancien fichier uniquement
+        # après avoir enregistré la nouvelle image
+        if nouvelle_image and ancienne_image:
+            ancienne_image.delete(save=False)
+
+        messages.success(
+            request,
+            "La photo a été modifiée avec succès."
+        )
+
+        return redirect(
+            'agence',
+            agence_slug=image.agence.slug
+        )
+
+    return redirect(
+        'agence',
+        agence_slug=image.agence.slug
+    )
+    
+# =====================================================
+# Modifier la vidéo et sa légende
+# =====================================================
+def agence_video_update(request, pk):
+
+    video = get_object_or_404(AgenceVideos, pk=pk)
+
+    if request.method == 'POST':
+
+        # Modifier la légende
+        video.legende = request.POST.get(
+            'legende',
+            ''
+        ).strip()
+
+        # Modifier la vidéo si une nouvelle est sélectionnée
+        nouvelle_video = request.FILES.get('video')
+
+        if nouvelle_video:
+            video.video = nouvelle_video
+
+        video.save()
+
+        return redirect(
+            'agence_presentation_manage',
+            agence_slug=video.agence.slug
+        )
+
+    return redirect(
+        'agence_presentation_manage',
+        agence_slug=video.agence.slug
+    )
+    video_obj = get_object_or_404(AgenceVideos, pk=pk)
+
+    if request.method == "POST":
+
+        # Modifier la légende
+        legende = request.POST.get("legende", "").strip()
+        video_obj.legende = legende
+
+        # Remplacer la vidéo seulement si un nouveau fichier est sélectionné
+        if request.FILES.get("video"):
+            video_obj.video = request.FILES["video"]
+
+        video_obj.save()
+
+        messages.success(
+            request,
+            "La vidéo et la légende ont été modifiées avec succès."
+        )
+
+    return redirect("agence_presentation_manage",agence_slug=video_obj.agence.slug)

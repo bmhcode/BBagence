@@ -372,9 +372,9 @@
                 <a href="{% url 'agence_messages' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2 position-relative shadow-sm">
                     <i class="fas fa-envelope me-2"></i> Messages
                 </a>
-                <!-- <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-gear me-2"></i> Gérer l'agence
-                </a> -->
+                </a>
 
                 <a href="{% url 'agence_list_promotion' agence.slug %}" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-tags me-2"></i> Promotions
@@ -748,11 +748,11 @@
                         <!-- Wishlist Button -->
                         {% if request.user.is_authenticated %}  
                             <button type="button"
-                                onclick="toggleWishlist(this, {{ object.id }})"
-                                class="wishlist-btn {% if object.id in user_wishlist_ids %} active {% endif %}"
+                                onclick="toggleWishlist(this, {{ car.id }})"
+                                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
                                 aria-label="Ajouter aux favoris"
-                                title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                                 <span class="wishlist-loader spinner-border spinner-border-sm"></span>
                             </button>
                         {% endif %}
@@ -927,11 +927,11 @@
                             <!-- Wishlist Button -->
                             {% if request.user.is_authenticated %}  
                                 <button type="button"
-                                        onclick="toggleWishlist(this, {{ object.id }})"
-                                        class="wishlist-btn {% if object.id in user_wishlist_ids %} active {% endif %}"
+                                        onclick="toggleWishlist(this, {{ car.id }})"
+                                        class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
                                         aria-label="Ajouter aux favoris"
-                                        title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                    <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                        title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                    <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                                     <span class="wishlist-loader spinner-border spinner-border-sm"></span>
                                 </button>
                             {% endif %}
@@ -1032,20 +1032,16 @@
                 <div class="col-sm-6 col-md-4 col-xl-3">
                     <div class="car-card">
                         <!-- Wishlist Button -->
-                        {% if request.user.is_authenticated %}
-<button
-    type="button"
-    class="wishlist-btn {% if object.id in user_wishlist_ids %}active{% endif %}"
-    data-car-id="{{ object.id }}"
-    onclick="toggleWishlist(this, this.dataset.carId)"
-    aria-label="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
-    title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
->
-    <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-
-    <span class="wishlist-loader spinner-border spinner-border-sm d-none"></span>
-</button>
-{% endif %}
+                        {% if request.user.is_authenticated %}  
+                        <button type="button"
+                                    onclick="toggleWishlist(this, {{ car.id }})"
+                                    class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                                aria-label="Ajouter aux favoris"
+                                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+                        </button>
+                        {% endif %}
 
                         <!-- Image -->
                         <div class="car-card__img">
@@ -1173,262 +1169,58 @@
                 </div>
 </div> -->
 
-  <!-- Galerie photos -->
-<section style="background-color: var(--color-bg); padding: 20px 0;">
-    <div class="container">
-
-        {% if agence.images.all %}
-
-        <div>
-
-            <!-- TITRE -->
-            <div style="text-align: center; margin-bottom: 40px;">
-
-                <h2 style="
-                    font-family: var(--font-display);
-                    font-size: 2.2rem;
-                    color: var(--color-primary);
-                ">
-                    Galerie Photos
-                </h2>
-
-                {% if request.user.is_superuser or agence.manager == request.user %}
-                    <button type="button"
-                            class="btn btn-light border rounded-pill px-4 py-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#addPhotosModal">
-
-                        <i class="fas fa-plus me-2 text-primary"></i>
-                        Ajouter des photos
-
-                    </button>
-                {% endif %}
-
-                <p style="
-                    color: var(--color-muted);
-                    font-size: 1.05rem;
-                    margin-top: 8px;
-                ">
-                    Découvrez les photos de <strong>{{ agence.nom }}</strong>
-                </p>
-
-                <div style="
-                    width: 60px;
-                    height: 3px;
-                    background: var(--color-pink);
-                    margin: 15px auto 0;
-                "></div>
-
-            </div>
-
-
-            <!-- PHOTOS -->
-           <div style="
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-">
-
-    {% for img in agence.images.all %}
-
-<div class="card h-100">
-
-    <!-- PHOTO -->
-    <img src="{{ img.image.url }}"
-         class="card-img-top"
-         alt="{{ img.legende|default:'Photo' }}"
-         style="height: 250px; object-fit: cover;">
-
-    <!-- CONTENU SOUS LA PHOTO -->
-    <div style="padding: 15px;">
-
-        <!-- LÉGENDE -->
-        <div style="
-            min-height: 45px;
-            margin-bottom: 12px;
-        ">
-
-            <p style="
-                margin: 0;
-                color: var(--color-primary);
-                font-weight: 500;
-            ">
-                <i class="fas fa-camera me-2"></i>
-
-                {% if img.legende %}
-                    {{ img.legende }}
-                {% else %}
-                    Instantané du magasin
-                {% endif %}
-            </p>
-
-        </div>
-
-        <!-- BOUTONS -->
-        {% if request.user.is_superuser or agence.manager == request.user %}
-
-        <div class="d-flex gap-2">
-
-            <!-- MODIFIER -->
-            <button type="button"
-        class="btn btn-outline-primary btn-sm rounded-pill flex-grow-1"
+    <!-- Galerie photos -->
+    <section class="" style="background-color: var(--color-bg); padding: 20px 0;">
+        <div class="container">
+            <!-- Photo Gallery Section -->
+            {% if agence.images %}
+            <div>
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 style="font-family: var(--font-display); font-size: 2.2rem; color: var(--color-primary);">Galerie Photos</h2>
+                   
+                 {% if request.user.is_superuser or agence.manager == request.user %}
+<button type="button"
+        class="btn btn-light border rounded-pill px-4 py-2"
         data-bs-toggle="modal"
-        data-bs-target="#editPhotoModal"
-        data-image-id="{{ img.id }}"
-        data-image-url="{{ img.image.url }}"
-        data-legende="{{ img.legende|default:'' }}"
-        data-edit-url="{% url 'agence_image_edit' agence.slug img.id %}">
+        data-bs-target="#addPhotosModal">
 
-    <i class="fas fa-edit me-1"></i>
-    Modifier
+    <i class="fas fa-plus me-2 text-primary"></i>
+    Ajouter des photos
+
 </button>
-
-        
-            <!-- SUPPRIMER -->
-            <form method="POST"
-                  action="{% url 'agence_image_delete' img.id %}"
-                  class="m-0"
-                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette photo ?');">
-
-                {% csrf_token %}
-
-                <button type="submit"
-                        class="btn btn-outline-danger btn-sm rounded-pill">
-
-                    <i class="fas fa-trash me-1"></i>
-                    Supprimer
-
-                </button>
-
-            </form>
-
-        </div>
-
-        {% endif %}
-
-    </div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-        </div>
-
-        {% endif %}
-
-    </div>
-</section>
+{% endif %}
 
 
-    <!-- =====================================================
-        MODALE : AJOUTER PLUSIEURS PHOTOS
-    ===================================================== -->
-
-    <div class="modal fade"
-        id="addPhotosModal"
-        tabindex="-1"
-        aria-labelledby="addPhotosModalLabel"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-
-            <div class="modal-content border-0 rounded-4 shadow">
-
-                <!-- HEADER -->
-                <div class="modal-header bg-primary text-white">
-
-                    <h5 class="modal-title" id="addPhotosModalLabel">
-                        <i class="fas fa-images me-2"></i>
-                        Ajouter des photos
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close btn-close-white"
-                            data-bs-dismiss="modal"
-                            aria-label="Fermer">
-                    </button>
-
+                    <p style="color: var(--color-muted); font-size: 1.05rem; margin-top: 8px;"> Découvrez les photos de <strong>{{ agence.nom }}</strong></p>
+                    <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 15px auto 0;"></div>
+                
                 </div>
-
-                <!-- BODY -->
-                <div class="modal-body p-4">
-
-                    <form method="POST"
-                        action="{% url 'agence_photos' agence.slug %}"
-                        enctype="multipart/form-data">
-
-                        {% csrf_token %}
-
-                        <!-- Sélection des photos -->
-                        <div class="mb-4">
-
-                            <label for="photos" class="form-label fw-bold">
-                                <i class="fas fa-images me-2"></i>
-                                Sélectionner les photos
-                            </label>
-
-                        <input type="file"
-                                id="photos"
-                                name="photos"
-                                class="form-control"
-                                accept="image/*"
-                                multiple>
-
-                            <div class="form-text">
-                                Vous pouvez sélectionner plusieurs photos.
-                            </div>
-
+                   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+                    {% for img in agence.images.all %}
+                    <div class="gallery-card" onclick="window.open('{{ img.image.url }}')">
+                        <img src="{{ img.image.url }}" alt="{{ img.legende }}">
+                        <div class="gallery-overlay">
+                            <p>
+                                <i class="fas fa-camera"></i>
+                                {{ img.legende|default:"Instantané du magasin" }}
+                            </p>
                         </div>
-
-                        <!-- APERÇU -->
-                        <div class="mb-4">
-
-                        
-                        <div id="photosPreview" class="row g-3 mt-2"></div>
-
-                        </div>
-
-                    
-
-                        <!-- BOUTONS -->
-                        <div class="text-end">
-
-                            <button type="button"
-                                    class="btn btn-secondary rounded-pill me-2"
-                                    data-bs-dismiss="modal">
-                                Annuler
-                            </button>
-
-                            <button type="submit"
-                                    class="btn btn-primary rounded-pill">
-
-                                <i class="fas fa-upload me-2"></i>
-                                Ajouter les photos
-
-                            </button>
-
-                        </div>
-
-                    </form>
-
+                    </div>
+                    {% endfor %}
                 </div>
-
             </div>
+            {% endif %}
 
         </div>
-
-    </div>
-
+    </section>
 <!-- =====================================================
-     MODALE : MODIFIER UNE PHOTO
+     MODALE : AJOUTER PLUSIEURS PHOTOS
 ===================================================== -->
 
 <div class="modal fade"
-     id="editPhotoModal"
+     id="addPhotosModal"
      tabindex="-1"
-     aria-labelledby="editPhotoModalLabel"
+     aria-labelledby="addPhotosModalLabel"
      aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1438,11 +1230,9 @@
             <!-- HEADER -->
             <div class="modal-header bg-primary text-white">
 
-                <h5 class="modal-title" id="editPhotoModalLabel">
-
-                    <i class="fas fa-edit me-2"></i>
-                    Modifier la photo
-
+                <h5 class="modal-title" id="addPhotosModalLabel">
+                    <i class="fas fa-images me-2"></i>
+                    Ajouter des photos
                 </h5>
 
                 <button type="button"
@@ -1453,79 +1243,65 @@
 
             </div>
 
-
             <!-- BODY -->
             <div class="modal-body p-4">
 
-                <form id="editPhotoForm"
-                      method="POST"
+                <form method="POST"
+                      action="{% url 'agence_photos' agence.slug %}"
                       enctype="multipart/form-data">
 
                     {% csrf_token %}
 
-
-                    <!-- APERÇU PHOTO -->
-                    <div class="text-center mb-4">
-
-                        <img id="editPhotoPreview"
-                             src=""
-                             alt="Aperçu"
-                             style="
-                                width: 100%;
-                                max-height: 350px;
-                                object-fit: contain;
-                                border-radius: 12px;
-                                background: #f5f5f5;
-                                padding: 5px;
-                             ">
-
-                    </div>
-
-
-                    <!-- NOUVELLE PHOTO -->
+                    <!-- Sélection des photos -->
                     <div class="mb-4">
 
-                        <label for="editPhoto"
-                               class="form-label fw-bold">
-
-                            <i class="fas fa-image me-2"></i>
-                            Nouvelle photo
-
+                        <label for="photos" class="form-label fw-bold">
+                            <i class="fas fa-images me-2"></i>
+                            Sélectionner les photos
                         </label>
 
                         <input type="file"
-                               id="editPhoto"
-                               name="image"
+                               id="photos"
+                               name="photos"
                                class="form-control"
-                               accept="image/*">
+                               accept="image/*"
+                               multiple
+                               required>
 
                         <div class="form-text">
-                            Laissez vide pour conserver la photo actuelle.
+                            Vous pouvez sélectionner plusieurs photos.
                         </div>
 
                     </div>
 
+                    <!-- APERÇU -->
+                    <div class="mb-4">
+
+                        <label class="form-label fw-bold">
+                            Aperçu des photos
+                        </label>
+
+                        <div id="photosPreview"
+                             class="row g-3">
+                        </div>
+
+                    </div>
 
                     <!-- LÉGENDE -->
                     <div class="mb-4">
 
-                        <label for="editLegende"
-                               class="form-label fw-bold">
-
-                            <i class="fas fa-comment me-2"></i>
+                        <label for="legende" class="form-label fw-bold">
                             Légende
-
                         </label>
 
                         <input type="text"
-                               id="editLegende"
+                               id="legende"
                                name="legende"
                                class="form-control"
                                maxlength="200"
-                               placeholder="Légende de la photo">
+                               placeholder="Légende des photos">
 
                     </div>
-
 
                     <!-- BOUTONS -->
                     <div class="text-end">
@@ -1533,16 +1309,14 @@
                         <button type="button"
                                 class="btn btn-secondary rounded-pill me-2"
                                 data-bs-dismiss="modal">
-
                             Annuler
-
                         </button>
 
                         <button type="submit"
                                 class="btn btn-primary rounded-pill">
 
-                            <i class="fas fa-save me-2"></i>
-                            Enregistrer 333
+                            <i class="fas fa-upload me-2"></i>
+                            Ajouter les photos
 
                         </button>
 
@@ -1561,11 +1335,6 @@
 
 
     <!-- Fin Galerie photos -->
-
-
-
-
-
 
     <!-- Videos de l'agence -->
     <section class="" style="background-color: var(--color-bg); padding: 10px 0;">
@@ -1986,39 +1755,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!input || !preview) return;
 
-    // Chaque élément contient :
-    // { file: fichier, legende: texte }
-    let selectedPhotos = [];
+    let selectedFiles = [];
 
-
-    // ==========================================
-    // SÉLECTION DES PHOTOS
-    // ==========================================
     input.addEventListener("change", function () {
 
-        const newFiles = Array.from(this.files);
-
-        selectedPhotos = newFiles.map(function (file) {
-            return {
-                file: file,
-                legende: ""
-            };
-        });
+        // Ajouter les nouvelles photos à la sélection
+        selectedFiles = Array.from(input.files);
 
         renderPreview();
+
     });
 
 
-    // ==========================================
-    // AFFICHER L'APERÇU
-    // ==========================================
     function renderPreview() {
 
         preview.innerHTML = "";
 
-        selectedPhotos.forEach(function (photo, index) {
-
-            const file = photo.file;
+        selectedFiles.forEach(function (file, index) {
 
             if (!file.type.startsWith("image/")) {
                 return;
@@ -2029,62 +1782,38 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.onload = function (event) {
 
                 const col = document.createElement("div");
-
-                col.className = "col-12 col-md-6";
+                col.className = "col-6 col-md-4 col-lg-3";
 
                 col.innerHTML = `
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative border rounded-3 overflow-hidden shadow-sm bg-white">
 
                         <!-- IMAGE -->
-                        <div class="position-relative">
+                        <img src="${event.target.result}"
+                             class="w-100"
+                             style="height:140px; object-fit:cover;"
+                             alt="${file.name}">
 
-                            <img src="${event.target.result}"
-                                 class="w-100 rounded-top"
-                                 style="height:180px; object-fit:cover;"
-                                 alt="${file.name}">
+                        <!-- BOUTON SUPPRIMER -->
+                        <button type="button"
+                                class="btn btn-danger btn-sm rounded-circle position-absolute"
+                                style="
+                                    top: 8px;
+                                    right: 8px;
+                                    width: 32px;
+                                    height: 32px;
+                                    padding: 0;
+                                    z-index: 10;
+                                "
+                                data-index="${index}"
+                                title="Supprimer cette photo">
 
-                            <!-- BOUTON SUPPRIMER -->
-                            <button type="button"
-                                    class="btn btn-danger btn-sm rounded-circle position-absolute"
-                                    style="
-                                        top:10px;
-                                        right:10px;
-                                        width:35px;
-                                        height:35px;
-                                        padding:0;
-                                        z-index:10;
-                                    "
-                                    data-index="${index}"
-                                    title="Supprimer cette photo">
+                            <i class="fas fa-trash"></i>
 
-                                <i class="fas fa-trash"></i>
+                        </button>
 
-                            </button>
-
-                        </div>
-
-
-                        <!-- INFORMATIONS -->
-                        <div class="card-body">
-
-                            <div class="small text-muted mb-2 text-truncate">
-                                <i class="fas fa-image me-1"></i>
-                                ${file.name}
-                            </div>
-
-
-                            <!-- LÉGENDE -->
-                            <label class="form-label fw-bold">
-                                Légende
-                            </label>
-
-                            <input type="text"
-                                   class="form-control photo-legende"
-                                   value="${escapeHtml(photo.legende)}"
-                                   data-index="${index}"
-                                   maxlength="200"
-                                   placeholder="Légende de cette photo">
-
+                        <!-- NOM -->
+                        <div class="p-2 small text-truncate">
+                            ${file.name}
                         </div>
 
                     </div>
@@ -2098,164 +1827,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ==========================================
-    // MODIFIER UNE LÉGENDE
-    // ==========================================
-    preview.addEventListener("input", function (event) {
-
-        const inputLegende = event.target.closest(".photo-legende");
-
-        if (!inputLegende) return;
-
-        const index = parseInt(inputLegende.dataset.index);
-
-        if (selectedPhotos[index]) {
-
-            selectedPhotos[index].legende = inputLegende.value;
-
-        }
-    });
-
-
-    // ==========================================
-    // SUPPRIMER UNE PHOTO
-    // ==========================================
+    // Suppression d'une photo de l'aperçu
     preview.addEventListener("click", function (event) {
 
-        const button = event.target.closest(
-            "button[data-index]"
-        );
+        const button = event.target.closest("button[data-index]");
 
         if (!button) return;
 
         const index = parseInt(button.dataset.index);
 
-        // Supprime uniquement cette photo
-        // et conserve les légendes des autres
-        selectedPhotos.splice(index, 1);
+        // Supprimer du tableau
+        selectedFiles.splice(index, 1);
 
-        updateFileInput();
-
-        renderPreview();
-    });
-
-
-    // ==========================================
-    // METTRE À JOUR input.files
-    // ==========================================
-    function updateFileInput() {
-
+        // Reconstruire l'objet FileList de l'input
         const dataTransfer = new DataTransfer();
 
-        selectedPhotos.forEach(function (photo) {
-
-            dataTransfer.items.add(photo.file);
-
+        selectedFiles.forEach(function (file) {
+            dataTransfer.items.add(file);
         });
 
         input.files = dataTransfer.files;
-    }
 
+        // Actualiser l'aperçu
+        renderPreview();
 
-    // ==========================================
-    // PROTECTION HTML
-    // ==========================================
-    function escapeHtml(text) {
-
-        const div = document.createElement("div");
-
-        div.textContent = text;
-
-        return div.innerHTML;
-    }
-
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    const editPhotoModal = document.getElementById('editPhotoModal');
-    const editPhotoForm = document.getElementById('editPhotoForm');
-    const editPhotoPreview = document.getElementById('editPhotoPreview');
-    const editPhoto = document.getElementById('editPhoto');
-    const editLegende = document.getElementById('editLegende');
-
-    if (!editPhotoModal || !editPhotoForm) {
-        return;
-    }
-
-    /*
-     * Ouverture de la fenêtre Modifier
-     */
-    editPhotoModal.addEventListener('show.bs.modal', function (event) {
-
-        const button = event.relatedTarget;
-
-        if (!button) {
-            return;
-        }
-
-        // Récupérer les données du bouton
-        const imageUrl = button.dataset.imageUrl || '';
-        const legende = button.dataset.legende || '';
-        const editUrl = button.dataset.editUrl || '';
-
-        // Afficher l'image actuelle
-        editPhotoPreview.src = imageUrl;
-
-        // Afficher la légende actuelle
-        editLegende.value = legende;
-
-        // Définir l'action du formulaire
-        editPhotoForm.action = editUrl;
-
-        // Réinitialiser le champ fichier
-        editPhoto.value = '';
-
-        console.log('URL modification :', editUrl);
-    });
-
-
-    /*
-     * Aperçu de la nouvelle photo
-     */
-    editPhoto.addEventListener('change', function () {
-
-        const file = this.files[0];
-
-        if (!file) {
-            return;
-        }
-
-        if (!file.type.startsWith('image/')) {
-            alert('Veuillez sélectionner une image valide.');
-            this.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = function (event) {
-            editPhotoPreview.src = event.target.result;
-        };
-
-        reader.readAsDataURL(file);
-    });
-
-
-    /*
-     * Quand la modale est fermée
-     */
-    editPhotoModal.addEventListener('hidden.bs.modal', function () {
-
-        editPhotoForm.reset();
-
-        editPhotoPreview.src = '';
-
-        editPhotoForm.action = '';
     });
 
 });
 </script>
+
+
+
+
 
 {% endblock %}

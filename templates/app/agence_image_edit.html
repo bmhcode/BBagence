@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="manage-card">
+
+        <h2 class="mb-4">
+            <i class="fas fa-edit me-2"></i>
+            Modifier la photo
+        </h2>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- IMAGE ACTUELLE -->
+            <div class="mb-4 text-center">
+
+                <img src="{{ image.image.url }}"
+                     alt="{{ image.legende|default:'Photo' }}"
+                     style="
+                        max-width: 400px;
+                        width: 100%;
+                        height: 250px;
+                        object-fit: cover;
+                        border-radius: 15px;
+                    ">
+
+            </div>
+
+            <!-- NOUVELLE IMAGE -->
+            <div class="form-group mb-4">
+
+                <label class="form-label fw-bold">
+                    Nouvelle image
+                </label>
+
+                <input type="file"
+                       name="image"
+                       class="form-control"
+                       accept="image/*">
+
+                <small class="text-muted">
+                    Laissez vide si vous souhaitez conserver l'image actuelle.
+                </small>
+
+            </div>
+
+            <!-- LÉGENDE -->
+            <div class="form-group mb-4">
+
+                <label class="form-label fw-bold">
+                    Légende / Titre
+                </label>
+
+                <input type="text"
+                       name="legende"
+                       class="form-control"
+                       value="{{ image.legende }}"
+                       maxlength="200"
+                       placeholder="Légende de la photo">
+
+            </div>
+
+            <!-- BOUTONS -->
+            <div class="d-flex gap-2 flex-wrap">
+
+                <button type="submit"
+                        class="btn btn-primary rounded-pill px-4">
+
+                    <i class="fas fa-save me-2"></i>
+                    Enregistrer les modifications
+
+                </button>
+
+                <a href="{% url 'agence_presentation_manage' image.agence.slug %}"
+                   class="btn btn-secondary rounded-pill px-4">
+
+                    <i class="fas fa-times me-2"></i>
+                    Annuler
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

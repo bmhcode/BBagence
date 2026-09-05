@@ -93,12 +93,17 @@ class Agence(models.Model):
     
     ville = models.CharField(max_length=100, choices=ALGERIA_CITIES, blank=True, null=True, verbose_name=_("Ville"))
     commune = models.CharField(max_length=100, blank=True, null=True, verbose_name=_("Commune"))
-    adresse = models.CharField(max_length=200, help_text="Ex: Niveau 1, Aile Nord")
+    emplacement = models.CharField(max_length=200, help_text="Ex: Niveau 1, Aile Nord")
     
     # ── Google Map ──
     google_map = models.URLField(max_length=1000, blank=True, verbose_name="Google Map URL")
 
+    est_valide= models.BooleanField(default=False)
+    date_debut_validite = models.DateField(null=True, blank=True)
+    nombre_jours_validite = models.IntegerField(default=30)
+    
     est_en_vedette = models.BooleanField(default=False)
+
     
     # ── Date ──    
     cree_le = models.DateTimeField(auto_now_add=True)
@@ -134,26 +139,23 @@ class Agence(models.Model):
     def get_absolute_url(self):
         return reverse('agence', kwargs={'agence_slug': self.slug})
 
-    @property
-    def logoURL(self):
-        return self.image.url if self.image else ""
-
     def main_image(self):
-        return self.images.filter(is_main=True).first()
+        # return self.images.filter(is_main=True).first()
+        return self.images.first()
 
     def main_video(self):
-        return self.videos.filter(is_main=True).first()
+        return self.videos.first()
 
 
     @property
     def localisation(self):
         if self.ville and self.commune:
-            return f"{self.ville}, {self.commune} - {self.adresse}"
+            return f"{self.ville}, {self.commune} - {self.emplacement}"
         elif self.ville:
-            return f"{self.ville} - {self.adresse}"
+            return f"{self.ville} - {self.emplacement}"
         elif self.commune:
-            return f"{self.commune} - {self.adresse}"
-        return self.adresse or "No location"
+            return f"{self.commune} - {self.emplacement}"
+        return self.emplacement or "No location"
 
     @property
     def est_ouvert_maintenant(self):
@@ -186,7 +188,7 @@ class AgenceImages(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='agence/images/')
     legende = models.CharField(max_length=200, blank=True)
-    is_main = models.BooleanField(default=False)
+   
 
     def __str__(self):
         return f"Image for {self.agence.nom}"
@@ -195,8 +197,7 @@ class AgenceVideos(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='videos')
     video = models.FileField(upload_to='agence/videos/')
     legende = models.CharField(max_length=200, blank=True)
-    is_main = models.BooleanField(default=False)
-
+   
     def __str__(self):
         return f"Video for {self.agence.nom}"    
 
@@ -435,6 +436,7 @@ class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="cars/gallery/")
     caption = models.CharField(max_length=200, blank=True)
+
     cree_le = models.DateTimeField(auto_now_add=True)
 
     order = models.PositiveIntegerField(default=0) 
@@ -634,15 +636,8 @@ class ContactMessage(models.Model):
 # =========================================
 
 class Profile(models.Model):
-    USER_ROLES = (
-        ('client', 'Client'),
-        ('proprietaire_agence', 'Proprietaire d\'Agence'), 
-        ('admin', 'Admin'),
-        ('superadmin', 'Super Admin'),
-    )
-
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=20, choices=USER_ROLES, default='Customer')
     telephone = models.CharField(max_length=20, blank=True, null=True, default='-')
     ville = models.CharField(max_length=100, choices=ALGERIA_CITIES, blank=True, null=True, verbose_name="Wilaya")
     commune = models.CharField(max_length=100, blank=True, null=True, verbose_name="Commune")

@@ -58,9 +58,7 @@ urlpatterns = [
     path('agence/video/<int:pk>/delete/', views.AgenceVideoDeleteView.as_view(), name='agence_video_delete'),
     path('agence/<slug:agence_slug>/presentation/', views.AgencePresentationView.as_view(), name='agence_presentation'),
     path('agence/<slug:agence_slug>/localisation-acces/', views.AgenceLocalisationAccesView.as_view(), name='agence_localisation_acces'),
-    path('agence/<slug:agence_slug>/video/', views.AgenceVideoView.as_view(), name='agence_video'),
-    path('agence/<slug:agence_slug>/photos/', views.AgencePhotosView.as_view(), name='agence_photos'),
-
+    
     # =========================== Events, Promotions, Blog, Contact ========
     path('evenements/create/', views.EvenementCreateView.as_view(), name='evenement_create'),
     path('evenements/update/<int:pk>/', views.EvenementUpdateView.as_view(), name='evenement_update'),
@@ -85,8 +83,13 @@ urlpatterns = [
 
     path('agence/<slug:agence_slug>/message/<int:msg_id>/delete/', views.MessageDeleteView.as_view(), name='message_delete'),
 
+    path("agence/<slug:agence_slug>/photos/", views.agence_photos, name="agence_photos" ),
 
-
+path(
+    'agence/<slug:agence_slug>/image/<int:pk>/edit/',
+    views.agence_image_edit,
+    name='agence_image_edit'
+),    path('agence/<slug:agence_slug>/video/<int:pk>/edit/', views.agence_video_update,  name='agence_video_update'),
 
 
 ]

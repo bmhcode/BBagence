@@ -4,13 +4,15 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, Brand, Evenement, ArticleBlog, ContactMessage, Profile, ALGERIA_CITIES
 
 class SignupForm(UserCreationForm):
-    email = forms.EmailField(required=True, label="Adresse e-mail")
     first_name = forms.CharField(max_length=150, required=True, label="Prénom")
     last_name = forms.CharField(max_length=150, required=True, label="Nom")
-    role = forms.ChoiceField(choices=Profile.USER_ROLES, initial='customer', label="Rôle")
+    
+    email = forms.EmailField(required=True, label="Adresse e-mail")
     telephone = forms.CharField(max_length=20, required=False, label="Téléphone")
+    
     ville = forms.ChoiceField(choices=[('', '---------')] + ALGERIA_CITIES, required=False, label="Wilaya")
     commune = forms.CharField(max_length=100, required=False, label="Commune")
+    
     image = forms.ImageField(required=False, label="Photo de profil")
 
     class Meta(UserCreationForm.Meta):
@@ -48,9 +50,8 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['role', 'image', 'commune']
+        fields = ['image', 'commune']
         widgets = {
-            'role': forms.Select(attrs={'class': 'form-select'}),
             'image': forms.FileInput(attrs={'class': 'form-control', 'id': 'imageUpload'}),
             'commune': forms.TextInput(attrs={'class': 'form-control'}),
         }
@@ -157,8 +158,10 @@ class AgenceForm(forms.ModelForm):
         model = Agence
         fields = [
             'nom', 'description', 'manager','telephone', 'site_web', 
-            'email', 'ville', 'commune', 'adresse', 'google_map', 
-            'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation'
+            'email', 'ville', 'commune', 'emplacement', 'google_map', 
+            'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation',
+            'est_valide', 'date_debut_validite', 'nombre_jours_validite', 
+            'est_en_vedette',
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -171,7 +174,7 @@ class AgenceForm(forms.ModelForm):
 
             'ville': forms.Select(attrs={'class': 'form-select'}),
             'commune': forms.Select(attrs={'class': 'form-select'}),
-            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'emplacement': forms.TextInput(attrs={'class': 'form-control'}),
 
             'google_map': forms.URLInput(attrs={'class': 'form-control'}),
 
@@ -180,6 +183,12 @@ class AgenceForm(forms.ModelForm):
             
             'est_ferme': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observation': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            
+            'est_valide': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'date_debut_validite': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'nombre_jours_validite': forms.NumberInput(attrs={'class': 'form-control'}),
+            
+            'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class AgenceSocialForm(forms.ModelForm):
@@ -207,22 +216,26 @@ class AgencePresentationForm(forms.ModelForm):
 class AgenceImageForm(forms.ModelForm):
     class Meta:
         model = AgenceImages
-        fields = ['image', 'legende','is_main']
+        fields = ['image', 'legende']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-file'}),
             'legende': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Légende de l\'image'}),
-            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class AgenceVideoForm(forms.ModelForm):
     class Meta:
         model = AgenceVideos
-        fields = ['video', 'legende','is_main']
+        fields = ['video', 'legende',]
         widgets = {
             'video': forms.ClearableFileInput(attrs={'class': 'form-file'}),
             'legende': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Légende de la vidéo'}),
-            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+
+
+
+
 
 class ContactForm(forms.ModelForm):
     class Meta:
@@ -243,7 +256,6 @@ class ContactForm(forms.ModelForm):
             'sujet': 'Sujet *',
             'message': 'Message *',
         }
-
 
 class PromotionForm(forms.ModelForm):
     # Champs supplémentaires hors-modèle
@@ -271,7 +283,6 @@ class PromotionForm(forms.ModelForm):
 
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
-
 
 # ===================== / Agence forms =================== #
 

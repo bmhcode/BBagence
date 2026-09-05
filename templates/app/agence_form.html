@@ -80,12 +80,12 @@
                                 </button>
                             </li>
 
-                            <!-- Contact -->
+                            <!-- Coordonnées -->
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link"
-                                        id="contact-tab"
+                                        id="coordonnees-tab"
                                         data-bs-toggle="tab"
-                                        data-bs-target="#contact"
+                                        data-bs-target="#coordonnees"
                                         type="button"
                                         role="tab">
                                     <i class="fas fa-address-book"></i>
@@ -133,7 +133,21 @@
                                 </button>
                             </li>
                             {% endif %}
-
+                            
+                            {% if request.user.is_superuser %}
+                                <!-- Configuration -->
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link"
+                                            id="configuration-tab"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#configuration"
+                                            type="button"
+                                            role="tab">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Configuration</span>
+                                    </button>
+                                </li>
+                            {% endif %}
                         </ul>
 
                         <!-- Contenu des onglets -->
@@ -172,7 +186,7 @@
                                                 </div>
                                             {% endif %}
                                         </div>
- <!-- Manager -->
+                                        <!-- Manager -->
                                         <div class="col-6">
                                             <label class="form-label fw-semibold">
                                                 Manager <span class="text-danger">*</span>
@@ -201,24 +215,18 @@
                                                 </div>
                                             {% endif %}
                                         </div>
-
-                                       
-
                                     </div>
-
                                 </div>
                             </div>
 
-
                             <!-- =========================
-                                ONGLET CONTACT
+                                ONGLET COORDONNEES
                             ========================== -->
                             <div class="tab-pane fade"
-                                id="contact"
+                                id="coordonnees"
                                 role="tabpanel">
 
                                 <div class="form-section">
-
                                     <div class="form-section-title">
                                         <div class="section-icon">
                                             <i class="fas fa-address-book"></i>
@@ -226,7 +234,7 @@
 
                                         <div>
                                             <h5>Coordonnées</h5>
-                                            <p>Informations de contact de votre agence</p>
+                                            <p>Coordonnées de votre agence</p>
                                         </div>
                                     </div>
 
@@ -269,9 +277,9 @@
 
                                         <div class="col-12">
                                             <label class="form-label fw-semibold">
-                                                Adresse
+                                                Emplacement
                                             </label>
-                                            {{ form.adresse }}
+                                            {{ form.emplacement }}
                                         </div>
 
                                     </div>
@@ -386,15 +394,12 @@
                                 </div>
                             </div>
 
-
                             <!-- =========================
                                 ONGLET RÉSEAUX SOCIAUX
                             ========================== -->
                             {% if social_form %}
                             <div class="tab-pane fade"
-                                id="social"
-                                role="tabpanel">
-
+                                id="social" role="tabpanel">
                                 <div class="form-section">
 
                                     <div class="form-section-title">
@@ -451,8 +456,62 @@
                             </div>
                             {% endif %}
 
-                        </div>
 
+                             <!-- =========================
+                                ONGLET CONFIGURATION
+                            ========================== -->
+                            <div class="tab-pane fade"
+                                id="configuration"
+                                role="tabpanel">
+
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-address-book"></i>
+                                        </div>
+
+                                        <div>
+                                            <h5>Configuration</h5>
+                                            <p>Configuration agence</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                       
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Est valide ?
+                                            </label>
+                                            {{ form.est_valide }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Est en vedette ? 
+                                            </label>
+                                            {{ form.est_en_vedette }}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Date début de validité
+                                            </label>
+                                            {{ form.date_debut_validite }}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">
+                                                Nombre de jours de validité
+                                            </label>
+                                            {{ form.nombre_jours_validite }}
+                                        </div>
+
+                                        
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- BOUTONS -->
                         <div class="form-actions d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
@@ -475,11 +534,8 @@
                             </button>
 
                         </div>
-
                     </div>
-
                 </div>
-
 
                 <!-- =========================
                     PREVIEW CARD
