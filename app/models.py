@@ -139,12 +139,21 @@ class Agence(models.Model):
     def get_absolute_url(self):
         return reverse('agence', kwargs={'agence_slug': self.slug})
 
+    @property
     def main_image(self):
-        # return self.images.filter(is_main=True).first()
-        return self.images.first()
+        return self.images.filter(is_main=True).first()
 
+    @property
+    def other_images(self):
+        return self.images.exclude(is_main=True)
+
+    @property
     def main_video(self):
-        return self.videos.first()
+        return self.videos.filter(is_main=True).first()
+
+    @property
+    def other_videos(self):
+        return self.videos.exclude(is_main=True)
 
 
     @property
@@ -188,18 +197,32 @@ class AgenceImages(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='agence/images/')
     legende = models.CharField(max_length=200, blank=True)
-   
+    is_main = models.BooleanField(default=False)
+        
+    order = models.PositiveIntegerField(default=0) 
+       
+    cree_le = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Image for {self.agence.nom}"
 
 class AgenceVideos(models.Model):
-    agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='videos')
+    agence = models.ForeignKey(
+        Agence,
+        on_delete=models.CASCADE,
+        related_name='videos'
+    )
     video = models.FileField(upload_to='agence/videos/')
     legende = models.CharField(max_length=200, blank=True)
-   
+    is_main = models.BooleanField(default=False)
+    cree_le = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_main', '-cree_le']
+
     def __str__(self):
-        return f"Video for {self.agence.nom}"    
+        return f"Video for {self.agence.nom}"
+
 
 class AgenceSocial(models.Model):
     agence = models.OneToOneField(Agence, on_delete=models.CASCADE, related_name='social')
@@ -340,6 +363,7 @@ class Car(models.Model):
     date_debut_publication_promo = models.DateField(null=True, blank=True)
 
     video = models.FileField(upload_to='cars/videos/', blank=True, null=True, verbose_name="Video")
+    video_legende = models.CharField(max_length=200, null=True, blank=True)
 
     est_en_vedette = models.BooleanField(default=False)
     est_disponible = models.BooleanField(default=True)
@@ -435,7 +459,7 @@ class Car(models.Model):
 class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="cars/gallery/")
-    caption = models.CharField(max_length=200, blank=True)
+    legende = models.CharField(max_length=200, blank=True)
 
     cree_le = models.DateTimeField(auto_now_add=True)
 

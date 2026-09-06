@@ -372,9 +372,9 @@
                 <a href="{% url 'agence_messages' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2 position-relative shadow-sm">
                     <i class="fas fa-envelope me-2"></i> Messages
                 </a>
-                <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                <!-- <a href="{% url 'agence_presentation_manage' agence.slug %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-gear me-2"></i> Gérer l'agence
-                </a>
+                </a> -->
 
                 <a href="{% url 'agence_list_promotion' agence.slug %}" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-tags me-2"></i> Promotions
@@ -748,11 +748,11 @@
                         <!-- Wishlist Button -->
                         {% if request.user.is_authenticated %}  
                             <button type="button"
-                                onclick="toggleWishlist(this, {{ car.id }})"
-                                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                                onclick="toggleWishlist(this, {{ object.id }})"
+                                class="wishlist-btn {% if object.id in user_wishlist_ids %} active {% endif %}"
                                 aria-label="Ajouter aux favoris"
-                                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                                 <span class="wishlist-loader spinner-border spinner-border-sm"></span>
                             </button>
                         {% endif %}
@@ -927,11 +927,11 @@
                             <!-- Wishlist Button -->
                             {% if request.user.is_authenticated %}  
                                 <button type="button"
-                                        onclick="toggleWishlist(this, {{ car.id }})"
-                                        class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                                        onclick="toggleWishlist(this, {{ object.id }})"
+                                        class="wishlist-btn {% if object.id in user_wishlist_ids %} active {% endif %}"
                                         aria-label="Ajouter aux favoris"
-                                        title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                    <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                        title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                    <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                                     <span class="wishlist-loader spinner-border spinner-border-sm"></span>
                                 </button>
                             {% endif %}
@@ -1032,16 +1032,20 @@
                 <div class="col-sm-6 col-md-4 col-xl-3">
                     <div class="car-card">
                         <!-- Wishlist Button -->
-                        {% if request.user.is_authenticated %}  
-                        <button type="button"
-                                    onclick="toggleWishlist(this, {{ car.id }})"
-                                    class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
-                                aria-label="Ajouter aux favoris"
-                                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-                                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
-                        </button>
-                        {% endif %}
+                        {% if request.user.is_authenticated %}
+<button
+    type="button"
+    class="wishlist-btn {% if object.id in user_wishlist_ids %}active{% endif %}"
+    data-car-id="{{ object.id }}"
+    onclick="toggleWishlist(this, this.dataset.carId)"
+    aria-label="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
+    title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
+>
+    <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+
+    <span class="wishlist-loader spinner-border spinner-border-sm d-none"></span>
+</button>
+{% endif %}
 
                         <!-- Image -->
                         <div class="car-card__img">
@@ -1169,15 +1173,25 @@
                 </div>
 </div> -->
 
-    <!-- Galerie photos -->
-    <section class="" style="background-color: var(--color-bg); padding: 20px 0;">
-        <div class="container">
-            <!-- Photo Gallery Section -->
-            {% if agence.images %}
-            <div>
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h2 style="font-family: var(--font-display); font-size: 2.2rem; color: var(--color-primary);">Galerie Photos</h2>
-                   
+  <!-- Galerie photos -->
+<section style="background-color: var(--color-bg); padding: 20px 0;">
+    <div class="container">
+
+        {% if agence.images.all %}
+
+        <div>
+
+            <!-- TITRE -->
+            <div style="text-align: center; margin-bottom: 40px;">
+
+                <h2 style="
+                    font-family: var(--font-display);
+                    font-size: 2.2rem;
+                    color: var(--color-primary);
+                ">
+                    Galerie Photos
+                </h2>
+
                 {% if request.user.is_superuser or agence.manager == request.user %}
                     <button type="button"
                             class="btn btn-light border rounded-pill px-4 py-2"
@@ -1190,37 +1204,231 @@
                     </button>
                 {% endif %}
 
+                <p style="
+                    color: var(--color-muted);
+                    font-size: 1.05rem;
+                    margin-top: 8px;
+                ">
+                    Découvrez les photos de <strong>{{ agence.nom }}</strong>
+                </p>
 
-                    <p style="color: var(--color-muted); font-size: 1.05rem; margin-top: 8px;"> Découvrez les photos de <strong>{{ agence.nom }}</strong></p>
-                    <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 15px auto 0;"></div>
-                
-                </div>
-                   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
-                    {% for img in agence.images.all %}
-                    <div class="gallery-card" onclick="window.open('{{ img.image.url }}')">
-                        <img src="{{ img.image.url }}" alt="{{ img.legende }}">
-                        <div class="gallery-overlay">
-                            <p>
-                                <i class="fas fa-camera"></i>
-                                {{ img.legende|default:"Instantané du magasin" }}
-                            </p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+                <div style="
+                    width: 60px;
+                    height: 3px;
+                    background: var(--color-pink);
+                    margin: 15px auto 0;
+                "></div>
+
             </div>
-            {% endif %}
+
+
+            <!-- PHOTOS -->
+           <div style="
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+">
+
+    {% for img in agence.images.all %}
+
+<div class="card h-100">
+
+    <!-- PHOTO -->
+    <img src="{{ img.image.url }}"
+         class="card-img-top"
+         alt="{{ img.legende|default:'Photo' }}"
+         style="height: 250px; object-fit: cover;">
+
+    <!-- CONTENU SOUS LA PHOTO -->
+    <div style="padding: 15px;">
+
+        <!-- LÉGENDE -->
+        <div style="
+            min-height: 45px;
+            margin-bottom: 12px;
+        ">
+
+            <p style="
+                margin: 0;
+                color: var(--color-primary);
+                font-weight: 500;
+            ">
+                <i class="fas fa-camera me-2"></i>
+
+                {% if img.legende %}
+                    {{ img.legende }}
+                {% else %}
+                    Instantané du magasin
+                {% endif %}
+            </p>
 
         </div>
-    </section>
+
+        <!-- BOUTONS -->
+        {% if request.user.is_superuser or agence.manager == request.user %}
+
+        <div class="d-flex gap-2">
+
+            <!-- MODIFIER -->
+            <button type="button"
+        class="btn btn-outline-primary btn-sm rounded-pill flex-grow-1"
+        data-bs-toggle="modal"
+        data-bs-target="#editPhotoModal"
+        data-image-id="{{ img.id }}"
+        data-image-url="{{ img.image.url }}"
+        data-legende="{{ img.legende|default:'' }}"
+        data-edit-url="{% url 'agence_image_edit' agence.slug img.id %}">
+
+    <i class="fas fa-edit me-1"></i>
+    Modifier
+</button>
+
+        
+            <!-- SUPPRIMER -->
+            <form method="POST"
+                  action="{% url 'agence_image_delete' img.id %}"
+                  class="m-0"
+                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette photo ?');">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn btn-outline-danger btn-sm rounded-pill">
+
+                    <i class="fas fa-trash me-1"></i>
+                    Supprimer
+
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+
+    <!-- =====================================================
+        MODALE : AJOUTER PLUSIEURS PHOTOS
+    ===================================================== -->
+
+    <div class="modal fade"
+        id="addPhotosModal"
+        tabindex="-1"
+        aria-labelledby="addPhotosModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content border-0 rounded-4 shadow">
+
+                <!-- HEADER -->
+                <div class="modal-header bg-primary text-white">
+
+                    <h5 class="modal-title" id="addPhotosModalLabel">
+                        <i class="fas fa-images me-2"></i>
+                        Ajouter des photos
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fermer">
+                    </button>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body p-4">
+
+                    <form method="POST"
+                        action="{% url 'agence_photos' agence.slug %}"
+                        enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <!-- Sélection des photos -->
+                        <div class="mb-4">
+
+                            <label for="photos" class="form-label fw-bold">
+                                <i class="fas fa-images me-2"></i>
+                                Sélectionner les photos
+                            </label>
+
+                        <input type="file"
+                                id="photos"
+                                name="photos"
+                                class="form-control"
+                                accept="image/*"
+                                multiple>
+
+                            <div class="form-text">
+                                Vous pouvez sélectionner plusieurs photos.
+                            </div>
+
+                        </div>
+
+                        <!-- APERÇU -->
+                        <div class="mb-4">
+
+                        
+                        <div id="photosPreview" class="row g-3 mt-2"></div>
+
+                        </div>
+
+                    
+
+                        <!-- BOUTONS -->
+                        <div class="text-end">
+
+                            <button type="button"
+                                    class="btn btn-secondary rounded-pill me-2"
+                                    data-bs-dismiss="modal">
+                                Annuler
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-primary rounded-pill">
+
+                                <i class="fas fa-upload me-2"></i>
+                                Ajouter les photos
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 <!-- =====================================================
-     MODALE : AJOUTER PLUSIEURS PHOTOS
+     MODALE : MODIFIER UNE PHOTO
 ===================================================== -->
 
 <div class="modal fade"
-     id="addPhotosModal"
+     id="editPhotoModal"
      tabindex="-1"
-     aria-labelledby="addPhotosModalLabel"
+     aria-labelledby="editPhotoModalLabel"
      aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1230,9 +1438,11 @@
             <!-- HEADER -->
             <div class="modal-header bg-primary text-white">
 
-                <h5 class="modal-title" id="addPhotosModalLabel">
-                    <i class="fas fa-images me-2"></i>
-                    Ajouter des photos
+                <h5 class="modal-title" id="editPhotoModalLabel">
+
+                    <i class="fas fa-edit me-2"></i>
+                    Modifier la photo
+
                 </h5>
 
                 <button type="button"
@@ -1243,45 +1453,79 @@
 
             </div>
 
+
             <!-- BODY -->
             <div class="modal-body p-4">
 
-                <form method="POST"
-                      action="{% url 'agence_photos' agence.slug %}"
+                <form id="editPhotoForm"
+                      method="POST"
                       enctype="multipart/form-data">
 
                     {% csrf_token %}
 
-                    <!-- Sélection des photos -->
+
+                    <!-- APERÇU PHOTO -->
+                    <div class="text-center mb-4">
+
+                        <img id="editPhotoPreview"
+                             src=""
+                             alt="Aperçu"
+                             style="
+                                width: 100%;
+                                max-height: 350px;
+                                object-fit: contain;
+                                border-radius: 12px;
+                                background: #f5f5f5;
+                                padding: 5px;
+                             ">
+
+                    </div>
+
+
+                    <!-- NOUVELLE PHOTO -->
                     <div class="mb-4">
 
-                        <label for="photos" class="form-label fw-bold">
-                            <i class="fas fa-images me-2"></i>
-                            Sélectionner les photos
+                        <label for="editPhoto"
+                               class="form-label fw-bold">
+
+                            <i class="fas fa-image me-2"></i>
+                            Nouvelle photo
+
                         </label>
 
-                       <input type="file"
-                            id="photos"
-                            name="photos"
-                            class="form-control"
-                            accept="image/*"
-                            multiple>
+                        <input type="file"
+                               id="editPhoto"
+                               name="image"
+                               class="form-control"
+                               accept="image/*">
 
                         <div class="form-text">
-                            Vous pouvez sélectionner plusieurs photos.
+                            Laissez vide pour conserver la photo actuelle.
                         </div>
 
                     </div>
 
-                    <!-- APERÇU -->
+
+                    <!-- LÉGENDE -->
                     <div class="mb-4">
 
-                       
-                       <div id="photosPreview" class="row g-3 mt-2"></div>
+                        <label for="editLegende"
+                               class="form-label fw-bold">
+
+                            <i class="fas fa-comment me-2"></i>
+                            Légende
+
+                        </label>
+
+                        <input type="text"
+                               id="editLegende"
+                               name="legende"
+                               class="form-control"
+                               maxlength="200"
+                               placeholder="Légende de la photo">
 
                     </div>
 
-                  
 
                     <!-- BOUTONS -->
                     <div class="text-end">
@@ -1289,14 +1533,16 @@
                         <button type="button"
                                 class="btn btn-secondary rounded-pill me-2"
                                 data-bs-dismiss="modal">
+
                             Annuler
+
                         </button>
 
                         <button type="submit"
                                 class="btn btn-primary rounded-pill">
 
-                            <i class="fas fa-upload me-2"></i>
-                            Ajouter les photos
+                            <i class="fas fa-save me-2"></i>
+                            Enregistrer 333
 
                         </button>
 
@@ -1316,50 +1562,119 @@
 
     <!-- Fin Galerie photos -->
 
+
+
+
+
+
     <!-- Videos de l'agence -->
-    <section class="" style="background-color: var(--color-bg); padding: 10px 0;">
+    
+    <section style="background-color: var(--color-bg); padding: 10px 0;">
         <div class="container">
-   
+
             <!-- Video Tours Section -->
-        {% if agence.videos %}
-        
             <div class="text-center mb-5">
+
                 <h3 class="display-5 fw-bold mb-2">
-                    Visites video
+                    Visites vidéo
                 </h3>
-                <a href=""
-                        class="btn btn-light border rounded-pill px-4 py-2 text-dark shadow-sm">
-                        <i class="fas fa-plus me-2 text-primary"></i> Ajouter des vidéos
-                </a>
-                <p class="text-muted mb-0">
-                    Découvrez <strong>{{ agence.nom }}</strong> à travers nos présentations vidéo
+
+                <!-- Bouton Ajouter -->
+                <button
+                    type="button"
+                    class="btn btn-light border rounded-pill px-4 py-2 text-dark shadow-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addVideoModal">
+
+                    <i class="fas fa-plus me-2 text-primary"></i>
+                    Ajouter une vidéo
+                </button>
+
+                <p class="text-muted mb-0 mt-2">
+                    Découvrez <strong>{{ agence.nom }}</strong>
+                    à travers nos présentations vidéo
                 </p>
-                <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+
+                <div style="
+                    width: 60px;
+                    height: 3px;
+                    background: var(--color-pink);
+                    margin: 8px auto 0;
+                "></div>
+
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
-                        {% for vid in agence.videos.all %}
+
+            <!-- Liste des vidéos -->
+            {% if videos %}
+
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(
+                        auto-fit,
+                        minmax(360px, 1fr)
+                    );
+                    gap: 30px;
+                ">
+
+                    {% for vid in videos %}
+
                         <div class="video-card">
+
                             <div class="video-container">
-                                <video controls>
-                                    <source src="{{ vid.video.url }}" type="video/mp4">
-                                    Votre navigateur ne supporte pas la lecture de vidéos.
+
+                                <video
+                                    controls
+                                    preload="metadata"
+                                    style="width: 100%; border-radius: 12px;">
+
+                                    <source
+                                        src="{{ vid.video.url }}"
+                                        type="video/mp4">
+
+                                    Votre navigateur ne supporte pas
+                                    la lecture de vidéos.
+
                                 </video>
+
                             </div>
+
+
                             <div class="video-body">
+
                                 <h4>
                                     <i class="fas fa-video"></i>
+
                                     {{ vid.legende|default:"Présentation générale" }}
                                 </h4>
-                            </div>
-                        </div>
-                        {% endfor %}
-            </div>
 
-        {% endif %}
-        
-    </div>
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="text-center py-5">
+
+                    <i
+                        class="fas fa-video-slash fa-3x text-muted mb-3">
+                    </i>
+
+                    <p class="text-muted">
+                        Aucune vidéo disponible pour cette agence.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
     </section>
+
     <!-- Fin Videos de l'agence -->
 
     <!-- Localisation et acces -->
@@ -1634,7 +1949,186 @@
 
     </div>
 
+
+
+
+
+<!-- ============================= -->
+<!-- MODALE AJOUTER UNE VIDÉO -->
+<!-- ============================= -->
+
+<div
+    class="modal fade"
+    id="addVideoModal"
+    tabindex="-1"
+    aria-labelledby="addVideoModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title fw-bold"
+                    id="addVideoModalLabel">
+
+                    <i class="fas fa-video text-primary me-2"></i>
+                    Ajouter une vidéo
+
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Fermer">
+                </button>
+
+            </div>
+
+
+            <!-- Formulaire -->
+            <form
+                method="POST"
+                action="{% url 'agence_video_add' agence_slug=agence.slug %}"
+                enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <!-- Sélection vidéo -->
+                    <div class="mb-4">
+
+                        <label
+                            for="videoFile"
+                            class="form-label fw-semibold">
+
+                            <i class="fas fa-file-video me-2"></i>
+                            Sélectionner une vidéo
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="video"
+                            id="videoFile"
+                            class="form-control"
+                            accept="video/*"
+                            required>
+
+                        <div class="form-text">
+                            Formats vidéo acceptés :
+                            MP4, WebM, MOV, etc.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Aperçu -->
+                    <div
+                        id="videoPreviewContainer"
+                        class="mb-4"
+                        style="display: none;">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="fas fa-eye me-2"></i>
+                            Aperçu
+
+                        </label>
+
+                        <div
+                            style="
+                                background: #000;
+                                border-radius: 12px;
+                                overflow: hidden;
+                            ">
+
+                            <video
+                                id="videoPreview"
+                                controls
+                                style="
+                                    width: 100%;
+                                    max-height: 400px;
+                                    display: block;
+                                ">
+                            </video>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Légende -->
+                    <div class="mb-3">
+
+                        <label
+                            for="videoLegende"
+                            class="form-label fw-semibold">
+
+                            <i class="fas fa-align-left me-2"></i>
+                            Légende
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="legende"
+                            id="videoLegende"
+                            class="form-control"
+                            maxlength="200"
+                            placeholder="Ex : Visite générale de l'agence">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Footer -->
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        Annuler
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary rounded-pill px-4">
+
+                        <i class="fas fa-save me-2"></i>
+                        Enregistrer
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
+
+
+
+
+
+    
+</div>
+
+
+
+
 
 
 <!--  BMH - Afficher la vidéo de la voiture -->
@@ -1920,6 +2414,157 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const editPhotoModal = document.getElementById('editPhotoModal');
+    const editPhotoForm = document.getElementById('editPhotoForm');
+    const editPhotoPreview = document.getElementById('editPhotoPreview');
+    const editPhoto = document.getElementById('editPhoto');
+    const editLegende = document.getElementById('editLegende');
+
+    if (!editPhotoModal || !editPhotoForm) {
+        return;
+    }
+
+    /*
+     * Ouverture de la fenêtre Modifier
+     */
+    editPhotoModal.addEventListener('show.bs.modal', function (event) {
+
+        const button = event.relatedTarget;
+
+        if (!button) {
+            return;
+        }
+
+        // Récupérer les données du bouton
+        const imageUrl = button.dataset.imageUrl || '';
+        const legende = button.dataset.legende || '';
+        const editUrl = button.dataset.editUrl || '';
+
+        // Afficher l'image actuelle
+        editPhotoPreview.src = imageUrl;
+
+        // Afficher la légende actuelle
+        editLegende.value = legende;
+
+        // Définir l'action du formulaire
+        editPhotoForm.action = editUrl;
+
+        // Réinitialiser le champ fichier
+        editPhoto.value = '';
+
+        console.log('URL modification :', editUrl);
+    });
+
+
+    /*
+     * Aperçu de la nouvelle photo
+     */
+    editPhoto.addEventListener('change', function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            alert('Veuillez sélectionner une image valide.');
+            this.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            editPhotoPreview.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+
+    /*
+     * Quand la modale est fermée
+     */
+    editPhotoModal.addEventListener('hidden.bs.modal', function () {
+
+        editPhotoForm.reset();
+
+        editPhotoPreview.src = '';
+
+        editPhotoForm.action = '';
+    });
+
+});
+</script>
+
+
+<!-- BMH Ajouter une vidéo -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const videoInput = document.getElementById('videoFile');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoPreviewContainer =
+        document.getElementById('videoPreviewContainer');
+
+    videoInput.addEventListener('change', function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            videoPreviewContainer.style.display = 'none';
+            videoPreview.removeAttribute('src');
+            return;
+        }
+
+        // Vérifier que c'est bien une vidéo
+        if (!file.type.startsWith('video/')) {
+
+            alert('Veuillez sélectionner un fichier vidéo.');
+
+            this.value = '';
+
+            videoPreviewContainer.style.display = 'none';
+
+            return;
+        }
+
+        // Créer l'URL temporaire pour l'aperçu
+        const videoURL = URL.createObjectURL(file);
+
+        videoPreview.src = videoURL;
+
+        videoPreviewContainer.style.display = 'block';
+
+        videoPreview.load();
+
+    });
+
+
+    // Nettoyer la vidéo lorsque la modale est fermée
+    const modal = document.getElementById('addVideoModal');
+
+    modal.addEventListener('hidden.bs.modal', function () {
+
+        videoPreview.pause();
+
+        videoPreview.removeAttribute('src');
+
+        videoPreview.load();
+
+        videoInput.value = '';
+
+        videoPreviewContainer.style.display = 'none';
+
+        document.getElementById('videoLegende').value = '';
+
+    });
+
+});
+</script>
 
 {% endblock %}

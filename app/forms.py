@@ -108,7 +108,7 @@ class CarForm(forms.ModelForm):
             'energie', 'boite_de_vitesse', 'kilometrage', 'description', 
             'prix_ancien', 'prix_actuel', 
             'est_en_promotion', 'titre_promo', 'description_promo', 'prix_promo', 'date_debut_promo', 'date_fin_promo', 'date_debut_publication_promo',
-            'video',
+            'video', 'video_legende',
             'est_en_vedette', 'est_disponible'
         ]
         widgets = {
@@ -137,7 +137,7 @@ class CarForm(forms.ModelForm):
             'date_debut_publication_promo': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
 
             'video': forms.ClearableFileInput(attrs={'class': 'form-control','accept': 'video/*',}),
-
+            'video_legende': forms.TextInput(attrs={'class': 'form-control'}),
             'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'est_disponible': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

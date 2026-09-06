@@ -346,6 +346,8 @@ class AgenceVideoView(DetailView):
         context = super().get_context_data(**kwargs)
         context['videos'] = self.object.videos.all()
         return context
+
+
 @login_required
 def agence_photos(request, agence_slug):
 
@@ -1007,7 +1009,6 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 # =========================================
 # Modifier l'image et sa légende
 # =========================================
-
 def agence_image_edit(request, agence_slug, pk):
 
     image = get_object_or_404(
@@ -1112,3 +1113,187 @@ def agence_video_update(request, pk):
         )
 
     return redirect("agence_presentation_manage",agence_slug=video_obj.agence.slug)
+
+
+# ============================================================================
+#   Ajouter une nouvelle vidéo + légende
+# =====================================
+class AgenceVideoCreateView(LoginRequiredMixin, CreateView):
+    model = AgenceVideos
+    fields = ['video', 'legende']
+
+    def get_agence(self):
+        return get_object_or_404(
+            Agence,
+            slug=self.kwargs['agence_slug']
+        )
+
+    def form_valid(self, form):
+        agence = self.get_agence()
+
+        # Vérification des droits
+        if not self.request.user.is_superuser and agence.manager != self.request.user:
+            return redirect(
+                'agence',
+                agence_slug=agence.slug
+            )
+
+        form.instance.agence = agence
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'agence',
+            kwargs={
+                'agence_slug': self.get_agence().slug
+            }
+        )
+
+
+@login_required
+@require_POST
+def agence_image_set_main(request, agence_slug, pk):
+
+    image = get_object_or_404(
+        AgenceImages,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and image.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=agence_slug
+        )
+
+    # Retirer le statut principal des autres images
+    AgenceImages.objects.filter(
+        agence=image.agence
+    ).update(is_main=False)
+
+    # Définir cette image comme principale
+    image.is_main = True
+    image.save(update_fields=['is_main'])
+
+    return redirect(
+        'agence',
+        agence_slug=agence_slug
+    )        
+
+
+@login_required
+@require_POST
+def agence_video_set_main(request, agence_slug, pk):
+    video = get_object_or_404(
+        AgenceVideos,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and video.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=video.agence.slug
+        )
+
+    # Retirer le statut principal de toutes les vidéos
+    AgenceVideos.objects.filter(
+        agence=video.agence
+    ).update(is_main=False)
+
+    # Mettre cette vidéo comme principale
+    video.is_main = True
+    video.save(update_fields=['is_main'])
+
+    return redirect(
+        'agence',
+        agence_slug=video.agence.slug
+    )
+
+@login_required
+@require_POST
+def agence_video_delete(request, agence_slug, pk):
+    video = get_object_or_404(
+        AgenceVideos,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and video.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=agence_slug
+        )
+
+    # Suppression
+    video.video.delete(save=False)  # supprime aussi le fichier physique
+    video.delete()
+
+    return redirect(
+        'agence',
+        agence_slug=agence_slug
+    )
+
+@login_required
+@require_POST
+def agence_video_edit(request, agence_slug, pk):
+    video = get_object_or_404(
+        AgenceVideos,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and video.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=video.agence.slug
+        )
+
+    # Modifier le titre
+    video.titre = request.POST.get('titre', '').strip()
+
+    # Remplacer la vidéo seulement si une nouvelle vidéo est envoyée
+    nouveau_fichier = request.FILES.get('video')
+
+    if nouveau_fichier:
+        if video.video:
+            video.video.delete(save=False)
+
+        video.video = nouveau_fichier
+
+    video.save()
+
+    return redirect(
+        'agence',
+        agence_slug=video.agence.slug
+    )
+    video = get_object_or_404(AgenceVideos, pk=pk)
+
+    # Vérification des droits
+    if not request.user.is_superuser and video.agence.manager != request.user:
+        return redirect(
+            'agence',
+            agence_slug=video.agence.slug
+        )
+
+    if request.FILES.get('video'):
+        # Supprimer l'ancien fichier
+        if video.video:
+            video.video.delete(save=False)
+
+        # Nouveau fichier
+        video.video = request.FILES['video']
+
+    video.titre = request.POST.get('titre', '').strip()
+
+    video.save()
+
+    return redirect(
+        'agence',
+        agence_slug=video.agence.slug
+    )

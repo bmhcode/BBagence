@@ -89,7 +89,44 @@ path(
     'agence/<slug:agence_slug>/image/<int:pk>/edit/',
     views.agence_image_edit,
     name='agence_image_edit'
-),    path('agence/<slug:agence_slug>/video/<int:pk>/edit/', views.agence_video_update,  name='agence_video_update'),
+),    
+
+
+path(
+    'agence/<slug:agence_slug>/image/<int:pk>/set-main/',
+    views.agence_image_set_main,
+    name='agence_image_set_main'
+),
+
+path(
+    'agence/<slug:agence_slug>/video/ajouter/',
+    views.AgenceVideoCreateView.as_view(),
+    name='agence_video_add'
+),
+
+path(
+    'agence/<slug:agence_slug>/video/<int:pk>/main/',
+    views.agence_video_set_main,
+    name='agence_video_set_main'
+),
+
+
+path(
+    'agence/<slug:agence_slug>/video/<int:pk>/edit/',
+    views.agence_video_edit,
+    name='agence_video_edit'
+),
+
+path('agence/<slug:agence_slug>/video/<int:pk>/edit/', 
+    views.agence_video_update,  
+    name='agence_video_update'),
+
+path(
+    'agence/<slug:agence_slug>/video/<int:pk>/delete/',
+    views.agence_video_delete,
+    name='agence_video_delete'
+),
+
 
 
 ]
