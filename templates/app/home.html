@@ -47,14 +47,14 @@
 {% block content %}
     
 <header class="hero-section">
-        <div>
-            <h1 class="display-4 mb-3">Expérience d'achat de voitures</h1>
-            <!-- <p class="lead mb-D">Découvrez les meilleures marques de voitures et des offres exclusives .</p> -->
-            <p class="lead mb-D">
-                Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.
-            </p>
-           <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
-        </div>
+    <div>
+        <h1 class="display-5 mb-3">Expérience d'achat de voitures</h1>
+        <p class="lead mb-D">
+            Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.
+        </p>
+        <a href="{% url 'agence_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Explorer les agences</a>
+       
+    </div>
 </header>
     
 <!-- ═══════════════════════════════════════
@@ -74,7 +74,7 @@
 
         <a href="{% url 'promotion_list' %}"
            class="btn btn-outline-danger rounded-pill px-3">
-            Voir toutes
+            Voir toutes les offres
             <i class="fas fa-arrow-right ms-1"></i>
         </a>
     </div>
@@ -313,7 +313,6 @@
 </section>
 {% endif %}
 
-
 <!-- ═══════════════════════════════════════
      4.5 agences en vedette 
 ═══════════════════════════════════════ -->
@@ -325,7 +324,12 @@
                 <i class="fas fa-plus"></i> Ajouter une agence
                 </a>
             {% endif %}
-            <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir toutes les agences <i class="fas fa-arrow-right"></i></a>
+            <!-- <a href="{% url 'agence_list' %}" class="text-decoration-none">Voir toutes les agences <i class="fas fa-arrow-right"></i></a> -->
+            <a href="{% url 'agence_list' %}"
+                class="btn btn-outline-danger rounded-pill px-3">
+                Voir toutes les agences
+                <i class="fas fa-arrow-right ms-1"></i>
+            </a>
         </div>
         <div class="row g-4">
             {% for object in agences_vedette %}
@@ -373,6 +377,7 @@
             </div>
             {% endfor %}
         </div>
+        
     </section>
 <!-- ═══════════════════════════════════════
      4.5 NOS MARQUES / BRANDS  

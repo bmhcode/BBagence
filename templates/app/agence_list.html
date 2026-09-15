@@ -17,13 +17,134 @@
 </div>
 
 <!-- Filter by Ville -->
-    <div class="card-body mb-4">
-        <div class="input-group">
-            <span class="input-group-text"><i class="fas fa-search"></i></span>
-            <input type="text" id="citySearch" class="form-control" placeholder="Rechercher par ville...">
-        </div>
+  <!-- =========================================================
+     FILTER : VILLE OU NOM DE L'AGENCE
+========================================================= -->
+
+<div class="card-body mb-4">
+    <div class="input-group">
+        
+        <span class="input-group-text">
+            <i class="fas fa-search"></i>
+        </span>
+
+        <input
+            type="text"
+            id="citySearch"
+            class="form-control"
+            placeholder="Rechercher par ville ou nom d'agence..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="clearSearch"
+            class="btn btn-outline-secondary d-none"
+            title="Effacer la recherche"
+        >
+            <i class="fas fa-times"></i>
+        </button>
+
     </div>
-<!-- end filter by city -->
+</div>
+
+
+<!-- =========================================================
+     EXEMPLE D'UNE CARTE AGENCE
+     Ajouter data-city + data-name
+========================================================= -->
+
+<div
+    class="agence-card"
+    data-city="{{ agence.ville|default:''|lower }}"
+    data-name="{{ agence.nom|default:''|lower }}"
+>
+    <!-- contenu de ton agence -->
+</div>
+
+
+<!-- =========================================================
+     SCRIPT : RECHERCHE VILLE + NOM AGENCE
+========================================================= -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("citySearch");
+    const clearButton = document.getElementById("clearSearch");
+    const cards = document.querySelectorAll(".agence-card");
+
+    if (!searchInput || !cards.length) {
+        return;
+    }
+
+    function normalizeText(text) {
+        return (text || "")
+            .toString()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim();
+    }
+
+    function filterAgences() {
+
+        const value = normalizeText(searchInput.value);
+
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+
+            const city = normalizeText(card.dataset.city);
+            const name = normalizeText(card.dataset.name);
+
+            const matches =
+                value === "" ||
+                city.includes(value) ||
+                name.includes(value);
+
+            if (matches) {
+
+                card.style.display = "";
+                visibleCount++;
+
+            } else {
+
+                card.style.display = "none";
+
+            }
+
+        });
+
+        // Afficher / masquer le bouton "Effacer"
+        if (searchInput.value.trim() !== "") {
+            clearButton.classList.remove("d-none");
+        } else {
+            clearButton.classList.add("d-none");
+        }
+
+    }
+
+    // Recherche en temps réel
+    searchInput.addEventListener("input", filterAgences);
+
+    // Effacer la recherche
+    clearButton.addEventListener("click", function () {
+
+        searchInput.value = "";
+
+        filterAgences();
+
+        searchInput.focus();
+
+    });
+
+});
+</script>
+
+<!-- end filter/search -->
+<!-- end script search by city -->
+
 
 <!-- liste des agences -->
 <div class="row">
@@ -32,7 +153,10 @@
     <div class="col-lg-12">
         <div class="row g-4">
             {% for object in agences %}
-            <div class="col-md-4 col-xl-3 agence-card" data-city="{{ object.ville|lower }}">
+            <div class="col-md-4 col-xl-3 agence-card" 
+                data-city="{{ object.ville|lower }}"
+                data-name="{{ object.nom|lower }}"
+            >
                 <div class="card h-100 shadow-sm">
                     {% if object.main_image %}
                         <img src="{{ object.main_image.image.url }}" class="card-img-top" alt="{{ object.nom }}" style="height: 180px; object-fit: cover;">
@@ -61,7 +185,13 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title">{{ object.nom }}</h5>
                             <!-- <span class="badge bg-light text-dark">{{ object.get_categorie_display }}</span> -->
+                            
+                            {% if not object.est_bloquee %}
                             <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
+                            {% else %}
+                            <a href="{{ object.get_absolute_url }}" class="btn btn-outline-danger btn-sm">bloquée</a>
+                            {% endif %}
+                       
                         </div>
                         <p class="card-text small">{% if object.description %}{{ object.description|truncatechars:30 }}{% else %} No description available {% endif %}</p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -100,35 +230,6 @@
     </div>
 </div>
 <!-- end list of agences -->
-
-
-
-
-<!-- Script search by city -->
-<script>
-const search = document.getElementById("citySearch");
-const cards = document.querySelectorAll(".agence-card");
-
-search.addEventListener("input", function () {
-
-    const value = this.value.trim().toLowerCase();
-
-    cards.forEach(card => {
-
-        const city = card.dataset.city;
-
-        if (value === "" || city.includes(value)) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
-
-    });
-
-});
-</script>
-<!-- end script search by city -->
-
 
 
 {% endblock %}

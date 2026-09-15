@@ -15,9 +15,10 @@ from django.contrib.auth import logout
 from django.utils import timezone
 import json
 
+
 from .models import ( Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
     Brand, Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
-from .forms import ( AgenceForm, AgencePresentationForm, AgenceImageForm, AgenceVideoForm,
+from .forms import ( AgenceForm, AgenceImageForm, AgenceVideoForm,
     SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, 
     ArticleBlogForm,  AgenceSocialForm, ContactForm, PromotionForm)
 
@@ -30,11 +31,10 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agences_vedette'] = Agence.objects.filter(est_en_vedette=True)[:6]
+        context['agences_vedette'] = Agence.objects.filter(est_bloquee=False, est_en_vedette=True)[:6]
         context['brands'] = Brand.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['evenements_prochains'] = Evenement.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['articles_recent'] = ArticleBlog.objects.filter(afficher=True).order_by('date_debut_publication')[:3]
-
 
         # Active car promotions
         context['cars_promotion'] = Car.objects.filter(
@@ -61,6 +61,7 @@ class HomeView(TemplateView):
 # =========================================
 # MIXINS & PERMISSIONS
 # =========================================
+
 class AgenceManagerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         if self.request.user.is_superuser:
@@ -130,7 +131,7 @@ class AgenceCreateView(LoginRequiredMixin, CreateView):
     model = Agence
     form_class = AgenceForm
     template_name = 'app/agence_form.html'
-    success_url = reverse_lazy('agence_list')
+    success_url = reverse_lazy('agence')
 
     def form_valid(self, form):
         form.instance.manager = self.request.user
@@ -291,16 +292,6 @@ class AgencePresentationManageView(LoginRequiredMixin, TemplateView):
 
         return redirect('agence_presentation_manage', agence_slug=agence.slug)
 
-class AgenceImageDeleteView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        image = get_object_or_404(AgenceImages, pk=pk)
-        agence = image.agence
-        if not request.user.is_superuser and agence.manager != request.user:
-            raise PermissionDenied
-        image.delete()
-        messages.success(request, "Image supprimée.")
-        return redirect('agence', agence_slug=agence.slug)
-
 class AgenceVideoDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         video = get_object_or_404(AgenceVideos, pk=pk)
@@ -346,8 +337,6 @@ class AgenceVideoView(DetailView):
         context = super().get_context_data(**kwargs)
         context['videos'] = self.object.videos.all()
         return context
-
-
 @login_required
 def agence_photos(request, agence_slug):
 
@@ -356,27 +345,153 @@ def agence_photos(request, agence_slug):
         slug=agence_slug
     )
 
+    # Vérification des permissions
     if not (
         request.user.is_superuser
         or agence.manager == request.user
     ):
+        messages.error(
+            request,
+            "Vous n'avez pas l'autorisation de modifier cette agence."
+        )
         return redirect("agence", agence.slug)
 
     if request.method == "POST":
 
         photos = request.FILES.getlist("photos")
 
+        # ==========================================================
+        # CAPACITÉ MAXIMALE : 500 Mo
+        # Images + vidéos de l'agence
+        # ==========================================================
+        MAX_TOTAL_SIZE = 500 * 1024 * 1024
+
+        # ==========================================================
+        # Vérifier qu'au moins une photo a été envoyée
+        # ==========================================================
+        if not photos:
+            messages.error(
+                request,
+                "Aucune photo n'a été sélectionnée."
+            )
+            return redirect("agence", agence.slug)
+
+        # ==========================================================
+        # Taille actuelle des images
+        # ==========================================================
+        current_images_size = sum(
+            img.image.size
+            for img in AgenceImages.objects.filter(agence=agence)
+            if img.image
+        )
+
+        # ==========================================================
+        # Taille actuelle des vidéos
+        # ==========================================================
+        current_videos_size = sum(
+            video.video.size
+            for video in AgenceVideos.objects.filter(agence=agence)
+            if video.video
+        )
+
+        # ==========================================================
+        # Taille déjà utilisée
+        # ==========================================================
+        current_total = (
+            current_images_size +
+            current_videos_size
+        )
+
+        # ==========================================================
+        # Taille totale des nouvelles photos
+        # ==========================================================
+        new_photos_size = sum(
+            photo.size
+            for photo in photos
+        )
+
+        # ==========================================================
+        # Nouvelle taille totale
+        # ==========================================================
+        new_total = current_total + new_photos_size
+
+        # ==========================================================
+        # Vérification capacité
+        # ==========================================================
+        if new_total > MAX_TOTAL_SIZE:
+
+            current_mb = current_total / (1024 * 1024)
+            new_mb = new_photos_size / (1024 * 1024)
+            max_mb = MAX_TOTAL_SIZE / (1024 * 1024)
+
+            messages.error(
+                request,
+                f"Capacité dépassée : "
+                f"{current_mb:.1f} Mo déjà utilisés + "
+                f"{new_mb:.1f} Mo à ajouter. "
+                f"Maximum autorisé : {max_mb:.0f} Mo."
+            )
+
+            return redirect(
+                "agence",
+                agence.slug
+            )
+
+        # ==========================================================
+        # Vérifier les fichiers
+        # ==========================================================
+        allowed_types = {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif"
+        }
+
+        uploaded_count = 0
+
+        # ==========================================================
+        # Création des images
+        # ==========================================================
         for index, photo in enumerate(photos):
 
+            # Vérification type MIME
+            if photo.content_type not in allowed_types:
+                messages.warning(
+                    request,
+                    f"Le fichier '{photo.name}' n'est pas une image autorisée."
+                )
+                continue
+
+            # Récupération de la légende
             legende = request.POST.get(
                 f"legende_{index}",
                 ""
             ).strip()
 
+            # Création
             AgenceImages.objects.create(
                 agence=agence,
                 image=photo,
                 legende=legende
+            )
+
+            uploaded_count += 1
+
+        # ==========================================================
+        # Message résultat
+        # ==========================================================
+        if uploaded_count > 0:
+
+            messages.success(
+                request,
+                f"{uploaded_count} photo(s) ajoutée(s) avec succès."
+            )
+
+        else:
+
+            messages.error(
+                request,
+                "Aucune photo n'a pu être ajoutée."
             )
 
         return redirect(
@@ -388,7 +503,6 @@ def agence_photos(request, agence_slug):
         "agence",
         agence.slug
     )
-
 class AgenceCarListView(ListView):
     model = Car
     template_name = 'app/agence_car_list.html'
@@ -697,43 +811,260 @@ class CarDeleteView(AgenceManagerRequiredMixin, DeleteView):
 
 @login_required
 @require_POST
+def car_images_add(request, agence_slug, car_id):
+
+    car = get_object_or_404(
+        Car,
+        id=car_id,
+        agence__slug=agence_slug
+    )
+
+
+    # ==========================================
+    # PERMISSION
+    # ==========================================
+
+    if (
+        not request.user.is_superuser
+        and car.agence.manager != request.user
+    ):
+        raise PermissionDenied
+
+
+    # ==========================================
+    # DONNÉES
+    # ==========================================
+
+    images = request.FILES.getlist('images')
+
+    legendes = request.POST.getlist('legendes')
+
+    main_images = request.POST.getlist('main_images')
+
+
+    if not images:
+
+        return JsonResponse({
+            'success': False,
+            'error': 'Aucune image sélectionnée.'
+        })
+
+
+    # ==========================================
+    # CRÉATION
+    # ==========================================
+
+    for index, image_file in enumerate(images):
+
+        legende = (
+            legendes[index]
+            if index < len(legendes)
+            else ''
+        )
+
+
+        is_main = (
+            index < len(main_images)
+            and main_images[index] == '1'
+        )
+
+
+        CarImages.objects.create(
+            car=car,
+            image=image_file,
+            legende=legende,
+            is_main=is_main
+        )
+
+
+    # ==========================================
+    # GARANTIR UNE SEULE IMAGE PRINCIPALE
+    # ==========================================
+
+    main_images_qs = car.images.filter(
+        is_main=True
+    )
+
+
+    if main_images_qs.count() > 1:
+
+        first_main = main_images_qs.first()
+
+        main_images_qs.exclude(
+            pk=first_main.pk
+        ).update(
+            is_main=False
+        )
+
+
+    # ==========================================
+    # S'IL N'Y A AUCUNE IMAGE PRINCIPALE
+    # ==========================================
+
+    if not car.images.filter(
+        is_main=True
+    ).exists():
+
+        first_image = car.images.first()
+
+        if first_image:
+
+            first_image.is_main = True
+
+            first_image.save(
+                update_fields=['is_main']
+            )
+
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Photos ajoutées avec succès.'
+    })
+
+
+
+@login_required
+@require_POST
 def car_image_delete(request, agence_slug, car_id, image_id):
-    image = get_object_or_404(CarImages, id=image_id)
+    image = get_object_or_404(
+        CarImages,
+        id=image_id,
+        car_id=car_id,
+        car__agence__slug=agence_slug
+    )
+
     car = image.car
-    
-    # Permission check
+
+    # Vérification des droits
     if not request.user.is_superuser and car.agence.manager != request.user:
         raise PermissionDenied
-        
+
+    # Supprimer le fichier physique
+    if image.image:
+        image.image.delete(save=False)
+
+    # Supprimer l'enregistrement
     image.delete()
-    messages.success(request, "L'image a été supprimée.")
-    return redirect('car', agence_slug=agence_slug, car_id=car.id)
+
+    messages.success(
+        request,
+        "L'image a été supprimée."
+    )
+
+    return redirect(
+        'car',
+        agence_slug=agence_slug,
+        car_id=car.id
+    )
+
+
+@login_required
+@require_POST
+def car_image_edit(
+    request,
+    agence_slug,
+    car_id,
+    image_id
+):
+
+    image = get_object_or_404(
+        CarImages,
+        id=image_id,
+        car__id=car_id,
+        car__agence__slug=agence_slug
+    )
+
+
+    car = image.car
+
+
+    # ==========================================
+    # PERMISSION
+    # ==========================================
+
+    if (
+        not request.user.is_superuser
+        and car.agence.manager != request.user
+    ):
+        raise PermissionDenied
+
+
+    # ==========================================
+    # LÉGENDE
+    # ==========================================
+
+    image.legende = request.POST.get(
+        'legende',
+        ''
+    ).strip()
+
+
+    # ==========================================
+    # IMAGE PRINCIPALE
+    # ==========================================
+
+    if request.POST.get('is_main') == '1':
+
+        # Une seule image principale
+        CarImages.objects.filter(
+            car=car,
+            is_main=True
+        ).exclude(
+            pk=image.pk
+        ).update(
+            is_main=False
+        )
+
+        image.is_main = True
+
+
+    image.save()
+
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Image modifiée avec succès.'
+    })
 
 @login_required
 @require_POST
 def car_image_set_main(request, agence_slug, car_id, image_id):
     """
-    Définit une image comme image principale en lui attribuant l'ordre 0
-    et en réordonnant les autres.
+    Définit une image comme image principale de la voiture.
+    Une seule image peut être principale.
     """
-    image = get_object_or_404(CarImages, id=image_id)
+
+    # Récupérer l'image appartenant bien à cette voiture et cette agence
+    image = get_object_or_404(
+        CarImages,
+        id=image_id,
+        car_id=car_id,
+        car__agence__slug=agence_slug
+    )
+
     car = image.car
-    
-    # Permission check
+
+    # Vérification des droits
     if not request.user.is_superuser and car.agence.manager != request.user:
         raise PermissionDenied
 
-    # Réordonner : l'image choisie passe en 0, les autres décalent
-    image.order = 0
-    image.save(update_fields=['order'])
-    other_images = car.images.exclude(pk=image.pk).order_by('order', 'id')
-    for idx, img in enumerate(other_images, start=1):
-        img.order = idx
-    CarImages.objects.bulk_update(other_images, ['order'])
+    # Retirer le statut principal de toutes les images
+    car.images.update(is_main=False)
 
-    messages.success(request, "Image principale mise à jour.")
-    return redirect('car', agence_slug=agence_slug, car_id=car.id)
+    # Définir l'image sélectionnée comme principale
+    image.is_main = True
+    image.save(update_fields=['is_main'])
 
+    messages.success(
+        request,
+        "L'image principale a été mise à jour."
+    )
+
+    return redirect(
+        'car',
+        agence_slug=agence_slug,
+        car_id=car.id
+    )
 # =========================== Promotion CRUD =============================
 
 class PromotionListView(ListView):
@@ -962,6 +1293,8 @@ class ContactView(CreateView):
             "Votre message a été envoyé avec succès !"
         )
         return super().form_valid(form)
+
+
 # =========================================
 # AGENCE MESSAGES LIST
 # =========================================
@@ -1007,7 +1340,7 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # =========================================
-# Modifier l'image et sa légende
+# Agence image et sa légende
 # =========================================
 def agence_image_edit(request, agence_slug, pk):
 
@@ -1019,10 +1352,7 @@ def agence_image_edit(request, agence_slug, pk):
 
     # Vérification des droits
     if not request.user.is_superuser and image.agence.manager != request.user:
-        return redirect(
-            'agence',
-            agence_slug=image.agence.slug
-        )
+        return redirect('agence', agence_slug=image.agence.slug)
 
     if request.method == 'POST':
 
@@ -1051,19 +1381,122 @@ def agence_image_edit(request, agence_slug, pk):
             "La photo a été modifiée avec succès."
         )
 
+        return redirect('agence', agence_slug=image.agence.slug)
+
+    return redirect('agence', agence_slug=image.agence.slug)
+
+@login_required
+@require_POST
+def agence_image_set_main(request, agence_slug, pk):
+
+    image = get_object_or_404(
+        AgenceImages,
+        pk=pk,
+        agence__slug=agence_slug
+    )
+
+    # Vérification des droits
+    if not request.user.is_superuser and image.agence.manager != request.user:
         return redirect(
             'agence',
-            agence_slug=image.agence.slug
+            agence_slug=agence_slug
         )
+
+    # Retirer le statut principal des autres images
+    AgenceImages.objects.filter(
+        agence=image.agence
+    ).update(is_main=False)
+
+    # Définir cette image comme principale
+    image.is_main = True
+    image.save(update_fields=['is_main'])
 
     return redirect(
         'agence',
-        agence_slug=image.agence.slug
-    )
-    
-# =====================================================
-# Modifier la vidéo et sa légende
-# =====================================================
+        agence_slug=agence_slug
+    )        
+
+
+class AgenceImageDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        image = get_object_or_404(AgenceImages, pk=pk)
+        agence = image.agence
+        if not request.user.is_superuser and agence.manager != request.user:
+            raise PermissionDenied
+        image.delete()
+        messages.success(request, "Image supprimée.")
+        return redirect('agence', agence_slug=agence.slug)
+
+
+# ============================================================================
+#   Agence vidéo et sa légende
+# =====================================
+class AgenceVideoCreateView(LoginRequiredMixin, CreateView):
+    model = AgenceVideos
+    form_class = AgenceVideoForm
+    template_name = 'app/agence.html'
+
+    def get_agence(self):
+        return get_object_or_404(
+            Agence,
+            slug=self.kwargs['agence_slug']
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # IMPORTANT :
+        # agence est nécessaire dans agence.html
+        context['agence'] = self.get_agence()
+
+        return context
+
+    def form_valid(self, form):
+        agence = self.get_agence()
+
+        # Vérification des droits
+        if (
+            not self.request.user.is_superuser
+            and agence.manager != self.request.user
+        ):
+            return redirect(
+                'agence',
+                agence_slug=agence.slug
+            )
+
+        # Vérifier la capacité totale (30 Mo) avant d'associer la vidéo
+        max_total = 30 * 1024 * 1024  # 30 Mo
+        current_images_size = sum(img.image.size for img in AgenceImages.objects.filter(agence=agence))
+        current_videos_size = sum(vid.video.size for vid in AgenceVideos.objects.filter(agence=agence))
+        current_total = current_images_size + current_videos_size
+        new_video = form.cleaned_data.get('video')
+        new_video_size = new_video.size if new_video else 0
+        if current_total + new_video_size > max_total:
+            messages.error(self.request, "La vidéo dépasse la capacité totale de 30 Mo pour cette agence.")
+            return redirect('agence', agence_slug=agence.slug)
+
+        # Associer la vidéo à l'agence
+        form.instance.agence = agence
+
+        # Si la vidéo est principale, enlever le statut principal des autres
+        if form.cleaned_data.get('is_main'):
+            AgenceVideos.objects.filter(
+                agence=agence,
+                is_main=True
+            ).update(is_main=False)
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'agence',
+            kwargs={
+                'agence_slug': self.get_agence().slug
+            }
+        )
+
+@login_required
+@require_POST
 def agence_video_update(request, pk):
 
     video = get_object_or_404(AgenceVideos, pk=pk)
@@ -1113,75 +1546,6 @@ def agence_video_update(request, pk):
         )
 
     return redirect("agence_presentation_manage",agence_slug=video_obj.agence.slug)
-
-
-# ============================================================================
-#   Ajouter une nouvelle vidéo + légende
-# =====================================
-class AgenceVideoCreateView(LoginRequiredMixin, CreateView):
-    model = AgenceVideos
-    fields = ['video', 'legende']
-
-    def get_agence(self):
-        return get_object_or_404(
-            Agence,
-            slug=self.kwargs['agence_slug']
-        )
-
-    def form_valid(self, form):
-        agence = self.get_agence()
-
-        # Vérification des droits
-        if not self.request.user.is_superuser and agence.manager != self.request.user:
-            return redirect(
-                'agence',
-                agence_slug=agence.slug
-            )
-
-        form.instance.agence = agence
-
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(
-            'agence',
-            kwargs={
-                'agence_slug': self.get_agence().slug
-            }
-        )
-
-
-@login_required
-@require_POST
-def agence_image_set_main(request, agence_slug, pk):
-
-    image = get_object_or_404(
-        AgenceImages,
-        pk=pk,
-        agence__slug=agence_slug
-    )
-
-    # Vérification des droits
-    if not request.user.is_superuser and image.agence.manager != request.user:
-        return redirect(
-            'agence',
-            agence_slug=agence_slug
-        )
-
-    # Retirer le statut principal des autres images
-    AgenceImages.objects.filter(
-        agence=image.agence
-    ).update(is_main=False)
-
-    # Définir cette image comme principale
-    image.is_main = True
-    image.save(update_fields=['is_main'])
-
-    return redirect(
-        'agence',
-        agence_slug=agence_slug
-    )        
-
 
 @login_required
 @require_POST

@@ -59,8 +59,6 @@
 }
 </style>
 
-
-
 <!-- Custom Styles for Premium Experience -->
 <style>
     .layout-map-img:hover {
@@ -248,7 +246,6 @@
     }
 </style>
 
-
 <style>
 
 
@@ -341,14 +338,11 @@
 }
 </style>
 
-
-
 {% endblock %}
 
 
 {% block content %}
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 
 <!-- HERO SECTION -->
@@ -379,11 +373,8 @@
                 <a href="{% url 'agence_list_promotion' agence.slug %}" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-tags me-2"></i> Promotions
                 </a>
-
             {% endif %}
-
- </div>
-        
+        </div>
         <!-- Edit/Delete for managers/superusers inside hero -->
         {% if request.user.is_superuser or object.manager == request.user %}
         <div class="position-absolute top-0 end-0 m-4 z-3 d-flex gap-2">
@@ -398,7 +389,6 @@
         </div>
         {% endif %}
     </div>
-
 </div>
 
 <div class="container-xxl-custom">
@@ -1173,481 +1163,438 @@
                 </div>
 </div> -->
 
-  <!-- Galerie photos -->
-<section style="background-color: var(--color-bg); padding: 20px 0;">
-    <div class="container">
+<!-- =====================================================
+GALERIE PHOTOS DE L'AGENCE
+===================================================== -->
+    <!-- Galerie photos -->
+    <section style="background-color: var(--color-bg); padding: 20px 0;">
+        <div class="container">
+            <div>
+                <!-- TITRE -->
+                <div style="text-align: center; margin-bottom: 40px;">
 
-        {% if agence.images.all %}
+                    <h2 style="font-family: var(--font-display);font-size: 2.2rem;color: var(--color-primary);">
+                        Galerie Photos
+                    </h2>
 
-        <div>
-
-            <!-- TITRE -->
-            <div style="text-align: center; margin-bottom: 40px;">
-
-                <h2 style="
-                    font-family: var(--font-display);
-                    font-size: 2.2rem;
-                    color: var(--color-primary);
-                ">
-                    Galerie Photos
-                </h2>
-
-                {% if request.user.is_superuser or agence.manager == request.user %}
-                    <button type="button"
-                            class="btn btn-light border rounded-pill px-4 py-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#addPhotosModal">
-
-                        <i class="fas fa-plus me-2 text-primary"></i>
-                        Ajouter des photos
-
-                    </button>
-                {% endif %}
-
-                <p style="
-                    color: var(--color-muted);
-                    font-size: 1.05rem;
-                    margin-top: 8px;
-                ">
-                    Découvrez les photos de <strong>{{ agence.nom }}</strong>
-                </p>
-
-                <div style="
-                    width: 60px;
-                    height: 3px;
-                    background: var(--color-pink);
-                    margin: 15px auto 0;
-                "></div>
-
-            </div>
-
-            <!-- PHOTOS -->
-           <!-- <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;"> -->
-
-            <!-- PHOTOS -->
-            <div class="agency-gallery-grid">
-
-                {% for img in agence.images.all %}
-
-                <div class="agency-gallery-card {% if img.is_main %}is-main{% endif %}">
-
-                    <!-- IMAGE -->
-                    <img
-                        src="{{ img.image.url }}"
-                        class="agency-gallery-image"
-                        alt="{{ img.legende|default:'Photo de l’agence' }}"
-                        loading="lazy"
-                        onclick="openAgencyImage('{{ img.image.url }}')"
-                    >
-
-                    <!-- BADGE IMAGE PRINCIPALE -->
-                    {% if img.is_main %}
-                        <div class="agency-main-badge">
-                            <i class="fas fa-star"></i>
-                            Principale
-                        </div>
+                    {% if request.user.is_superuser or agence.manager == request.user %}
+                        <button type="button" class="btn btn-light border rounded-pill px-4 py-2" data-bs-toggle="modal" data-bs-target="#addPhotosModal">
+                            <i class="fas fa-plus me-2 text-primary"></i>
+                            Ajouter des photos
+                        </button>
                     {% endif %}
 
-                    <!-- BOUTON AGRANDIR -->
-                    <button
-                        type="button"
-                        class="agency-view-btn"
-                        title="Agrandir l'image"
-                        onclick="event.stopPropagation(); openAgencyImage('{{ img.image.url }}')"
-                    >
-                        <i class="fas fa-expand-alt"></i>
-                    </button>
+                    <p style="color: var(--color-muted);font-size: 1.05rem;margin-top: 8px;">
+                        Découvrez les photos de <strong>{{ agence.nom }}</strong>
+                    </p>
+                    <div style="width: 60px;height: 3px;background: var(--color-pink);margin: 15px auto 0;"></div>
 
+                </div>
 
-                    <!-- ACTIONS ADMIN -->
-                    {% if request.user.is_superuser or agence.manager == request.user %}
+                <!-- PHOTOS -->
+                <!-- <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;"> -->
 
-                        <div class="agency-gallery-actions">
+                <!-- PHOTOS -->
+                <div class="agency-gallery-grid">
+                    {% if agence.images.all %}
+                    {% for img in agence.images.all %}
 
-                            <!-- IMAGE PRINCIPALE -->
-                            {% if not img.is_main %}
-                                <form method="POST"
-                                    action="{% url 'agence_image_set_main' agence.slug img.id %}"
+                    <div class="agency-gallery-card {% if img.is_main %}is-main{% endif %}">
+
+                        <!-- IMAGE -->
+                        <img
+                            src="{{ img.image.url }}"
+                            class="agency-gallery-image"
+                            alt="{{ img.legende|default:'Photo de l’agence' }}"
+                            loading="lazy"
+                            onclick="openAgencyImage('{{ img.image.url }}')"
+                        >
+                        <!-- BADGE IMAGE PRINCIPALE -->
+                        {% if img.is_main %}
+                            <div class="agency-main-badge">
+                                <i class="fas fa-star"></i>
+                                Principale
+                            </div>
+                        {% endif %}
+
+                        <!-- BOUTON AGRANDIR -->
+                        <button
+                            type="button"
+                            class="agency-view-btn"
+                            title="Agrandir l'image"
+                            onclick="event.stopPropagation(); openAgencyImage('{{ img.image.url }}')"
+                        >
+                            <i class="fas fa-expand-alt"></i>
+                        </button>
+
+                        <!-- ACTIONS ADMIN -->
+                        {% if request.user.is_superuser or agence.manager == request.user %}
+                            <div class="agency-gallery-actions">
+                                <!-- IMAGE PRINCIPALE -->
+                                {% if not img.is_main %}
+                                    <form method="POST"
+                                        action="{% url 'agence_image_set_main' agence.slug img.id %}"
+                                        class="m-0"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="agency-gallery-action set-main"
+                                            title="Mettre comme image principale"
+                                        >
+                                            <i class="fas fa-star"></i>
+                                        </button>
+
+                                    </form>
+
+                                {% else %}
+                                    <div
+                                        class="agency-gallery-action main-active"
+                                        title="Image principale"
+                                    >
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                {% endif %}
+
+                                <!-- MODIFIER -->
+                                <button
+                                    type="button"
+                                    class="agency-gallery-action edit"
+                                    title="Modifier l'image"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editPhotoModal"
+                                    data-image-id="{{ img.id }}"
+                                    data-image-url="{{ img.image.url }}"
+                                    data-legende="{{ img.legende|default:'' }}"
+                                    data-edit-url="{% url 'agence_image_edit' agence.slug img.id %}"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <!-- SUPPRIMER -->
+                                <form
+                                    method="POST"
+                                    action="{% url 'agence_image_delete' img.id %}"
                                     class="m-0"
+                                    onsubmit="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
                                 >
                                     {% csrf_token %}
 
                                     <button
                                         type="submit"
-                                        class="agency-gallery-action set-main"
-                                        title="Mettre comme image principale"
+                                        class="agency-gallery-action delete"
+                                        title="Supprimer l'image"
                                     >
-                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
 
                                 </form>
+                            </div>
+                        {% endif %}
+                        <!-- LÉGENDE -->
+                        <div class="agency-gallery-caption">
 
+                            <i class="fas fa-camera me-2"></i>
+
+                            {% if img.legende %}
+                                {{ img.legende }}
                             {% else %}
-
-                                <div
-                                    class="agency-gallery-action main-active"
-                                    title="Image principale"
-                                >
-                                    <i class="fas fa-star"></i>
-                                </div>
-
+                                Instantané de l'agence
                             {% endif %}
 
-
-                            <!-- MODIFIER -->
-                            <button
-                                type="button"
-                                class="agency-gallery-action edit"
-                                title="Modifier l'image"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editPhotoModal"
-                                data-image-id="{{ img.id }}"
-                                data-image-url="{{ img.image.url }}"
-                                data-legende="{{ img.legende|default:'' }}"
-                                data-edit-url="{% url 'agence_image_edit' agence.slug img.id %}"
-                            >
-                                <i class="fas fa-edit"></i>
-                            </button>
-
-
-                            <!-- SUPPRIMER -->
-                            <form
-                                method="POST"
-                                action="{% url 'agence_image_delete' img.id %}"
-                                class="m-0"
-                                onsubmit="return confirm('Voulez-vous vraiment supprimer cette photo ?');"
-                            >
-                                {% csrf_token %}
-
-                                <button
-                                    type="submit"
-                                    class="agency-gallery-action delete"
-                                    title="Supprimer l'image"
-                                >
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-
-                            </form>
-
                         </div>
-
-                    {% endif %}
-
-                    <!-- LÉGENDE -->
-                    <div class="agency-gallery-caption">
-
-                        <i class="fas fa-camera me-2"></i>
-
-                        {% if img.legende %}
-                            {{ img.legende }}
-                        {% else %}
-                            Instantané de l'agence
-                        {% endif %}
-
                     </div>
-
+                    {% endfor %}
+                    {% endif %}
                 </div>
 
-                {% endfor %}
+                <style>
+
+                /* ==========================================
+                GALERIE AGENCE
+                ========================================== */
+
+                .agency-gallery-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 24px;
+                }
+
+                .agency-gallery-card {
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: 18px;
+                    background: #fff;
+                    border: 2px solid transparent;
+                    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+                    transition: all .3s ease;
+                }
+
+                .agency-gallery-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+                }
+
+                .agency-gallery-card.is-main {
+                    border-color: var(--color-pink);
+                }
+
+
+                /* IMAGE */
+
+                .agency-gallery-image {
+                    width: 100%;
+                    height: 250px;
+                    display: block;
+                    object-fit: cover;
+                    cursor: pointer;
+                    transition: transform .5s ease;
+                }
+
+                .agency-gallery-card:hover .agency-gallery-image {
+                    transform: scale(1.05);
+                }
+
+
+                /* BADGE PRINCIPALE */
+
+                .agency-main-badge {
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    z-index: 5;
+
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    padding: 7px 12px;
+                    border-radius: 50px;
+
+                    background: var(--color-pink);
+                    color: #fff;
+
+                    font-size: .75rem;
+                    font-weight: 700;
+
+                    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+                }
+
+
+                /* BOUTON AGRANDIR */
+
+                .agency-view-btn {
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    z-index: 6;
+
+                    width: 42px;
+                    height: 42px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    border: 1px solid rgba(255,255,255,.3);
+                    border-radius: 50%;
+
+                    background: rgba(0,0,0,.6);
+                    backdrop-filter: blur(6px);
+
+                    color: #fff;
+                    cursor: pointer;
+
+                    opacity: 0;
+                    transform: translateY(-5px);
+
+                    transition: all .25s ease;
+                }
+
+                .agency-gallery-card:hover .agency-view-btn {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                .agency-view-btn:hover {
+                    background: rgba(0,0,0,.9);
+                    transform: scale(1.1);
+                }
+
+
+                /* ACTIONS ADMIN */
+
+                .agency-gallery-actions {
+                    position: absolute;
+                    left: 50%;
+                    bottom: 55px;
+                    z-index: 10;
+
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+
+                    transform: translateX(-50%) translateY(10px);
+                    opacity: 0;
+
+                    transition: all .25s ease;
+                }
+
+                .agency-gallery-card:hover .agency-gallery-actions {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+
+
+                /* BOUTONS */
+
+                .agency-gallery-action {
+                    width: 40px;
+                    height: 40px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    border: 1px solid rgba(255,255,255,.3);
+                    border-radius: 50%;
+
+                    background: rgba(0,0,0,.7);
+                    backdrop-filter: blur(6px);
+
+                    color: #fff;
+
+                    cursor: pointer;
+                    text-decoration: none;
+
+                    transition: all .25s ease;
+                }
+
+                .agency-gallery-action:hover {
+                    transform: scale(1.12);
+                }
+
+
+                /* ÉTOILE */
+
+                .agency-gallery-action.set-main:hover {
+                    background: var(--color-pink);
+                    color: #fff;
+                }
+
+
+                /* IMAGE PRINCIPALE */
+
+                .agency-gallery-action.main-active {
+                    background: var(--color-pink);
+                    color: #fff;
+                    cursor: default;
+                }
+
+
+                /* MODIFIER */
+
+                .agency-gallery-action.edit:hover {
+                    background: var(--color-primary);
+                    color: #fff;
+                }
+
+
+                /* SUPPRIMER */
+
+                .agency-gallery-action.delete {
+                    color: #ff6b6b;
+                }
+
+                .agency-gallery-action.delete:hover {
+                    background: #dc2626;
+                    color: #fff;
+                }
+
+
+                /* LÉGENDE */
+
+                .agency-gallery-caption {
+                    padding: 15px;
+
+                    min-height: 55px;
+
+                    color: var(--color-primary);
+                    font-weight: 500;
+                }
+
+                .agency-gallery-caption i {
+                    color: var(--color-pink);
+                }
+
+
+                /* MOBILE */
+
+                @media (max-width: 768px) {
+
+                    .agency-gallery-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 12px;
+                    }
+
+                    .agency-gallery-image {
+                        height: 220px;
+                    }
+
+                    .agency-view-btn,
+                    .agency-gallery-actions {
+                        opacity: 1;
+                    }
+
+                    .agency-gallery-actions {
+                        left: auto;
+                        right: 10px;
+                        bottom: 55px;
+                        transform: none;
+                    }
+
+                    .agency-gallery-card:hover .agency-gallery-actions {
+                        transform: none;
+                    }
+
+                }
+
+
+                @media (max-width: 480px) {
+
+                    .agency-gallery-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .agency-gallery-image {
+                        height: 280px;
+                    }
+
+                }
+
+                </style>
+
+                <script>
+
+                function openAgencyImage(imageUrl) {
+
+                    window.open(
+                        imageUrl,
+                        '_blank',
+                        'noopener,noreferrer'
+                    );
+
+                }
+
+                </script>
 
             </div>
-
-<style>
-
-/* ==========================================
-   GALERIE AGENCE
-========================================== */
-
-.agency-gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-}
-
-.agency-gallery-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 18px;
-    background: #fff;
-    border: 2px solid transparent;
-    box-shadow: 0 6px 20px rgba(0,0,0,.08);
-    transition: all .3s ease;
-}
-
-.agency-gallery-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,.15);
-}
-
-.agency-gallery-card.is-main {
-    border-color: var(--color-pink);
-}
-
-
-/* IMAGE */
-
-.agency-gallery-image {
-    width: 100%;
-    height: 250px;
-    display: block;
-    object-fit: cover;
-    cursor: pointer;
-    transition: transform .5s ease;
-}
-
-.agency-gallery-card:hover .agency-gallery-image {
-    transform: scale(1.05);
-}
-
-
-/* BADGE PRINCIPALE */
-
-.agency-main-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 5;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    padding: 7px 12px;
-    border-radius: 50px;
-
-    background: var(--color-pink);
-    color: #fff;
-
-    font-size: .75rem;
-    font-weight: 700;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,.2);
-}
-
-
-/* BOUTON AGRANDIR */
-
-.agency-view-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 6;
-
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-
-    background: rgba(0,0,0,.6);
-    backdrop-filter: blur(6px);
-
-    color: #fff;
-    cursor: pointer;
-
-    opacity: 0;
-    transform: translateY(-5px);
-
-    transition: all .25s ease;
-}
-
-.agency-gallery-card:hover .agency-view-btn {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.agency-view-btn:hover {
-    background: rgba(0,0,0,.9);
-    transform: scale(1.1);
-}
-
-
-/* ACTIONS ADMIN */
-
-.agency-gallery-actions {
-    position: absolute;
-    left: 50%;
-    bottom: 55px;
-    z-index: 10;
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    transform: translateX(-50%) translateY(10px);
-    opacity: 0;
-
-    transition: all .25s ease;
-}
-
-.agency-gallery-card:hover .agency-gallery-actions {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-
-/* BOUTONS */
-
-.agency-gallery-action {
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-
-    background: rgba(0,0,0,.7);
-    backdrop-filter: blur(6px);
-
-    color: #fff;
-
-    cursor: pointer;
-    text-decoration: none;
-
-    transition: all .25s ease;
-}
-
-.agency-gallery-action:hover {
-    transform: scale(1.12);
-}
-
-
-/* ÉTOILE */
-
-.agency-gallery-action.set-main:hover {
-    background: var(--color-pink);
-    color: #fff;
-}
-
-
-/* IMAGE PRINCIPALE */
-
-.agency-gallery-action.main-active {
-    background: var(--color-pink);
-    color: #fff;
-    cursor: default;
-}
-
-
-/* MODIFIER */
-
-.agency-gallery-action.edit:hover {
-    background: var(--color-primary);
-    color: #fff;
-}
-
-
-/* SUPPRIMER */
-
-.agency-gallery-action.delete {
-    color: #ff6b6b;
-}
-
-.agency-gallery-action.delete:hover {
-    background: #dc2626;
-    color: #fff;
-}
-
-
-/* LÉGENDE */
-
-.agency-gallery-caption {
-    padding: 15px;
-
-    min-height: 55px;
-
-    color: var(--color-primary);
-    font-weight: 500;
-}
-
-.agency-gallery-caption i {
-    color: var(--color-pink);
-}
-
-
-/* MOBILE */
-
-@media (max-width: 768px) {
-
-    .agency-gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .agency-gallery-image {
-        height: 220px;
-    }
-
-    .agency-view-btn,
-    .agency-gallery-actions {
-        opacity: 1;
-    }
-
-    .agency-gallery-actions {
-        left: auto;
-        right: 10px;
-        bottom: 55px;
-        transform: none;
-    }
-
-    .agency-gallery-card:hover .agency-gallery-actions {
-        transform: none;
-    }
-
-}
-
-
-@media (max-width: 480px) {
-
-    .agency-gallery-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .agency-gallery-image {
-        height: 280px;
-    }
-
-}
-
-</style>
-
-<script>
-
-function openAgencyImage(imageUrl) {
-
-    window.open(
-        imageUrl,
-        '_blank',
-        'noopener,noreferrer'
-    );
-
-}
-
-</script>
-
-
-
-</div>
-
+           
         </div>
+    </section>
 
-        {% endif %}
-
-    </div>
-</section>
-
-
-    <!-- =====================================================
-        MODALE : AJOUTER PLUSIEURS PHOTOS
-    ===================================================== -->
-
+    <!-- Modal : Ajouter plusieurs photos -->
     <div class="modal fade"
         id="addPhotosModal"
         tabindex="-1"
@@ -1706,166 +1653,413 @@ function openAgencyImage(imageUrl) {
 
                         <!-- APERÇU -->
                         <div class="mb-4">
-
-                        
+             
                         <div id="photosPreview" class="row g-3 mt-2"></div>
-
                         </div>
-
-                    
 
                         <!-- BOUTONS -->
                         <div class="text-end">
-
                             <button type="button"
                                     class="btn btn-secondary rounded-pill me-2"
                                     data-bs-dismiss="modal">
                                 Annuler
                             </button>
-
                             <button type="submit"
                                     class="btn btn-primary rounded-pill">
 
                                 <i class="fas fa-upload me-2"></i>
                                 Ajouter les photos
-
                             </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal : Modifier une photo -->   
+    <div class="modal fade"
+        id="editPhotoModal"
+        tabindex="-1"
+        aria-labelledby="editPhotoModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <!-- HEADER -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editPhotoModalLabel">
+                        <i class="fas fa-edit me-2"></i>
+                        Modifier la photo
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fermer">
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body p-4">
+                    <form id="editPhotoForm"
+                        method="POST"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- APERÇU PHOTO -->
+                        <div class="text-center mb-4">
+                            <img id="editPhotoPreview"
+                                src=""
+                                alt="Aperçu"
+                                style="
+                                    width: 100%;
+                                    max-height: 350px;
+                                    object-fit: contain;
+                                    border-radius: 12px;
+                                    background: #f5f5f5;
+                                    padding: 5px;
+                                ">
                         </div>
 
+                        <!-- NOUVELLE PHOTO -->
+                        <div class="mb-4">
+                            <label for="editPhoto"
+                                class="form-label fw-bold">
+                                <i class="fas fa-image me-2"></i>
+                                Nouvelle photo
+                            </label>
+                            <input type="file"
+                                id="editPhoto"
+                                name="image"
+                                class="form-control"
+                                accept="image/*">
+                            <div class="form-text">
+                                Laissez vide pour conserver la photo actuelle.
+                            </div>
+                        </div>
+
+                        <!-- LÉGENDE -->
+                        <div class="mb-4">
+                            <label for="editLegende"
+                                class="form-label fw-bold">
+                                <i class="fas fa-comment me-2"></i>
+                                Légende
+                            </label>
+                            <input type="text"
+                                id="editLegende"
+                                name="legende"
+                                class="form-control"
+                                maxlength="200"
+                                placeholder="Légende de la photo">
+                        </div>
+
+                        <!-- BOUTONS -->
+                        <div class="text-end">
+                            <button type="button"
+                                    class="btn btn-secondary rounded-pill me-2"
+                                    data-bs-dismiss="modal">
+                                Annuler
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-primary rounded-pill">
+                                <i class="fas fa-save me-2"></i>
+                                Enregistrer 333
+                            </button>
+                        </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<!-- =====================================================
+FIN GALERIE PHOTOS 
+===================================================== -->
+
+<!-- =====================================================
+VIDEO DE L'AGENCE
+===================================================== -->
+    <!-- Vidéos de l'agence -->
+    <section style="background-color: var(--color-bg); padding: 30px 0;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h3 class="display-5 fw-bold mb-2">Visites vidéo</h3>
+                <!-- Bouton Ajouter -->
+                <button type="button" class="btn btn-light border rounded-pill px-4 py-2 text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#addVideoModal">
+                    <i class="fas fa-plus me-2 text-primary"></i>
+                    Ajouter une vidéo
+                </button>
+                <p class="text-muted">Découvrez nos véhicules et notre agence en vidéo</p>
+            </div>
+            <div class="row g-4">
+                    {% if agence.videos.all %}
+                    {% for video in agence.videos.all %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <!-- Vidéo -->
+                            <div class="position-relative">
+                                <video class="w-100" controls preload="metadata" style="height: 220px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                                    <source src="{{ video.video.url }}" type="video/mp4">
+                                    Votre navigateur ne supporte pas la vidéo.
+                                </video>
+                                {% if video.is_main %}
+                                    <span class="badge bg-primary position-absolute top-0 start-0 m-2">
+                                        ⭐ Vidéo principale
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <!-- Informations -->
+                            <div class="card-body">
+                                {% if video.titre %}
+                                    <h5 class="card-title">
+                                        {{ video.titre }}
+                                    </h5>
+                                {% endif %}
+                                <!-- Actions -->
+                                <div class="d-flex gap-2 flex-wrap mt-3">
+                                    <!-- Vidéo principale -->
+                                    {% if not video.is_main %}
+                                        <form method="POST" action="{% url 'agence_video_set_main' agence_slug=agence.slug pk=video.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Mettre comme vidéo principale">
+                                                <i class="fas fa-star"></i> Principale
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-primary" disabled>
+                                            <i class="fas fa-star"></i>
+                                            Principale
+                                        </button>
+                                    {% endif %}
+                                    <!-- Modifier -->
+                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="openVideoEditModal('{{ video.pk }}', '{{ video.titre|escapejs }}')">
+                                        <i class="fas fa-edit"></i>
+                                        Modifier
+                                    </button>
+                                    <!-- Supprimer -->
+                                    <form method="POST" action="{% url 'agence_video_delete' agence_slug=agence.slug pk=video.pk %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette vidéo ?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- MODALE AJOUTER UNE VIDÉO -->
+    <div
+    class="modal fade"
+    id="addVideoModal"
+    tabindex="-1"
+    aria-labelledby="addVideoModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="addVideoModalLabel">
+                    <i class="fas fa-video text-primary me-2"></i>
+                    Ajouter une vidéo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+
+            <!-- Formulaire -->
+            <form method="POST" action="{% url 'agence_video_add' agence_slug=agence.slug %}" enctype="multipart/form-data">
+
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Sélection vidéo -->
+                    <div class="mb-4">
+                        <label for="videoFile" class="form-label fw-semibold">
+                            <i class="fas fa-file-video me-2"></i>
+                            Sélectionner une vidéo
+                        </label>
+
+                        <input
+                            type="file"
+                            name="video"
+                            id="videoFile"
+                            class="form-control"
+                            accept="video/*"
+                            required>
+
+                        <div class="form-text">
+                            Formats vidéo acceptés :
+                            MP4, WebM, MOV, etc.
+                        </div>
+
+                    </div>
+
+                    <!-- Aperçu -->
+                    <div
+                        id="videoPreviewContainer"
+                        class="mb-4"
+                        style="display: none;">
+
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-eye me-2"></i>
+                            Aperçu
+                        </label>
+
+                        <div
+                            style="
+                                background: #000;
+                                border-radius: 12px;
+                                overflow: hidden;
+                            ">
+
+                            <video
+                                id="videoPreview"
+                                controls
+                                style="
+                                    width: 100%;
+                                    max-height: 400px;
+                                    display: block;
+                                ">
+                            </video>
+                        </div>
+                    </div>
+
+                    <!-- Légende -->
+                    <div class="mb-3">
+                        <label
+                            for="videoLegende"
+                            class="form-label fw-semibold">
+
+                            <i class="fas fa-align-left me-2"></i>
+                            Légende
+                        </label>
+                        <input
+                            type="text"
+                            name="legende"
+                            id="videoLegende"
+                            class="form-control"
+                            maxlength="200"
+                            placeholder="Ex : Visite générale de l'agence">
+
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-save me-2"></i>
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal modification vidéo -->
+    <div
+        class="modal fade"
+        id="editVideoModal"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        <i class="fas fa-video"></i>
+                        Modifier la vidéo
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                    ></button>
 
                 </div>
 
-            </div>
-
-        </div>
-
-    </div>
-
-<!-- =====================================================
-     MODALE : MODIFIER UNE PHOTO
-===================================================== -->
-
-<div class="modal fade"
-     id="editPhotoModal"
-     tabindex="-1"
-     aria-labelledby="editPhotoModalLabel"
-     aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-
-        <div class="modal-content border-0 rounded-4 shadow">
-
-            <!-- HEADER -->
-            <div class="modal-header bg-primary text-white">
-
-                <h5 class="modal-title" id="editPhotoModalLabel">
-
-                    <i class="fas fa-edit me-2"></i>
-                    Modifier la photo
-
-                </h5>
-
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Fermer">
-                </button>
-
-            </div>
-
-
-            <!-- BODY -->
-            <div class="modal-body p-4">
-
-                <form id="editPhotoForm"
-                      method="POST"
-                      enctype="multipart/form-data">
+                <form
+                    id="editVideoForm"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
 
                     {% csrf_token %}
 
+                    <div class="modal-body">
 
-                    <!-- APERÇU PHOTO -->
-                    <div class="text-center mb-4">
+                        <!-- Titre -->
+                        <div class="mb-3">
 
-                        <img id="editPhotoPreview"
-                             src=""
-                             alt="Aperçu"
-                             style="
-                                width: 100%;
-                                max-height: 350px;
-                                object-fit: contain;
-                                border-radius: 12px;
-                                background: #f5f5f5;
-                                padding: 5px;
-                             ">
+                            <label class="form-label">
+                                Titre
+                            </label>
 
-                    </div>
+                            <input
+                                type="text"
+                                id="editVideoTitre"
+                                name="titre"
+                                class="form-control"
+                                placeholder="Titre de la vidéo"
+                            >
 
+                        </div>
 
-                    <!-- NOUVELLE PHOTO -->
-                    <div class="mb-4">
+                        <!-- Nouvelle vidéo -->
+                        <div class="mb-3">
 
-                        <label for="editPhoto"
-                               class="form-label fw-bold">
+                            <label class="form-label">
+                                Remplacer la vidéo
+                            </label>
 
-                            <i class="fas fa-image me-2"></i>
-                            Nouvelle photo
+                            <input
+                                type="file"
+                                name="video"
+                                class="form-control"
+                                accept="video/*"
+                            >
 
-                        </label>
+                            <small class="text-muted">
+                                Laissez vide pour conserver la vidéo actuelle.
+                            </small>
 
-                        <input type="file"
-                               id="editPhoto"
-                               name="image"
-                               class="form-control"
-                               accept="image/*">
-
-                        <div class="form-text">
-                            Laissez vide pour conserver la photo actuelle.
                         </div>
 
                     </div>
 
+                    <div class="modal-footer">
 
-                    <!-- LÉGENDE -->
-                    <div class="mb-4">
-
-                        <label for="editLegende"
-                               class="form-label fw-bold">
-
-                            <i class="fas fa-comment me-2"></i>
-                            Légende
-
-                        </label>
-
-                        <input type="text"
-                               id="editLegende"
-                               name="legende"
-                               class="form-control"
-                               maxlength="200"
-                               placeholder="Légende de la photo">
-
-                    </div>
-
-
-                    <!-- BOUTONS -->
-                    <div class="text-end">
-
-                        <button type="button"
-                                class="btn btn-secondary rounded-pill me-2"
-                                data-bs-dismiss="modal">
-
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
                             Annuler
-
                         </button>
 
-                        <button type="submit"
-                                class="btn btn-primary rounded-pill">
-
-                            <i class="fas fa-save me-2"></i>
-                            Enregistrer 333
-
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            <i class="fas fa-save"></i>
+                            Enregistrer
                         </button>
 
                     </div>
@@ -1875,276 +2069,14 @@ function openAgencyImage(imageUrl) {
             </div>
 
         </div>
-
     </div>
 
-</div>
+    <!-- Script pour ouvrir le modal -->
+    <script>
 
+    function openVideoEditModal(videoId, titre) {
 
-
-    <!-- Fin Galerie photos -->
-
-
-
-
-
-
-    <!-- Videos de l'agence -->
-    <!-- Vidéos de l'agence -->
-<section style="background-color: var(--color-bg); padding: 30px 0;">
-    <div class="container">
-
-        {% if agence.videos.all %}
-
-            <div class="text-center mb-5">
-                <h3 class="display-5 fw-bold mb-2">
-                    Visites vidéo
-                </h3>
-
-                <p class="text-muted">
-                    Découvrez nos véhicules et notre agence en vidéo
-                </p>
-            </div>
-
-            <div class="row g-4">
-
-                {% for video in agence.videos.all %}
-
-                <div class="col-md-6 col-lg-4">
-
-                    <div class="card h-100 shadow-sm border-0">
-
-                        <!-- Vidéo -->
-                        <div class="position-relative">
-
-                            <video
-                                class="w-100"
-                                controls
-                                preload="metadata"
-                                style="
-                                    height: 220px;
-                                    object-fit: cover;
-                                    border-radius: 10px 10px 0 0;
-                                "
-                            >
-                                <source src="{{ video.video.url }}" type="video/mp4">
-                                Votre navigateur ne supporte pas la vidéo.
-                            </video>
-
-                            {% if video.is_main %}
-                                <span
-                                    class="badge bg-primary position-absolute top-0 start-0 m-2"
-                                >
-                                    ⭐ Vidéo principale
-                                </span>
-                            {% endif %}
-
-                        </div>
-
-                        <!-- Informations -->
-                        <div class="card-body">
-
-                            {% if video.titre %}
-                                <h5 class="card-title">
-                                    {{ video.titre }}
-                                </h5>
-                            {% endif %}
-
-                            <!-- Actions -->
-                            <div class="d-flex gap-2 flex-wrap mt-3">
-
-                                <!-- Vidéo principale -->
-                                {% if not video.is_main %}
-
-                                    <form
-                                        method="POST"
-                                        action="{% url 'agence_video_set_main' agence_slug=agence.slug pk=video.pk %}"
-                                    >
-                                        {% csrf_token %}
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm btn-outline-primary"
-                                            title="Mettre comme vidéo principale"
-                                        >
-                                            <i class="fas fa-star"></i>
-                                            Principale
-                                        </button>
-                                    </form>
-
-                                {% else %}
-
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-primary"
-                                        disabled
-                                    >
-                                        <i class="fas fa-star"></i>
-                                        Principale
-                                    </button>
-
-                                {% endif %}
-
-
-                                <!-- Modifier -->
-                                <button
-                                    type="button"
-                                    class="btn btn-sm btn-outline-warning"
-                                    onclick="openVideoEditModal(
-                                        '{{ video.pk }}',
-                                        '{{ video.titre|escapejs }}'
-                                    )"
-                                >
-                                    <i class="fas fa-edit"></i>
-                                    Modifier
-                                </button>
-
-
-                                <!-- Supprimer -->
-                                <form
-                                    method="POST"
-                                    action="{% url 'agence_video_delete' agence_slug=agence.slug pk=video.pk %}"
-                                    onsubmit="return confirm('Voulez-vous vraiment supprimer cette vidéo ?');"
-                                >
-                                    {% csrf_token %}
-
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-outline-danger"
-                                    >
-                                        <i class="fas fa-trash"></i>
-                                        Supprimer
-                                    </button>
-
-                                </form>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-        {% endif %}
-
-    </div>
-</section>
-
-
-<!--  Fenetre modale pour modifier la vidéo-->
-<!-- Modal modification vidéo -->
-<div
-    class="modal fade"
-    id="editVideoModal"
-    tabindex="-1"
-    aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="fas fa-video"></i>
-                    Modifier la vidéo
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
-
-            <form
-                id="editVideoForm"
-                method="POST"
-                enctype="multipart/form-data"
-            >
-
-                {% csrf_token %}
-
-                <div class="modal-body">
-
-                    <!-- Titre -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Titre
-                        </label>
-
-                        <input
-                            type="text"
-                            id="editVideoTitre"
-                            name="titre"
-                            class="form-control"
-                            placeholder="Titre de la vidéo"
-                        >
-
-                    </div>
-
-                    <!-- Nouvelle vidéo -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Remplacer la vidéo
-                        </label>
-
-                        <input
-                            type="file"
-                            name="video"
-                            class="form-control"
-                            accept="video/*"
-                        >
-
-                        <small class="text-muted">
-                            Laissez vide pour conserver la vidéo actuelle.
-                        </small>
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                    >
-                        Annuler
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        <i class="fas fa-save"></i>
-                        Enregistrer
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-</div>
-
-<!-- Script pour ouvrir le modal -->
-<script>
-
-function openVideoEditModal(videoId, titre) {
-
-    const form = document.getElementById('editVideoForm');
+        const form = document.getElementById('editVideoForm');
 
     const titreInput = document.getElementById('editVideoTitre');
 
@@ -2165,17 +2097,18 @@ function openVideoEditModal(videoId, titre) {
     modal.show();
 }
 
-</script>
+    </script>
 
+<!-- =====================================================
+fin VIDEO DE L'AGENCE
+===================================================== -->
 
+<!-- =====================================================
+LOCALISATION ET ACCES
+===================================================== -->
 
-
-
-    <!-- Fin Videos de l'agence -->
-
-    <!-- Localisation et acces -->
     <section class="" style="background-color: var(--color-bg); padding: 10px 0;">
-    <div class="container">
+        <div class="container">
         <!-- Location Section with Google Map & Info Panel -->
         {% if agence.google_map %}
         <div style="margin-bottom: 20px;">
@@ -2307,9 +2240,12 @@ function openVideoEditModal(videoId, titre) {
         </div>
         {% endif %}
 
-    </div>
+        </div>
     </section>
-    <!-- Fin Localisation et acces -->
+
+<!-- =====================================================
+FIN LOCALISATION ET ACCES
+===================================================== -->
 
     <!-- RIGHT COLUMN: CONTACT & MANAGER -->
     <div class="col-12">
@@ -2446,186 +2382,7 @@ function openVideoEditModal(videoId, titre) {
     </div>
 
 
-
-
-
-<!-- ============================= -->
-<!-- MODALE AJOUTER UNE VIDÉO -->
-<!-- ============================= -->
-
-<div
-    class="modal fade"
-    id="addVideoModal"
-    tabindex="-1"
-    aria-labelledby="addVideoModalLabel"
-    aria-hidden="true">
-
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <!-- Header -->
-            <div class="modal-header">
-
-                <h5
-                    class="modal-title fw-bold"
-                    id="addVideoModalLabel">
-
-                    <i class="fas fa-video text-primary me-2"></i>
-                    Ajouter une vidéo
-
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Fermer">
-                </button>
-
-            </div>
-
-
-            <!-- Formulaire -->
-            <form
-                method="POST"
-                action="{% url 'agence_video_add' agence_slug=agence.slug %}"
-                enctype="multipart/form-data">
-
-                {% csrf_token %}
-
-                <div class="modal-body">
-
-                    <!-- Sélection vidéo -->
-                    <div class="mb-4">
-
-                        <label
-                            for="videoFile"
-                            class="form-label fw-semibold">
-
-                            <i class="fas fa-file-video me-2"></i>
-                            Sélectionner une vidéo
-
-                        </label>
-
-                        <input
-                            type="file"
-                            name="video"
-                            id="videoFile"
-                            class="form-control"
-                            accept="video/*"
-                            required>
-
-                        <div class="form-text">
-                            Formats vidéo acceptés :
-                            MP4, WebM, MOV, etc.
-                        </div>
-
-                    </div>
-
-
-                    <!-- Aperçu -->
-                    <div
-                        id="videoPreviewContainer"
-                        class="mb-4"
-                        style="display: none;">
-
-                        <label class="form-label fw-semibold">
-
-                            <i class="fas fa-eye me-2"></i>
-                            Aperçu
-
-                        </label>
-
-                        <div
-                            style="
-                                background: #000;
-                                border-radius: 12px;
-                                overflow: hidden;
-                            ">
-
-                            <video
-                                id="videoPreview"
-                                controls
-                                style="
-                                    width: 100%;
-                                    max-height: 400px;
-                                    display: block;
-                                ">
-                            </video>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Légende -->
-                    <div class="mb-3">
-
-                        <label
-                            for="videoLegende"
-                            class="form-label fw-semibold">
-
-                            <i class="fas fa-align-left me-2"></i>
-                            Légende
-
-                        </label>
-
-                        <input
-                            type="text"
-                            name="legende"
-                            id="videoLegende"
-                            class="form-control"
-                            maxlength="200"
-                            placeholder="Ex : Visite générale de l'agence">
-
-                    </div>
-
-                </div>
-
-
-                <!-- Footer -->
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">
-
-                        Annuler
-
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary rounded-pill px-4">
-
-                        <i class="fas fa-save me-2"></i>
-                        Enregistrer
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
 </div>
-
-
-
-
-
-    
-</div>
-
-
-
-
-
 
 <!--  BMH - Afficher la vidéo de la voiture -->
 <script>
@@ -2655,8 +2412,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 <!--  fin afficher la vidéo de la voiture -->
-
-
 
 <script>
 /* CSRF */
@@ -2713,8 +2468,6 @@ function toggleWishlist(btn, carId) {
     });
 }
 </script>
-
-
 
 <!--  BMH - Ajouter des photos -->
 <script>
@@ -2910,9 +2663,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     const editPhotoModal = document.getElementById('editPhotoModal');
     const editPhotoForm = document.getElementById('editPhotoForm');
     const editPhotoPreview = document.getElementById('editPhotoPreview');
@@ -2996,7 +2749,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
-
 
 <!-- BMH Ajouter une vidéo -->
 <script>

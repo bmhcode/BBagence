@@ -119,8 +119,8 @@
                                 </button>
                             </li>
 
-                            <!-- Réseaux sociaux -->
-                            {% if social_form %}
+                           <!-- Réseaux sociaux : uniquement en modification -->
+                            {% if object %}
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link"
                                         id="social-tab"
@@ -133,6 +133,9 @@
                                 </button>
                             </li>
                             {% endif %}
+
+
+
                             
                             {% if request.user.is_superuser %}
                                 <!-- Configuration -->
@@ -168,7 +171,7 @@
                                         </div>
 
                                         <div>
-                                            <h5>Informations de l'agence</h5>
+                                            <!-- <h5>Informations de l'agence</h5> -->
                                             <p>Informations principales de votre agence</p>
                                         </div>
                                     </div>
@@ -186,21 +189,7 @@
                                                 </div>
                                             {% endif %}
                                         </div>
-                                        <!-- Manager -->
-                                        <div class="col-6">
-                                            <label class="form-label fw-semibold">
-                                                Manager <span class="text-danger">*</span>
-                                            </label>
-
-                                            {{ form.manager }}
-
-                                            {% if form.manager.errors %}
-                                                <div class="text-danger small mt-1">
-                                                    {{ form.manager.errors.0 }}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
+                                        
                                         <div class="col-12">
                                             <label class="form-label fw-semibold">
                                                 Description
@@ -233,7 +222,7 @@
                                         </div>
 
                                         <div>
-                                            <h5>Coordonnées</h5>
+                                            <!-- <h5>Coordonnées</h5> -->
                                             <p>Coordonnées de votre agence</p>
                                         </div>
                                     </div>
@@ -303,7 +292,7 @@
                                         </div>
 
                                         <div>
-                                            <h5>Horaires d'ouverture</h5>
+                                            <!-- <h5>Horaires d'ouverture</h5> -->
                                             <p>Configurez les horaires de votre agence</p>
                                         </div>
                                     </div>
@@ -354,8 +343,6 @@
 
                                 </div>
                             </div>
-
-
                             <!-- =========================
                                 ONGLET LOCALISATION
                             ========================== -->
@@ -371,7 +358,7 @@
                                         </div>
 
                                         <div>
-                                            <h5>Localisation</h5>
+                                            <!-- <h5>Localisation</h5> -->
                                             <p>Ajoutez la localisation Google Maps</p>
                                         </div>
                                     </div>
@@ -397,7 +384,7 @@
                             <!-- =========================
                                 ONGLET RÉSEAUX SOCIAUX
                             ========================== -->
-                            {% if social_form %}
+                            <!-- {% if social_form %} -->
                             <div class="tab-pane fade"
                                 id="social" role="tabpanel">
                                 <div class="form-section">
@@ -454,9 +441,10 @@
 
                                 </div>
                             </div>
-                            {% endif %}
+                            <!-- {% endif %} -->
 
 
+                            
                              <!-- =========================
                                 ONGLET CONFIGURATION
                             ========================== -->
@@ -471,20 +459,26 @@
                                         </div>
 
                                         <div>
-                                            <h5>Configuration</h5>
+                                            <!-- <h5>Configuration</h5> -->
                                             <p>Configuration agence</p>
                                         </div>
                                     </div>
 
                                     <div class="row g-3">
 
-                                       
-                                        <div class="col-md-6">
+                                        <!-- Manager -->
+                                        <div class="col-6">
                                             <label class="form-label fw-semibold">
-                                                Est valide ?
+                                                Manager <span class="text-danger">*</span>
                                             </label>
-                                            {{ form.est_valide }}
+                                            {{ form.manager }}
+                                            {% if form.manager.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.manager.errors.0 }}
+                                                </div>
+                                            {% endif %}
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">
                                                 Est en vedette ? 
@@ -494,18 +488,31 @@
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">
-                                                Date début de validité
+                                                Date début d'abonnement
                                             </label>
-                                            {{ form.date_debut_validite }}
+                                            {{ form.date_debut_abonnement }}
                                         </div>
-
+                                        
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">
-                                                Nombre de jours de validité
+                                                Nombre de jours d'abonnement
                                             </label>
-                                            {{ form.nombre_jours_validite }}
+                                            {{ form.nombre_jours_abonnement }}
                                         </div>
-
+                                        
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Est Bloqué ?
+                                            </label>
+                                            {{ form.est_bloquee }}
+                                        </div>
+                                        
+                                        <div class="col-md-9">
+                                            <label class="form-label fw-semibold">
+                                                Cause de blocage
+                                            </label>
+                                            {{ form.cause_blocage }}
+                                        </div>
                                         
 
                                     </div>
@@ -587,7 +594,6 @@
             </div>
         </form>
     </div>
-
     
 </div>
 

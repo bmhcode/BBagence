@@ -1,0 +1,899 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ agence.nom }} - BBCARS{% endblock %}
+
+{% block content %}
+
+
+<section class="" style="padding: 10px 0 10px; ">
+    <div class="container" style="position: relative; z-index: 2;">
+        <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
+            <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <a href="{% url 'agence' car.agence.slug %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ car.agence.nom }}</a>
+            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">{{ car.marque }} {{ car.modele }} - {{ car.annee }}</span>
+        </nav>
+    </div>
+</section>
+
+<div class="row">
+    <!-- Car image -->
+    <div class="col-sm-7 col-md-7 col-lg-7">
+        <div class="card shadow rounded-3 overflow-hidden mb-4" >
+
+            <!-- Wishlist Button -->
+            {% if request.user.is_authenticated %}
+            <button
+                type="button"
+                onclick="toggleWishlist(this, {{ car.id }})"
+                class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}"
+                aria-label="Ajouter aux favoris"
+                title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+            </button>
+            {% endif %}
+            <!-- / Wishlist Button -->
+
+            <!-- Car image -->
+            <div class="position-relative">
+                {% if car.main_image %}
+                    <img id="mainCarImage"
+                        src="{{ car.main_image.image.url }}"
+                        class="img-fluid"
+                        alt="{{ car.nom }}"
+                        style="width: 100%;
+                        max-height: 250px;
+                        object-fit: cover;
+                        transition: opacity 0.3s ease;">
+                {% endif %}
+                
+                {% if car.est_en_promotion %}
+                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                        PROMO {{ car.prix_promo|intcomma }} <small>Million</small>
+                    </div>
+                </a>
+                {% endif %}
+            </div>      
+            <!-- / Car image -->
+
+            <!-- Edit/Delete buttons for manager or superuser -->
+            {% if request.user.is_superuser or car.agence.manager == request.user %}
+                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                    <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            {% endif %}
+            <!-- /Edit/Delete buttons for manager or superuser -->
+
+            <div class="card-body p-4">
+                <!-- Back Link -->
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                        <i class="fas fa-store me-1"></i>
+                        <a href="{% url 'agence' car.agence.slug %}"> {{ car.agence.nom }} </a> — {{ car.agence.ville }}
+                    </small>
+                </div> 
+                <!-- Actions -->
+                <div class="d-flex gap-3 mt-3 mb-3">
+                    <a href="{% url 'contact' %}?agence={{ agence.nom|urlencode }}"
+                    class="btn btn-outline-primary action-btn">
+                        <i class="fas fa-envelope me-2"></i>
+                        <span>Envoyer un message</span>
+                    </a>
+                    <a href="tel:{{ car.agence.telephone }}"
+                    class="btn btn-primary action-btn">
+                        <i class="fas fa-phone-alt me-2"></i>
+                        <span>Appeler {{ car.agence.telephone }}</span>
+                    </a>
+                </div>
+
+                {% if car.description %}
+                <div class="d-flex align-items-center mt-3 mb-2">
+                    <h6 class="me-2 mb-0">À propos de véhicule</h6>
+                    <hr class="text-primary flex-grow-1 mb-0" style="height: 2px;" >
+                </div>
+                <p class=""> {{ car.description }} </p>
+                {% endif %}
+                
+            </div>           
+        </div>
+    </div>
+
+    <!-- Car infos -->
+    <div class="col-sm-5 col-md-5 col-lg-5">
+        <div class="card shadow-sm rounded-3 mb-2">
+            <div class="card-body p-4">
+                <h4 class="mb-4">{{car.marque}} {{car.modele}} - {{car.annee}}</h4>
+               
+                        {% if car.moteur %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-tools text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block text-uppercase fw-bold">MOTEUR</small>
+                                <span>{{ car.moteur }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if car.energie %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-gas-pump text-primary"></i>
+                            </div>
+                            <div>
+                                <!-- <small class="text-muted d-block text-uppercase fw-bold">ÉNERGIE</small> -->
+                                <span>{{ car.get_energie_display }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if car.boite_de_vitesse %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-cogs text-primary"></i>
+                            </div>
+                            <div>
+                                <!-- <small class="text-muted d-block uppercase fw-bold">BOITE DE VITESSES</small> -->
+                                <span>{{ car.get_boite_de_vitesse_display }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                  
+                        {% if car.couleur %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-palette text-primary"></i>
+                            </div>
+                            <div>
+                                <!-- <small class="text-muted d-block uppercase fw-bold">COULEUR</small> -->
+                                <span>{{ car.couleur }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if car.kilometrage %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-road text-primary"></i>
+                            </div>
+                            <div>
+                                <!-- <small class="text-muted d-block uppercase fw-bold">KILOMETRAGE</small> -->
+                                <span>{{ car.kilometrage|intcomma }} km</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                
+                        {% if car.prix_actuel %}
+                        <div class="mb-2 d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3">
+                                <i class="fas fa-money-bill-wave text-primary"></i>
+                            </div>
+                            <div>
+                               <span class="car-card__price">{{ car.prix_actuel|intcomma }} Million</span>
+                                {% if car.prix_ancien %}
+                                    <span class="car-card__price-old">{{ car.prix_ancien|intcomma }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Galerie Photos ==================== -->
+<section class="car-gallery-section">
+    <div class="container">
+        {% if car.images.all %}
+        <!-- Header -->
+        <div class="gallery-header">
+            <div>
+                <h2 class="gallery-title">
+                    <i class="fas fa-images"></i>
+                    Galerie Photos
+                </h2>
+
+                <p class="gallery-subtitle">
+                    Découvrez les photos de <strong>{{ car.marque }} {{ car.modele }} - {{ car.annee }}</strong>
+                </p>
+            </div>
+
+            <!-- <a href="{% url 'agence_photos' agence.slug %}"
+               class="gallery-link">
+                <i class="fas fa-images"></i>
+                Voir toute la galerie
+            </a> -->
+        </div>
+        <!-- Gallery Grid -->
+        <div class="gallery-grid">
+
+            {% for img in car.images.all %}
+            <div class="gallery-card {% if img.is_main %}is-main{% endif %}">
+                <!-- Image -->
+                <img
+                    src="{{ img.image.url }}"
+                    alt="{{ img.caption|default:'Photo de la voiture' }}" class="gallery-image"
+                    loading="lazy"
+                    onclick="window.open('{{ img.image.url }}', '_blank')"
+                >
+                <!-- Main Badge -->
+                {% if img.is_main %}
+                <div class="main-badge">
+                    <i class="fas fa-star"></i>
+                    Principale
+                </div>
+                {% endif %}
+
+                <!-- View Button -->
+                <button
+                    type="button"
+                    class="gallery-view-btn"
+                    title="Voir l'image"
+                    onclick="event.stopPropagation(); window.open('{{ img.image.url }}', '_blank')"
+                >
+                    <i class="fas fa-expand-alt"></i>
+                </button>
+
+                <!-- ==================== ADMIN ACTIONS ==================== -->
+                {% if request.user.is_superuser or car.agence.manager == request.user %}
+                <div class="gallery-admin-actions">
+                    <!-- Set Main -->
+                    {% if not img.is_main %}
+                    <form
+                        method="post"
+                        action="{% url 'car_image_set_main' car.agence.slug car.id img.id %}"
+                    >
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            class="gallery-action-btn set-main-btn"
+                            title="Définir comme image principale"
+                        >
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </form>
+
+                    {% else %}
+
+                    <div
+                        class="gallery-action-btn main-active"
+                        title="Image principale"
+                    >
+                        <i class="fas fa-star"></i>
+                    </div>
+
+                    {% endif %}
+
+                    <!-- Delete -->
+                    <form
+                        method="post"
+                        action="{% url 'car_image_delete' car.agence.slug car.id img.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="gallery-action-btn delete-btn"
+                            title="Supprimer l'image"
+                            onclick="return confirm('Voulez-vous vraiment supprimer cette image ?');"
+                        >
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            {{img.caption}}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ==================== CSS ==================== -->
+<style>
+
+.car-gallery-section {
+    background: var(--color-bg);
+    padding: 40px 0;
+}
+
+/* ==================== HEADER ==================== */
+
+.gallery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.gallery-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.gallery-title i {
+    margin-right: 8px;
+    color: var(--color-pink);
+}
+
+.gallery-subtitle {
+    margin: 8px 0 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+}
+
+.gallery-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    background: #fff;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    transition: all .25s ease;
+    white-space: nowrap;
+}
+
+.gallery-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.10);
+    color: var(--color-pink);
+}
+
+
+/* ==================== GRID ==================== */
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+
+/* ==================== CARD ==================== */
+
+.gallery-card {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #eee;
+    border: 2px solid transparent;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        border-color .3s ease;
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+}
+
+.gallery-card.is-main {
+    border-color: var(--accent);
+}
+
+
+/* ==================== IMAGE ==================== */
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform .5s ease;
+}
+
+.gallery-card:hover .gallery-image {
+    transform: scale(1.05);
+}
+
+
+/* ==================== MAIN BADGE ==================== */
+
+.main-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 12px;
+    border-radius: 50px;
+
+    background: var(--accent);
+    color: #fff;
+
+    font-size: .75rem;
+    font-weight: 700;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.main-badge i {
+    font-size: .7rem;
+}
+
+
+/* ==================== VIEW BUTTON ==================== */
+
+.gallery-view-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 4;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(6px);
+
+    color: #fff;
+    cursor: pointer;
+
+    opacity: 0;
+    transform: translateY(-5px);
+
+    transition: all .25s ease;
+}
+
+.gallery-card:hover .gallery-view-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.gallery-view-btn:hover {
+    background: rgba(0,0,0,.85);
+    transform: scale(1.1) !important;
+}
+
+
+/* ==================== ADMIN ACTIONS ==================== */
+
+.gallery-admin-actions {
+    position: absolute;
+    left: 50%;
+    bottom: 15px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    transform: translate(-50%, 15px);
+    opacity: 0;
+
+    transition: all .25s ease;
+}
+
+.gallery-card:hover .gallery-admin-actions {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* ==================== ACTION BUTTON ==================== */
+
+.gallery-action-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(6px);
+
+    color: #fff;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    transition: all .25s ease;
+}
+
+.gallery-action-btn:hover {
+    transform: scale(1.12);
+}
+
+
+/* Set Main */
+
+.set-main-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+
+/* Already Main */
+
+.main-active {
+    background: var(--accent);
+    color: #fff;
+    cursor: default;
+}
+
+
+/* Delete */
+
+.delete-btn {
+    color: #ff6b6b;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 768px) {
+
+    .car-gallery-section {
+        padding: 30px 0;
+    }
+
+    .gallery-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gallery-title {
+        font-size: 1.7rem;
+    }
+
+    .gallery-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .gallery-card {
+        height: 240px;
+        border-radius: 12px;
+    }
+
+    /* Sur mobile, afficher les boutons */
+    .gallery-view-btn,
+    .gallery-admin-actions {
+        opacity: 1;
+        transform: none;
+    }
+
+    .gallery-admin-actions {
+        left: auto;
+        right: 10px;
+        bottom: 10px;
+        transform: none;
+    }
+
+    .gallery-action-btn,
+    .gallery-view-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery-card {
+        height: 280px;
+    }
+}
+
+</style>
+<!-- ==================== Fin Galerie Photos ==================== -->
+
+<!-- Présentation video -->
+ <div class="container">
+{% if car.video %}   
+    <div class="text-center mt-5 mb-5">
+            <h3 class="display-6 fw-bold mb-2">
+                 <i class="fas fa-play-circle"></i>
+                Visite video
+            </h3>
+            <p class="text-muted mb-0">
+                Découvrez <strong>{{ car.marque }} {{ car.modele }} - {{car.annee}}</strong> à travers nos présentations vidéo
+            </p>
+            <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+                <div class="video-card">
+                    <div class="video-container">
+                        <video controls>
+                            <source src="{{ car.video.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                    </div>
+                    <div class="video-body">
+                        <h4>
+                            <i class="fas fa-video"></i>
+                            {% if car.legende %}
+                                {{ car.legende }}
+                            {% else %}
+                                Présentation de la <strong>{{ car.marque }} {{ car.modele }} - {{ car.annee }}</strong>
+                            {% endif %}
+                        </h4>
+                    </div>
+                </div>
+    </div>
+{% endif %}
+</div>
+<!-- Fin Présentation video -->
+
+<!-- Cars related -->
+{% if cars_related %}
+    <div class="car-detail-card" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3 class="car-detail-section-title" style="margin: 0;">Vous aimerez peut-être aussi </h3>
+        </div>
+          
+        <div class="row g-4">
+            {% for car in cars_related %}
+                <div class="col-sm-4 col-xl-3">
+                    <div class="car-card">
+                            <!-- Wishlist Button -->
+                            {% if request.user.is_authenticated %}  
+                                <button type="button" onclick="toggleWishlist(this, {{ car.id }})" class="wishlist-btn {% if car.id in user_wishlist_ids %} active {% endif %}" aria-label="Ajouter aux favoris" title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                    <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                                    <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+                                </button>
+                            {% endif %}
+                            <!-- Image -->
+                            <div class="car-card__img">
+                                <a href="{% url 'car' car.agence.slug car.id %}">
+                                    {% if car.main_image %}
+                                        <div class="position-relative w-100 h-100">
+                                            <img src="{{ car.main_image.image.url }}"
+                                                class="secondary-car-image"
+                                                data-full-image="{{ car.main_image.image.url }}"
+                                                onclick="changeMainImage(this); return false;"
+                                                style="width: 100%;
+                                                        height: 100%;
+                                                        object-fit: cover;
+                                                        cursor: pointer;
+                                                        display: block;">
+
+                                            <!-- PROMO - Bottom Left -->
+                                            {% if car.est_en_promotion_valide %}
+                                                <a href="{% url 'car_promotion' car.agence.slug car.id %}">
+                                                    <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
+                                                        PROMO {{ car.prix_promo|intcomma }} Million
+                                                    </div>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-car fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                         <!-- Edit/Delete buttons for manager or superuser -->
+                            {% if request.user.is_superuser or car.agence.manager == request.user %}
+                                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                                        <a href="{% url 'car_update' car.agence.slug car.id %}" class="btn btn-primary btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'car_delete' car.agence.slug car.id %}" class="btn btn-danger btn-sm" style="padding: 5px 8px; font-size: 0.7rem;">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                </div>
+                            {% endif %}
+                            <!-- Body -->
+                            <div class="car-card__body">
+                                <div class="car-card__brand">{{ car.marque }}</div>
+                                <div class="car-card__title">{{ car.modele }} {{ car.annee }}</div>
+                                <div class="car-card__meta">
+                                    <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ car.get_energie_display }}</span>
+                                    <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ car.get_boite_de_vitesse_display }}</span>
+                                    <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ car.kilometrage|intcomma }} km</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="car-card__price">{{ car.prix_actuel|intcomma }} Million</span>
+                                        {% if car.prix_ancien %}
+                                            <span class="car-card__price-old">{{ car.prix_ancien|intcomma }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'car' car.agence.slug car.id %}"
+                                    class="btn btn-primary btn-sm rounded-pill px-3">
+                                        Voir
+                                    </a>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <!-- <i class="fas fa-map-marker-alt me-1"></i> -->
+                                        <i class="fas fa-store me-1"></i>
+                                        <a href="{% url 'agence' car.agence.slug %}">{{ car.agence.nom }}</a> — {{ car.agence.ville }}
+                                    </small>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav class="mt-5">
+                    <ul class="pagination justify-content-center gap-1">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                            <a class="page-link rounded-pill" href="?page={{ i }}&{{ request.GET.urlencode }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+            </nav>
+        {% endif %}
+
+    </div>
+{% endif %}
+<!-- / ── Car related ── -->
+
+
+
+<script>
+
+/* CSRF */
+function getCSRFToken() {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+/* wishlist */
+function updateBadge(count) {
+
+    const badge = document.getElementById("wishlist-count");
+
+    if (!badge) return;
+
+    badge.textContent = count;
+
+    if (count > 0) {
+        badge.classList.remove("d-none");
+    } else {
+        badge.classList.add("d-none");
+    }
+}
+function toggleWishlist(btn, carId) {
+
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    fetch(`/wishlist/toggle/${carId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (!data.success) return;
+
+        const icon = btn.querySelector("i");
+
+        if (data.in_wishlist) {
+            btn.classList.add("active");
+            icon.classList.remove("far");
+            icon.classList.add("fas");
+        } else {
+            btn.classList.remove("active");
+            icon.classList.remove("fas");
+            icon.classList.add("far");
+        }
+
+        updateBadge(data.wishlist_count);
+    }
+)
+    .catch(console.error)
+    .finally(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+    });
+}
+
+</script>
+
+<script>
+
+function changeMainImage(image) {
+
+    const mainImage = document.getElementById("mainCarImage");
+
+    if (!mainImage) {
+        console.log("Image principale introuvable");
+        return;
+    }
+
+    // Changer immédiatement l'image
+    mainImage.style.opacity = "0";
+
+    setTimeout(() => {
+        mainImage.src = image.src;
+        mainImage.style.opacity = "1";
+    }, 200);
+
+    // Mettre à jour la bordure active
+    document.querySelectorAll(".secondary-car-image").forEach(img => {
+        img.parentElement.style.borderColor = "transparent";
+    });
+
+    image.parentElement.style.borderColor = "var(--accent)";
+}
+
+
+</script>
+
+{% endblock %}

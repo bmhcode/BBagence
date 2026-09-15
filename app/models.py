@@ -98,13 +98,14 @@ class Agence(models.Model):
     # ── Google Map ──
     google_map = models.URLField(max_length=1000, blank=True, verbose_name="Google Map URL")
 
-    est_valide= models.BooleanField(default=False)
-    date_debut_validite = models.DateField(null=True, blank=True)
-    nombre_jours_validite = models.IntegerField(default=30)
+    date_debut_abonnement = models.DateField(null=True, blank=True)
+    nombre_jours_abonnement = models.IntegerField(default=30)
+    
+    est_bloquee = models.BooleanField(default=True)
+    cause_blocage = models.CharField(max_length=200, null=True, blank=True, help_text="Ex: Non respect des règles")
     
     est_en_vedette = models.BooleanField(default=False)
 
-    
     # ── Date ──    
     cree_le = models.DateTimeField(auto_now_add=True)
     modifie_le = models.DateTimeField(auto_now=True)
@@ -155,7 +156,6 @@ class Agence(models.Model):
     def other_videos(self):
         return self.videos.exclude(is_main=True)
 
-
     @property
     def localisation(self):
         if self.ville and self.commune:
@@ -164,7 +164,7 @@ class Agence(models.Model):
             return f"{self.ville} - {self.emplacement}"
         elif self.commune:
             return f"{self.commune} - {self.emplacement}"
-        return self.emplacement or "No location"
+        return self.emplacement or "Pas de localisation"
 
     @property
     def est_ouvert_maintenant(self):
@@ -200,18 +200,14 @@ class AgenceImages(models.Model):
     is_main = models.BooleanField(default=False)
         
     order = models.PositiveIntegerField(default=0) 
-       
+
     cree_le = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Image for {self.agence.nom}"
 
 class AgenceVideos(models.Model):
-    agence = models.ForeignKey(
-        Agence,
-        on_delete=models.CASCADE,
-        related_name='videos'
-    )
+    agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='videos')
     video = models.FileField(upload_to='agence/videos/')
     legende = models.CharField(max_length=200, blank=True)
     is_main = models.BooleanField(default=False)
@@ -222,7 +218,6 @@ class AgenceVideos(models.Model):
 
     def __str__(self):
         return f"Video for {self.agence.nom}"
-
 
 class AgenceSocial(models.Model):
     agence = models.OneToOneField(Agence, on_delete=models.CASCADE, related_name='social')
@@ -456,18 +451,20 @@ class Car(models.Model):
         #         if qs.exists():
         #             raise ValidationError("Cette agence a déjà une promotion active. Une seule promotion est autorisée par agence.")
     
+
 class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="cars/gallery/")
     legende = models.CharField(max_length=200, blank=True)
-
-    cree_le = models.DateTimeField(auto_now_add=True)
+    is_main = models.BooleanField(default=False)
 
     order = models.PositiveIntegerField(default=0) 
 
+    cree_le = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         verbose_name_plural = "Images des voitures" 
-        ordering = ['order', 'cree_le']
+        ordering = ['-is_main', '-cree_le']
 
     def __str__(self):
         return f"Image de {self.car.marque} {self.car.modele} - {self.id}"
@@ -479,6 +476,10 @@ class CarImages(models.Model):
         except:
             url = ''
         return url
+
+    @property
+    def main_image(self):
+        return self.images.filter(is_main=True).first()
 
 #============== End Car ==============
 

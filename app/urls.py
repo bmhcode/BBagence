@@ -47,15 +47,19 @@ urlpatterns = [
     path('agence/<slug:agence_slug>/car/<int:car_id>/delete/', views.CarDeleteView.as_view(), name='car_delete'),
 
     # Car images (AJAX / Actions)
-    path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/delete/', views.car_image_delete, name='car_image_delete'),
-    path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/set-main/', views.car_image_set_main, name='car_image_set_main'),
-
-
+   # Car images
+   path(
+    'agence/<slug:agence_slug>/car/<int:car_id>/images/add/',
+    views.car_images_add,
+    name='car_images_add'
+),
+path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/set-main/',views.car_image_set_main,name='car_image_set_main'),
+path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/edit/',
+    views.car_image_edit, name='car_image_edit'),
+path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/delete/',views.car_image_delete,name='car_image_delete'),
     # =========================== Agence Media Manage ======================
     path('agence/<slug:agence_slug>/cars/', views.AgenceCarListView.as_view(), name='agence_car_list'),
     path('agence/<slug:agence_slug>/presentation/manage/', views.AgencePresentationManageView.as_view(), name='agence_presentation_manage'),
-    path('agence/image/<int:pk>/delete/', views.AgenceImageDeleteView.as_view(), name='agence_image_delete'),
-    path('agence/video/<int:pk>/delete/', views.AgenceVideoDeleteView.as_view(), name='agence_video_delete'),
     path('agence/<slug:agence_slug>/presentation/', views.AgencePresentationView.as_view(), name='agence_presentation'),
     path('agence/<slug:agence_slug>/localisation-acces/', views.AgenceLocalisationAccesView.as_view(), name='agence_localisation_acces'),
     
@@ -70,9 +74,6 @@ urlpatterns = [
     path('agence/<slug:agence_slug>/car/<int:car_id>/promotion/', views.CarPromotionView.as_view(), name='car_promotion'),
     path('agence/<slug:agence_slug>/promotion/<int:pk>/update/', views.PromotionUpdateView.as_view(), name='promotion_update'),
 
-
-
-
     path('blog/', views.ArticleBlogListView.as_view(), name='blog_list'),
     path('blog/create/', views.ArticleBlogCreateView.as_view(), name='blog_create'),
     path('blog/<int:pk>/update/', views.ArticleBlogUpdateView.as_view(), name='blog_update'),
@@ -85,47 +86,17 @@ urlpatterns = [
 
     path("agence/<slug:agence_slug>/photos/", views.agence_photos, name="agence_photos" ),
 
-path(
-    'agence/<slug:agence_slug>/image/<int:pk>/edit/',
-    views.agence_image_edit,
-    name='agence_image_edit'
-),    
+    path('agence/<slug:agence_slug>/image/<int:pk>/set-main/',views.agence_image_set_main,name='agence_image_set_main'),
+    path('agence/<slug:agence_slug>/image/<int:pk>/edit/',views.agence_image_edit,name='agence_image_edit'),    
+    path('agence/image/<int:pk>/delete/', views.AgenceImageDeleteView.as_view(), name='agence_image_delete'),
 
 
-path(
-    'agence/<slug:agence_slug>/image/<int:pk>/set-main/',
-    views.agence_image_set_main,
-    name='agence_image_set_main'
-),
-
-path(
-    'agence/<slug:agence_slug>/video/ajouter/',
-    views.AgenceVideoCreateView.as_view(),
-    name='agence_video_add'
-),
-
-path(
-    'agence/<slug:agence_slug>/video/<int:pk>/main/',
-    views.agence_video_set_main,
-    name='agence_video_set_main'
-),
-
-
-path(
-    'agence/<slug:agence_slug>/video/<int:pk>/edit/',
-    views.agence_video_edit,
-    name='agence_video_edit'
-),
-
-path('agence/<slug:agence_slug>/video/<int:pk>/edit/', 
-    views.agence_video_update,  
-    name='agence_video_update'),
-
-path(
-    'agence/<slug:agence_slug>/video/<int:pk>/delete/',
-    views.agence_video_delete,
-    name='agence_video_delete'
-),
+    path('agence/video/<int:pk>/delete/', views.AgenceVideoDeleteView.as_view(), name='agence_video_delete'),
+    path('agence/<slug:agence_slug>/video/<int:pk>/main/',views.agence_video_set_main,name='agence_video_set_main'),
+    path('agence/<slug:agence_slug>/video/ajouter/',views.AgenceVideoCreateView.as_view(),name='agence_video_add'),
+    path('agence/<slug:agence_slug>/video/<int:pk>/edit/',views.agence_video_edit,name='agence_video_edit'),
+    path('agence/<slug:agence_slug>/video/<int:pk>/edit/',views.agence_video_update,name='agence_video_update'),
+    path('agence/<slug:agence_slug>/video/<int:pk>/delete/',views.agence_video_delete,name='agence_video_delete'),
 
 
 

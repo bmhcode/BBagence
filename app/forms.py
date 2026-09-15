@@ -160,7 +160,8 @@ class AgenceForm(forms.ModelForm):
             'nom', 'description', 'manager','telephone', 'site_web', 
             'email', 'ville', 'commune', 'emplacement', 'google_map', 
             'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation',
-            'est_valide', 'date_debut_validite', 'nombre_jours_validite', 
+            'date_debut_abonnement', 'nombre_jours_abonnement', 
+            'est_bloquee', 'cause_blocage',
             'est_en_vedette',
         ]
         widgets = {
@@ -184,9 +185,11 @@ class AgenceForm(forms.ModelForm):
             'est_ferme': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'observation': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             
-            'est_valide': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'date_debut_validite': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'nombre_jours_validite': forms.NumberInput(attrs={'class': 'form-control'}),
+            'date_debut_abonnement': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
+            'nombre_jours_abonnement': forms.NumberInput(attrs={'class': 'form-control'}),
+            
+            'est_bloquee': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'cause_blocage': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             
             'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -203,14 +206,6 @@ class AgenceSocialForm(forms.ModelForm):
             'whatsapp': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'WhatsApp Link/Number'}),
             'telegram': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Telegram Link'}),
             'youtube': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'YouTube URL'}),
-        }
-
-class AgencePresentationForm(forms.ModelForm):
-    class Meta:
-        model = Agence
-        fields = ['google_map']
-        widgets = {
-            'google_map': forms.URLInput(attrs={'placeholder': 'Ex : https://www.google.com/maps/embed?pb=...'}),
         }
 
 class AgenceImageForm(forms.ModelForm):
@@ -231,11 +226,7 @@ class AgenceVideoForm(forms.ModelForm):
             'legende': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Légende de la vidéo'}),
         }
 
-
-
-
-
-
+# ====================== / Agence forms ====================== #
 
 class ContactForm(forms.ModelForm):
     class Meta:
@@ -284,8 +275,6 @@ class PromotionForm(forms.ModelForm):
         self.fields['date_debut_promo'].input_formats = ['%Y-%m-%d']
         self.fields['date_fin_promo'].input_formats = ['%Y-%m-%d']
 
-# ===================== / Agence forms =================== #
-
 class BrandForm(forms.ModelForm):
     class Meta:
         model = Brand
@@ -297,8 +286,6 @@ class BrandForm(forms.ModelForm):
             'date_fin': forms.DateTimeInput(attrs={'class': 'form-input', 'type': 'datetime-local'}),
             'afficher': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-
-# ===================== Events forms ===================== # 
 
 class EvenementForm(forms.ModelForm):
     class Meta:
@@ -315,10 +302,6 @@ class EvenementForm(forms.ModelForm):
 
         }
 
-# ===================== /Events forms ===================== # 
-
-# ===================== Blog forms ======================== # 
-
 class ArticleBlogForm(forms.ModelForm):
     class Meta:
         model = ArticleBlog
@@ -332,4 +315,3 @@ class ArticleBlogForm(forms.ModelForm):
             'afficher': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-# ===================== / Blog forms ======================= #   

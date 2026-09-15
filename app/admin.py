@@ -11,8 +11,11 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Agence)
 class AgenceAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'manager','ville','est_valide','date_debut_validite','nombre_jours_validite','est_en_vedette')
-    list_filter = ('manager','ville','est_en_vedette')
+    list_display = ('nom', 'manager','ville',
+                    'date_debut_abonnement','nombre_jours_abonnement',
+                    'est_bloquee','cause_blocage','est_en_vedette',)
+                    
+    list_filter = ('manager','ville','est_en_vedette','est_bloquee')
     search_fields = ('nom', 'description')
     prepopulated_fields = {'slug': ('nom',)}
 

@@ -26,6 +26,7 @@
     {% block extra_css %}{% endblock %}
 
 </head>
+
 <body>
 
 
@@ -33,16 +34,13 @@
      NAVBAR
 ========================================= -->
 
-<nav id="ym-navbar" class="navbar navbar-expand-lg navbar-custom sticky-top">
+<nav class="navbar navbar-expand-lg main-navbar sticky-top">
     <div class="container-xxl-custom d-flex flex-nowrap align-items-center">
 
         <!-- LOGO -->
-        <a class="navbar-brand footer-brand" 
-        style="color: #fcc52b; font-size: 25px; font-weight: 700;" href="{% url 'home' %}">
-
+        <a class="navbar-brand" href="{% url 'home' %}">
             <i class="fas fa-car me-2"></i>
             BB<span>car</span>
-
         </a>
 
         <!-- MOBILE BUTTON -->
@@ -69,7 +67,7 @@
                         Accueil
                     </a>
                 </li> -->
-<!--  -->
+<!-- Agences -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'agence_list' %}active{% endif %}"
                        href="{% url 'agence_list' %}">
@@ -77,7 +75,7 @@
                         Agences
                     </a>
                 </li>
-<!-- Voitures -->
+<!--Voitures -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'car_list' %}active{% endif %}"
                        href="{% url 'car_list' %}">
@@ -94,21 +92,21 @@
                     </a>
                 </li>
 <!-- Evénements -->
-                <!-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'evenement_list' %}active{% endif %}"
                        href="{% url 'evenement_list' %}">
                         <i class="fas fa-calendar-alt me-1"></i>
                         Événements
                     </a>
-                </li> -->
+                </li>
 <!-- Blog -->
-                <!-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}"
                        href="{% url 'blog_list' %}">
                         <i class="fas fa-newspaper me-1"></i>
                         Blog
                     </a>
-                </li> -->
+                </li>
 <!-- Contact -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
@@ -266,6 +264,7 @@
             </div>
         </div>
     </div>
+    
 </nav>
 
 <!-- =========================================
