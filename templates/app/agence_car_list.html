@@ -202,6 +202,7 @@
 <div class="row mb-3">
     <div class="col-12">
         <!-- <h1 class="display-6 text-center mb-3">{{agence.nom}}</h1> -->
+        <p class="text-center text-muted col-md-8 mx-auto">Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.</p>
         <p class="text-center mb-4">
              <span><i class="fas fa-map-marker-alt"></i> 
                 <small> <a href="{% url 'agence_localisation_acces' agence.slug %}">{{ agence.ville }}</a> {% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%} - {{agence.adresse}} - </small>
@@ -214,7 +215,6 @@
             <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
             {% endif %}
         </div> -->
-        <p class="text-center text-muted col-md-8 mx-auto">Découvrez notre gamme variée de marques et de modèles et trouvez le véhicule de votre choix.</p>
     </div>
 </div>
 
@@ -300,13 +300,6 @@
                             {% endif %}
 
 
-
-
-                            
-
-
-
-
                             <!-- Body -->
                             <div class="car-card__body">
                                 <small class="text-uppercase fw-bold text-danger d-block" style="font-size:.7rem; letter-spacing:.06em;">{{ object.marque }}</small>
@@ -347,6 +340,7 @@
                 {% endif %}
             </div>
         {% endif %}
+        
 </div>
 <!-- /Tous les véhicules neuves /  -->
 

@@ -691,7 +691,7 @@ class CarCreateView(AgenceManagerRequiredMixin, CreateView):
         )
 
         return redirect(
-            "agence_carlist",
+            "agence_car_list",
             agence_slug=agence.slug,
         )
 
@@ -1338,7 +1338,6 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
             }
         )
 
-
 # =========================================
 # Agence image et sa légende
 # =========================================
@@ -1416,7 +1415,6 @@ def agence_image_set_main(request, agence_slug, pk):
         agence_slug=agence_slug
     )        
 
-
 class AgenceImageDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         image = get_object_or_404(AgenceImages, pk=pk)
@@ -1426,7 +1424,6 @@ class AgenceImageDeleteView(LoginRequiredMixin, View):
         image.delete()
         messages.success(request, "Image supprimée.")
         return redirect('agence', agence_slug=agence.slug)
-
 
 # ============================================================================
 #   Agence vidéo et sa légende
@@ -1464,15 +1461,15 @@ class AgenceVideoCreateView(LoginRequiredMixin, CreateView):
                 agence_slug=agence.slug
             )
 
-        # Vérifier la capacité totale (30 Mo) avant d'associer la vidéo
-        max_total = 30 * 1024 * 1024  # 30 Mo
+        # Vérifier la capacité totale (100 Mo) avant d'associer la vidéo
+        max_total = 100 * 1024 * 1024  # 100 Mo
         current_images_size = sum(img.image.size for img in AgenceImages.objects.filter(agence=agence))
         current_videos_size = sum(vid.video.size for vid in AgenceVideos.objects.filter(agence=agence))
         current_total = current_images_size + current_videos_size
         new_video = form.cleaned_data.get('video')
         new_video_size = new_video.size if new_video else 0
         if current_total + new_video_size > max_total:
-            messages.error(self.request, "La vidéo dépasse la capacité totale de 30 Mo pour cette agence.")
+            messages.error(self.request, "La vidéo dépasse la capacité totale de 100 Mo pour cette agence.")
             return redirect('agence', agence_slug=agence.slug)
 
         # Associer la vidéo à l'agence
