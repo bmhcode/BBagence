@@ -88,11 +88,13 @@
             {% if request.user.is_authenticated %}
                 <button
                     type="button"
-                    class="wishlist-btn position-absolute top-0 end-0 m-3
-                        {% if car.id in user_wishlist_ids %}active{% endif %}"
+                    class="btn btn-primary btn-sm rounded-circle position-absolute top-0 end-0 m-3
+                        {% if car.id in user_wishlist_ids %} active {% endif %}"
                     onclick="toggleWishlist(this, {{ car.id }})"
-                    aria-label="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
-                    title="{% if car.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
+                    data-car-id="{{ car.id }}"
+                    aria-label="{% if car.id in user_wishlist_ids %} Retirer des favoris {% else %} Ajouter aux favoris {% endif %}"
+                    title="{% if car.id in user_wishlist_ids %} Retirer des favoris {% else %} Ajouter aux favoris {% endif %}"
+                    aria-pressed="{% if car.id in user_wishlist_ids %}true{% else %}false{% endif %}"
                     style="z-index: 10;"
                 >
                     <i class="{% if car.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
@@ -1793,9 +1795,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- / Bmh photo -->
 
-
-
-
 <!-- Présentation video -->
  <div class="container">
 {% if car.video %}   
@@ -1811,7 +1810,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
-                <div class="video-card">
+        <div class="video-card">
                     <div class="video-container">
                         <video controls>
                             <source src="{{ car.video.url }}" type="video/mp4">
@@ -1828,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             {% endif %}
                         </h4>
                     </div>
-                </div>
+        </div>
     </div>
 {% endif %}
 </div>

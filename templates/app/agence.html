@@ -350,9 +350,20 @@
     <div class="agency-hero__overlay"></div>
     <div class="agency-hero__content">
         <h1 class="agency-hero__title">{{ agence.nom }}</h1>
-        <p class="agency-hero__subtitle">
+        <!-- <p class="agency-hero__subtitle">
             {{ agence.ville }} {% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%}
-        </p>
+        
+        </p> -->
+
+<!-- Localisation -->
+            <div class="agency-hero__subtitle">
+                <a href="{% url 'agence_localisation_acces' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="fas fa-map-marked-alt me-2"></i>                                
+                    <small> {{ agence.ville }}{% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%}</small>
+                </a>
+            </div>
+
+
         
         <div class="d-flex justify-content-center gap-3 mt-4">
             <a href="{% url 'agence_car_list'  agence.slug %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="font-size: 1.1rem;">
@@ -456,12 +467,12 @@
             {% endif %}
 
             <!-- Localisation -->
-            <div class="info-bar-item">
+            <!-- <div class="info-bar-item">
                 <a href="{% url 'agence_localisation_acces' agence.slug %}" class="btn btn-outline-primary rounded-pill px-4">
                     <i class="fas fa-map-marked-alt me-2"></i>                                
                     <small> {{ agence.ville }}{% if agence.ville != agence.commune%} - {{agence.commune}} {%endif%}</small>
                 </a>
-            </div>
+            </div> -->
 
         </div>
     </div>
@@ -2091,6 +2102,8 @@ LOCALISATION ET ACCES
                 <p style="color: var(--color-muted); font-size: 1rem; display: flex; align-items: center; gap: 10px; line-height: 1.5; justify-content: center;">
                     <i class="fas fa-map-marker-alt" style="color: var(--color-pink);"></i>
                     <span>{{ agence.ville|default:"" }}{% if agence.commune %}, {{ agence.commune }}{% endif %}{% if agence.adresse %}, {{ agence.adresse }}{% endif %}</span>
+                
+                
                 </p>
                 <p style="color: var(--color-muted); font-size: 1.05rem; margin-top: 0px;">Comment vous rendre dans notre agence</p>
                 <div style="width: 60px; height: 3px; background: var(--color-pink); margin: 8px auto 0;"></div>
