@@ -41,16 +41,16 @@ class Subscription(models.Model):
         ('BUSINESS', 'Business'),
     )
 
-    PLAN_LIMITS = {
-        'FREE': 3,
-        'PRO': 5,
+    PLAN_MAX_VOITURE = {
+        'FREE': 10,
+        'PRO': 20,
         'BUSINESS': None,  # None = Unlimited
     }
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscription')
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='FREE')
 
-    def max_products(self):
-        return self.PLAN_LIMITS.get(self.plan)
+    def nombre_maximal_voitures(self):
+        return self.PLAN_MAX_VOITURE.get(self.plan)
 
     def __str__(self):
         return f"{self.user.username} - {self.plan}"
@@ -101,24 +101,26 @@ class Agence(models.Model):
     date_debut_abonnement = models.DateField(null=True, blank=True)
     nombre_jours_abonnement = models.IntegerField(default=30)
     
-    est_bloquee = models.BooleanField(default=True)
-    cause_blocage = models.CharField(max_length=200, null=True, blank=True, help_text="Ex: Non respect des règles")
-    
-    est_en_vedette = models.BooleanField(default=False)
 
     # ── Date ──    
     cree_le = models.DateTimeField(auto_now_add=True)
     modifie_le = models.DateTimeField(auto_now=True)
     date_ouverture = models.DateField(blank=True, null=True, verbose_name="date d'ouverture (si future)")
 
-    # ── Horaire ──
+    # ── Horaire & Fermeture ──
     heure_ouverture = models.TimeField(null=True, blank=True)
     heure_fermeture = models.TimeField(null=True, blank=True)
 
-    # ── Fermeture ──
-    est_ferme = models.BooleanField(default=False, verbose_name="fermée ?")
-    observation = models.TextField(blank=True, verbose_name="Observation") # En cas de fermeture ou autre
+    fermeture_temporaire = models.BooleanField(default=False, verbose_name="Fermeture temporaire ?") # L'agence est fermée temporairement par le manager
+    motif_fermeture = models.TextField(blank=True, verbose_name="Motif et observation en cas de fermeture") # En cas de fermeture ou autre
 
+    est_en_service = models.BooleanField(default=False) # Activation de l'agence par le manager
+
+    est_suspendue = models.BooleanField(default=False) # Bloquer l'agence par l'admin
+    motif_suspension = models.CharField(max_length=200, null=True, blank=True, help_text="Ex: Non respect des règles")
+    
+    est_en_vedette = models.BooleanField(default=False)
+    
     class Meta:
         verbose_name = "Agence"
         verbose_name_plural = "Agences"
@@ -168,7 +170,7 @@ class Agence(models.Model):
 
     @property
     def est_ouvert_maintenant(self):
-        if self.est_ferme:
+        if self.fermeture_temporaire:
             return False
 
         if not self.heure_ouverture or not self.heure_fermeture:
@@ -185,8 +187,8 @@ class Agence(models.Model):
         )
 
     def get_ouvert_ferme_display(self):
-        if self.est_ferme:
-            return "Fermée"
+        if self.fermeture_temporaire:
+            return "Fermée Temporairement"
 
         if not self.heure_ouverture or not self.heure_fermeture:
             return "Horaires inconnus"
@@ -228,27 +230,7 @@ class AgenceSocial(models.Model):
     whatsapp = models.URLField(blank=True)
     telegram = models.URLField(blank=True)
     youtube = models.URLField(blank=True)
-   
-class AgenceValidation(models.Model):
-    PERIOD_CHOICES = [
-        (30, '1 Month'),
-        (90, '3 Months'),
-        (180, '6 Months'),
-        (365, '1 Year'),
-    ]
-    agence = models.OneToOneField(Agence, on_delete=models.CASCADE, related_name='validation')
-    is_validated = models.BooleanField(default=False)
-    observation = models.TextField(blank=True, verbose_name="Observation")
-
-    date_debut = models.DateField(null=True, blank=True,verbose_name=_("Start date"))
-    periode = models.IntegerField(choices=PERIOD_CHOICES, null=True, blank=True,verbose_name=_("Period"))
-
-    def is_active(self):
-        if self.date_debut and self.periode:
-            from datetime import timedelta
-            return self.date_debut + timedelta(days=self.periode)
-        return None    
-
+  
 class AgenceReview(models.Model): # Agence Review 
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -439,8 +421,6 @@ class Car(models.Model):
             and self.date_debut_publication_promo
             and self.date_debut_publication_promo <= timezone.now().date(),
         )      
-
-
         # def clean(self):
         #     super().clean()
         #     from django.core.exceptions import ValidationError

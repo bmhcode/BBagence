@@ -106,19 +106,7 @@
                                 </button>
                             </li>
 
-                            <!-- Localisation -->
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link"
-                                        id="localisation-tab"
-                                        data-bs-toggle="tab"
-                                        data-bs-target="#localisation"
-                                        type="button"
-                                        role="tab">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Localisation</span>
-                                </button>
-                            </li>
-
+                           
                            <!-- Réseaux sociaux : uniquement en modification -->
                             {% if object %}
                             <li class="nav-item" role="presentation">
@@ -134,20 +122,30 @@
                             </li>
                             {% endif %}
 
+                                <!-- Configuration manager-->
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link"
+                                            id="configuration_manager-tab"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#configuration_manager"
+                                            type="button"
+                                            role="tab">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Configuration manager</span>
+                                    </button>
+                                </li>
 
-
-                            
                             {% if request.user.is_superuser %}
                                 <!-- Configuration -->
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link"
-                                            id="configuration-tab"
+                                            id="configuration_admin-tab"
                                             data-bs-toggle="tab"
-                                            data-bs-target="#configuration"
+                                            data-bs-target="#configuration_admin"
                                             type="button"
                                             role="tab">
                                         <i class="fas fa-cog"></i>
-                                        <span>Configuration</span>
+                                        <span>Configuration admin</span>
                                     </button>
                                 </li>
                             {% endif %}
@@ -271,6 +269,30 @@
                                             {{ form.emplacement }}
                                         </div>
 
+                                            <div class="form-section">
+
+                                    <div class="form-section-title">
+                                       
+                                        <label class="form-label fw-semibold">
+                                             <i class="fas fa-map-marked-alt"></i> Localisation : URL Embed Google Maps
+                                        </label>
+                                     
+                                    </div>
+
+
+                                    {{ form.google_map }}
+
+                                    <div class="alert alert-light border mt-3 mb-0">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>
+
+                                        Exemple :
+                                        <code>
+                                            https://www.google.com/maps/embed?pb=...
+                                        </code>
+                                    </div>
+
+                                </div>
+
                                     </div>
 
                                 </div>
@@ -312,35 +334,8 @@
                                             </label>
                                             {{ form.heure_fermeture }}
                                         </div>
-
-                                        <div class="col-md-2 d-flex align-items-end">
-
-                                            <div class="form-check form-switch mb-2">
-                                                {{ form.est_ferme }}
-
-                                                <label class="form-check-label fw-semibold"
-                                                    for="{{ form.est_ferme.id_for_label }}">
-                                                    Fermée
-                                                </label>
-                                            </div>
-
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label fw-semibold">
-                                                Observation
-                                            </label>
-
-                                            {{ form.observation }}
-
-                                            <div class="form-text">
-                                                Exemple : fermeture exceptionnelle,
-                                                congés, travaux...
-                                            </div>
-                                        </div>
-
                                     </div>
-
+                                   
                                 </div>
                             </div>
                             <!-- =========================
@@ -350,35 +345,7 @@
                                 id="localisation"
                                 role="tabpanel">
 
-                                <div class="form-section">
-
-                                    <div class="form-section-title">
-                                        <div class="section-icon">
-                                            <i class="fas fa-map-marked-alt"></i>
-                                        </div>
-
-                                        <div>
-                                            <!-- <h5>Localisation</h5> -->
-                                            <p>Ajoutez la localisation Google Maps</p>
-                                        </div>
-                                    </div>
-
-                                    <label class="form-label fw-semibold">
-                                        URL Embed Google Maps
-                                    </label>
-
-                                    {{ form.google_map }}
-
-                                    <div class="alert alert-light border mt-3 mb-0">
-                                        <i class="fas fa-info-circle text-primary me-2"></i>
-
-                                        Exemple :
-                                        <code>
-                                            https://www.google.com/maps/embed?pb=...
-                                        </code>
-                                    </div>
-
-                                </div>
+                            
                             </div>
 
                             <!-- =========================
@@ -444,12 +411,11 @@
                             <!-- {% endif %} -->
 
 
-                            
-                             <!-- =========================
-                                ONGLET CONFIGURATION
+                            <!-- =========================
+                                ONGLET CONFIGURATION MANAGER
                             ========================== -->
                             <div class="tab-pane fade"
-                                id="configuration"
+                                id="configuration_manager"
                                 role="tabpanel">
 
                                 <div class="form-section">
@@ -460,7 +426,49 @@
 
                                         <div>
                                             <!-- <h5>Configuration</h5> -->
-                                            <p>Configuration agence</p>
+                                            <p>Configuration manager</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                        
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Est en service ?
+                                            </label>
+                                            {{ form.est_en_service }}
+                                        </div>                                     
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
+                                                Est en vedette ? 
+                                            </label>
+                                            {{ form.est_en_vedette }}
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                             <!-- =========================
+                                ONGLET CONFIGURATION ADMIN
+                            ========================== -->
+                            <div class="tab-pane fade"
+                                id="configuration_admin"
+                                role="tabpanel">
+
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <div class="section-icon">
+                                            <i class="fas fa-address-book"></i>
+                                        </div>
+
+                                        <div>
+                                            <!-- <h5>Configuration</h5> -->
+                                            <p>Configuration admin</p>
                                         </div>
                                     </div>
 
@@ -479,12 +487,7 @@
                                             {% endif %}
                                         </div>
 
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">
-                                                Est en vedette ? 
-                                            </label>
-                                            {{ form.est_en_vedette }}
-                                        </div>
+
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">
@@ -492,32 +495,34 @@
                                             </label>
                                             {{ form.date_debut_abonnement }}
                                         </div>
-                                        
+
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">
                                                 Nombre de jours d'abonnement
                                             </label>
                                             {{ form.nombre_jours_abonnement }}
                                         </div>
-                                        
+
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">
-                                                Est Bloqué ?
+                                                Est suspendue ?
                                             </label>
-                                            {{ form.est_bloquee }}
+                                            {{ form.est_suspendue }}
                                         </div>
                                         
                                         <div class="col-md-9">
                                             <label class="form-label fw-semibold">
-                                                Cause de blocage
+                                                Motif de suspension
                                             </label>
-                                            {{ form.cause_blocage }}
+                                            {{ form.motif_suspension }}
                                         </div>
                                         
 
                                     </div>
                                 </div>
                             </div>
+
+
                         </div>
 
                         <!-- BOUTONS -->

@@ -186,10 +186,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             <h5 class="card-title">{{ object.nom }}</h5>
                             <!-- <span class="badge bg-light text-dark">{{ object.get_categorie_display }}</span> -->
                             
-                            {% if not object.est_bloquee %}
-                            <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
+                            {% if object.est_en_service %}
+                                <a href="{{ object.get_absolute_url }}" class="btn btn-outline-primary btn-sm">Visiter</a>
                             {% else %}
-                            <a href="{{ object.get_absolute_url }}" class="btn btn-outline-danger btn-sm">bloquée</a>
+                                <a href="#" class="btn btn-outline-danger btn-sm">Hors service</a>
                             {% endif %}
                        
                         </div>

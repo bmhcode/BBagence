@@ -14,8 +14,14 @@
         <nav class="" style="margin-bottom: 14px; font-size: 0.85rem; color: rgba(19, 22, 33, 0.7);">
             <a href="{% url 'home' %}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">Accueil</a>
             <span style="margin: 0 8px; opacity: 0.5;">/</span>
-            <a href="{{ agence.get_absolute_url }}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence.nom }}</a>
-            <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            {% if agence.est_en_service %}
+                <a href="{{ agence.get_absolute_url }}" style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence.nom }}</a>
+                <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            {% else %}
+                <span style="color: var(--color-pink); text-decoration: none; transition: color var(--transition);">{{ agence.nom }}</span>
+                <span style="margin: 0 8px; opacity: 0.5;">/</span>
+            {% endif %}
+            
             <span style="color: rgba(19, 22, 33, 0.7); font-weight: 700;">Localisation & Accès</span>
         </nav>
     </div>

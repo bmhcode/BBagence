@@ -17,10 +17,9 @@ import json
 
 
 from .models import ( Agence, AgenceImages, AgenceVideos, AgenceSocial, Car, CarImages, 
-    Brand, Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
-from .forms import ( AgenceForm, AgenceImageForm, AgenceVideoForm,
-    SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, 
-    ArticleBlogForm,  AgenceSocialForm, ContactForm, PromotionForm)
+                    Brand, Evenement, ArticleBlog, ContactMessage, Wishlist, Profile)
+from .forms import ( AgenceForm, AgenceImageForm, AgenceVideoForm, SignupForm, UserForm, ProfileForm, CarForm, EvenementForm, 
+                    ArticleBlogForm,  AgenceSocialForm, ContactForm, PromotionForm)
 
 
 # =========================================
@@ -31,7 +30,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agences_vedette'] = Agence.objects.filter(est_bloquee=False, est_en_vedette=True)[:6]
+        context['agences_vedette'] = Agence.objects.filter(est_suspendue=False, est_en_vedette=True, est_en_service=True)[:6]
         context['brands'] = Brand.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['evenements_prochains'] = Evenement.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['articles_recent'] = ArticleBlog.objects.filter(afficher=True).order_by('date_debut_publication')[:3]
@@ -184,7 +183,7 @@ class AgenceListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         agence_nom = self.request.GET.get('agence_nom')
-        queryset = Agence.objects.all()
+        queryset = Agence.objects.filter(est_suspendue=False)
         if query:
             queryset = queryset.filter(
                 Q(nom__icontains=query) | Q(description__icontains=query)
@@ -196,6 +195,7 @@ class AgenceListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['noms'] = Agence.objects.values_list('nom', flat=True).distinct()
+        
         context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
         return context
 
@@ -1276,10 +1276,8 @@ class ContactView(CreateView):
     def get_initial(self):
         initial = super().get_initial()
         agence = self.get_agence()
-
         if agence:
             initial['agence'] = agence.id
-
         return initial
 
     def get_context_data(self, **kwargs):

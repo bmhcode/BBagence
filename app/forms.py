@@ -159,10 +159,9 @@ class AgenceForm(forms.ModelForm):
         fields = [
             'nom', 'description', 'manager','telephone', 'site_web', 
             'email', 'ville', 'commune', 'emplacement', 'google_map', 
-            'heure_ouverture', 'heure_fermeture', 'est_ferme', 'observation',
             'date_debut_abonnement', 'nombre_jours_abonnement', 
-            'est_bloquee', 'cause_blocage',
-            'est_en_vedette',
+            'heure_ouverture', 'heure_fermeture', 'fermeture_temporaire', 'motif_fermeture',
+            'est_en_vedette', 'est_en_service', 'est_suspendue', 'motif_suspension',
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -182,16 +181,19 @@ class AgenceForm(forms.ModelForm):
             'heure_ouverture': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'heure_fermeture': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             
-            'est_ferme': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'observation': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'Fermeture_temporaire': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'Motif_fermeture': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             
             'date_debut_abonnement': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
             'nombre_jours_abonnement': forms.NumberInput(attrs={'class': 'form-control'}),
             
-            'est_bloquee': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'cause_blocage': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'est_en_service': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             
             'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            
+            'est_suspendue': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'motif_suspension': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            
         }
 
 class AgenceSocialForm(forms.ModelForm):

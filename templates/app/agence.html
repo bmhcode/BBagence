@@ -2236,87 +2236,14 @@ FIN LOCALISATION ET ACCES
 
     <!-- RIGHT COLUMN: CONTACT & MANAGER -->
     <div class="col-12">
-        <h3 class="agency-section-title">Contact & Infos</h3>
+        <h3 class="agency-section-title">Nous suivre</h3>
                 
         <div class="card shadow-sm border-0 mb-4 rounded-3">
             <div class="card-body p-4">
                 <div class="row align-items-center justify-content-between">
 
-                    {% if agence.email %}
-                    <div class="col-md-4 mb-4">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light rounded-circle p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 45px; height: 45px;">
-                                <i class="fas fa-envelope text-primary"></i>
-                            </div>
-
-                            <div>
-                                <small class="text-muted d-block fw-bold"
-                                    style="font-size: 0.75rem; text-transform: uppercase;">
-                                    Email
-                    </small>
-
-                    <a href="mailto:{{ agence.email }}"
-                    class="text-decoration-none fw-bold text-dark">
-                        {{ agence.email }}
-                    </a>
-                </div>
-            </div>
-                    </div>
-                    {% endif %}
-
-                    {% if agence.site_web %}
-                    <div class="col-md-4 mb-4">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light rounded-circle p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 45px; height: 45px;">
-                                <i class="fas fa-globe text-primary"></i>
-                            </div>
-
-                            <div>
-                                <small class="text-muted d-block fw-bold"
-                                    style="font-size: 0.75rem; text-transform: uppercase;">
-                                    Site Web
-                                </small>
-
-                                <a href="{{ agence.site_web }}"
-                                target="_blank"
-                                class="text-decoration-none fw-bold text-dark">
-                                    Visiter le site web
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if agence.heure_ouverture and agence.heure_fermeture %}
-                    <div class="col-md-4 mb-4">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light rounded-circle p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 45px; height: 45px;">
-                                <i class="fas fa-clock text-primary"></i>
-                            </div>
-
-                            <div>
-                                <small class="text-muted d-block fw-bold"
-                                    style="font-size: 0.75rem; text-transform: uppercase;">
-                                    Horaires d'ouverture
-                                </small>
-
-                                <span class="fw-bold text-dark">
-                                    {{ agence.get_ouvert_ferme_display }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                </div>
-                <div class="col-12">
-                        <!-- Réseaux sociaux -->
+                     <!-- Réseaux sociaux -->
                         {% if agence.social.facebook or agence.social.instagram or agence.social.twitter %}
-                        <hr class="my-4">
-                        <h6 class="fw-bold mb-3">Nous suivre</h6>
                         <div class="social-links d-flex flex-wrap gap-2">
                             {% if agence.social.facebook %}
                             <a href="{{ agence.social.facebook }}" class="social-btn" target="_blank" title="Facebook">
@@ -2335,7 +2262,7 @@ FIN LOCALISATION ET ACCES
                             {% endif %}
                         </div>
                         {% endif %}
-                </div>
+                
             </div>
         </div>
 
