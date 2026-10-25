@@ -32,7 +32,7 @@
             type="text"
             id="citySearch"
             class="form-control"
-            placeholder="Rechercher par ville ou nom d'agence..."
+            placeholder="Rechercher par ville, agence ou proprietaire..."
             autocomplete="off"
         >
 
@@ -58,15 +58,14 @@
     class="agence-card"
     data-city="{{ agence.ville|default:''|lower }}"
     data-name="{{ agence.nom|default:''|lower }}"
+    data-owner="{{ agence.manager|default:''|lower }}"
 >
     <!-- contenu de ton agence -->
 </div>
 
-
 <!-- =========================================================
      SCRIPT : RECHERCHE VILLE + NOM AGENCE
 ========================================================= -->
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -97,11 +96,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const city = normalizeText(card.dataset.city);
             const name = normalizeText(card.dataset.name);
+            const owner = normalizeText(card.dataset.owner);
 
             const matches =
                 value === "" ||
                 city.includes(value) ||
-                name.includes(value);
+                name.includes(value) ||
+                owner.includes(value);
 
             if (matches) {
 
@@ -156,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="col-md-4 col-xl-3 agence-card" 
                 data-city="{{ object.ville|lower }}"
                 data-name="{{ object.nom|lower }}"
+                data-owner="{{ object.manager|lower }}"
             >
                 <div class="card h-100 shadow-sm">
                     {% if object.main_image %}

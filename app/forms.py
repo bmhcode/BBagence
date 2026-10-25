@@ -159,7 +159,7 @@ class AgenceForm(forms.ModelForm):
         fields = [
             'nom', 'description', 'manager','telephone', 'site_web', 
             'email', 'ville', 'commune', 'emplacement', 'google_map', 
-            'date_debut_abonnement', 'nombre_jours_abonnement', 
+            'date_debut_abonnement', 'date_fin_abonnement', 
             'heure_ouverture', 'heure_fermeture', 'fermeture_temporaire', 'motif_fermeture',
             'est_en_vedette', 'est_en_service', 'est_suspendue', 'motif_suspension',
         ]
@@ -185,14 +185,13 @@ class AgenceForm(forms.ModelForm):
             'Motif_fermeture': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             
             'date_debut_abonnement': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
-            'nombre_jours_abonnement': forms.NumberInput(attrs={'class': 'form-control'}),
+            'date_fin_abonnement': forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control','type': 'date',}),
             
             'est_en_service': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            
-            'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            
             'est_suspendue': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'motif_suspension': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            
+            'est_en_vedette': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             
         }
 

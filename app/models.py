@@ -98,10 +98,10 @@ class Agence(models.Model):
     # ── Google Map ──
     google_map = models.URLField(max_length=1000, blank=True, verbose_name="Google Map URL")
 
+    # ── Abonnement ──
     date_debut_abonnement = models.DateField(null=True, blank=True)
-    nombre_jours_abonnement = models.IntegerField(default=30)
+    date_fin_abonnement = models.DateField(null=True, blank=True)
     
-
     # ── Date ──    
     cree_le = models.DateTimeField(auto_now_add=True)
     modifie_le = models.DateTimeField(auto_now=True)
@@ -194,7 +194,24 @@ class Agence(models.Model):
             return "Horaires inconnus"
 
         return f"{self.heure_ouverture.strftime('%H:%M')} - {self.heure_fermeture.strftime('%H:%M')}"    
-      
+
+    @property
+    def abonnement_expire(self):
+        if not self.date_debut_abonnement or not self.date_fin_abonnement:
+            return True
+
+        today = timezone.localdate()
+
+        # L'abonnement n'a pas encore commencé
+        if self.date_debut_abonnement > today:
+            return True
+
+        # L'abonnement est expiré après la date de fin
+        if today > self.date_fin_abonnement:
+            return True
+
+        return False   
+     
 class AgenceImages(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='agence/images/')

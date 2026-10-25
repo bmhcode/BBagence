@@ -30,7 +30,22 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agences_vedette'] = Agence.objects.filter(est_suspendue=False, est_en_vedette=True, est_en_service=True)[:6]
+        
+        today = timezone.localdate()
+
+        context['agences_vedette'] = Agence.objects.filter(
+            est_suspendue=False,
+            est_en_vedette=True,
+            est_en_service=True,
+            date_debut_abonnement__lte=today,
+            date_fin_abonnement__gte=today,
+        ).exclude(
+            date_debut_abonnement__isnull=True
+        ).exclude(
+            date_fin_abonnement__isnull=True
+        ).order_by('-id')[:6]
+        
+        
         context['brands'] = Brand.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['evenements_prochains'] = Evenement.objects.filter(afficher=True).order_by('date_debut')[:3]
         context['articles_recent'] = ArticleBlog.objects.filter(afficher=True).order_by('date_debut_publication')[:3]
@@ -174,6 +189,39 @@ class AgenceDeleteView(AgenceManagerRequiredMixin, DeleteView):
         messages.success(self.request, "L'agence a été supprimée.")
         return super().delete(request, *args, **kwargs)
 
+class OwnerAgenceListView(ListView):
+    model = Agence
+    template_name = 'app/owner_agences_list.html'
+    context_object_name = 'agences'
+    paginate_by = 12
+
+    def get_queryset(self):
+        return super().get_queryset().filter(manager=self.request.user)
+
+class AgenceBloquesListView(ListView):
+    model = Agence
+    template_name = 'app/agence_bloques_list.html'
+    context_object_name = 'agences'
+    paginate_by = 12
+
+    def get_queryset(self):
+        agences = (
+            Agence.objects
+            .filter(
+                Q(est_suspendue=True)
+                | Q(date_fin_abonnement__lt=timezone.localdate())
+                | Q(date_fin_abonnement__isnull=True)
+                | Q(date_debut_abonnement__isnull=True)
+            )
+            .order_by('date_debut_abonnement')
+        )
+
+        return [
+            agence
+            for agence in agences
+            if agence.est_suspendue or agence.abonnement_expire
+        ]
+
 class AgenceListView(ListView):
     model = Agence
     template_name = 'app/agence_list.html'
@@ -181,23 +229,31 @@ class AgenceListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
+        queryset = Agence.objects.filter(
+            est_suspendue=False
+        ).select_related('manager')
+
         query = self.request.GET.get('q')
         agence_nom = self.request.GET.get('agence_nom')
-        queryset = Agence.objects.filter(est_suspendue=False)
+
         if query:
             queryset = queryset.filter(
-                Q(nom__icontains=query) | Q(description__icontains=query)
+                Q(nom__icontains=query)
+                | Q(ville__icontains=query)
+                | Q(commune__icontains=query)
             )
-        if agence_nom:
-            queryset = queryset.filter(nom=agence_nom)
-        return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['noms'] = Agence.objects.values_list('nom', flat=True).distinct()
-        
-        context["villes"] = (Agence.objects.values_list("ville", flat=True).distinct().order_by("ville"))
-        return context
+        if agence_nom:
+            queryset = queryset.filter(
+                nom__icontains=agence_nom
+            )
+
+        # Exclure les agences dont l'abonnement est expiré
+        # today = timezone.localdate()
+        return [
+            agence for agence in queryset
+            if not agence.abonnement_expire
+        ]
 
 class AgenceListPromotionView(ListView):
     model = Car

@@ -192,57 +192,51 @@
 
                         </a>
 
-
                         <ul class="dropdown-menu dropdown-menu-end">
-
                             <li>
                                 <a class="dropdown-item"
                                    href="{% url 'profile' %}">
 
                                     <i class="fas fa-id-card me-2"></i>
                                     Mon profil
-
                                 </a>
                             </li>
 
+                            <li>
+                                <a class="dropdown-item"
+                                {% if request.user.is_superuser %}
+                                   href="{% url 'agence_bloqués' %}">
+                                    <i class="fas fa-list me-2"></i>
+                                    Agences suspendus ou hors delais
+                                {% else %}
+                                   href="{% url 'owner_agence_list' %}">
+                                    <i class="fas fa-car me-2"></i>
+                                    Mes agences
+                                {% endif %}
+                                </a>
+                            </li>
 
-                            {% if request.user.is_superuser or request.user.profile.role == 'agence_owner' %}
-
+                            {% if request.user.is_superuser %}
                                 <li>
                                     <a class="dropdown-item"
                                        href="{% url 'dashboard' %}">
-
                                         <i class="fas fa-chart-line me-2"></i>
                                         Mon Dashboard
-
                                     </a>
                                 </li>
 
                             {% endif %}
 
+                            <li> <hr class="dropdown-divider"> </li>
 
                             <li>
-                                <hr class="dropdown-divider">
-                            </li>
-
-
-                            <li>
-
-                                <form method="post"
-                                      action="{% url 'logout' %}">
-
+                                <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
-
-                                    <button type="submit"
-                                            class="dropdown-item text-danger">
-
+                                    <button type="submit" class="dropdown-item text-danger">
                                         <i class="fas fa-sign-out-alt me-2"></i>
                                         Déconnexion
-
                                     </button>
-
                                 </form>
-
                             </li>
 
                         </ul>

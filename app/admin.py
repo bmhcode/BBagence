@@ -12,7 +12,7 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(Agence)
 class AgenceAdmin(admin.ModelAdmin):
     list_display = ('nom', 'manager','ville',
-                    'date_debut_abonnement','nombre_jours_abonnement',
+                    'date_debut_abonnement','date_fin_abonnement',
                     'est_en_service', 'fermeture_temporaire', 'motif_fermeture','est_en_vedette',
                     'est_suspendue','motif_suspension',)
                     

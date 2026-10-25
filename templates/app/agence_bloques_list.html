@@ -1,0 +1,423 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Agences bloquées - BBcar{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-2">
+                <i class="fas fa-building me-2 text-warning"></i>
+                Gestion des agences bloquées
+            </h1>
+            <p class="text-muted mb-0">
+                Agences hors service, suspendues ou dont l'abonnement a expiré.
+            </p>
+        </div>
+
+        {% if request.user.is_superuser %}
+        <a href="{% url 'agence_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Ajouter une agence
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Statistiques de la page -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-4 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="status-icon bg-danger-subtle text-danger">
+                        <i class="fas fa-power-off"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Agences hors service</div>
+                        <div class="h4 fw-bold mb-0">
+                            {{ nombre_hors_service|default:"—" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="status-icon bg-warning-subtle text-warning-emphasis">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Agences suspendues</div>
+                        <div class="h4 fw-bold mb-0">
+                            {{ nombre_suspendues|default:"—" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="status-icon bg-secondary-subtle text-secondary">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small">Abonnements expirés</div>
+                        <div class="h4 fw-bold mb-0">
+                            {{ nombre_abonnements_expires|default:"—" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-md-6">
+                    <h2 class="h5 fw-bold mb-0">Liste des agences</h2>
+                    <small class="text-muted">
+                        {{ agences|length }} agence(s) sur cette page
+                    </small>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input
+                            type="search"
+                            id="agencySearch"
+                            class="form-control bg-light border-start-0"
+                            placeholder="Rechercher une agence, ville, responsable..."
+                            aria-label="Rechercher une agence">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="agencyTable">
+
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Agence</th>
+                        <th>Responsable</th>
+                        <th>Localisation</th>
+                        <th>Début abonnement</th>
+                        <th>Durée</th>
+                        <th>État</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for object in agences %}
+                    <tr class="agency-row">
+
+                        <!-- Agence -->
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center gap-3">
+                                {% if object.main_image %}
+                                    <img
+                                        src="{{ object.main_image.image.url }}"
+                                        alt="{{ object.nom }}"
+                                        class="agency-thumbnail">
+                                {% else %}
+                                    <div class="agency-thumbnail placeholder-thumbnail">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                {% endif %}
+
+                                <div>
+                                    <a href="{{ object.get_absolute_url }}"
+                                       class="fw-bold text-decoration-none text-dark agency-name">
+                                        {{ object.nom }}
+                                    </a>
+                                    <div class="text-muted small">
+                                        {{ object.telephone|default:"-" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Responsable -->
+                        <td class="agency-owner">
+                            {% if object.manager %}
+                                {{ object.manager.get_full_name|default:object.manager.username }}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Localisation -->
+                        <td class="agency-city">
+                            <div>
+                                <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                {{ object.ville|default:"Non définie" }}
+                            </div>
+                            {% if object.commune and object.commune != object.ville %}
+                                <small class="text-muted">{{ object.commune }}</small>
+                            {% endif %}
+                        </td>
+
+                        <!-- Abonnement -->
+                        <td>
+                            {% if object.date_debut_abonnement %}
+                                {{ object.date_debut_abonnement|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if object.date_fin_abonnement %}
+                                {{ object.date_fin_abonnement|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- États : plusieurs badges possibles -->
+                        <td>
+                            <div class="d-flex flex-column align-items-start gap-1">
+
+                                {% if not object.est_en_service %}
+                                    <span class="badge text-bg-danger">
+                                        <i class="fas fa-power-off me-1"></i>
+                                        Hors service
+                                    </span>
+                                {% endif %}
+
+                                {% if object.est_suspendue %}
+                                    <span class="badge text-bg-warning">
+                                        <i class="fas fa-ban me-1"></i>
+                                        Suspendue
+                                    </span>
+                                {% endif %}
+
+                                {% if object.abonnement_expire %}
+                                    <span class="badge text-bg-secondary">
+                                        <i class="fas fa-calendar-times me-1"></i>
+                                        Abonnement expiré
+                                    </span>
+                                {% endif %}
+
+                                {% if object.est_en_service and not object.est_suspendue and not object.abonnement_expire %}
+                                    <span class="badge text-bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Aucun blocage détecté
+                                    </span>
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                        <!-- Actions -->
+                        <td>
+                            <div class="d-flex justify-content-center gap-1">
+
+                                <a href="{{ object.get_absolute_url }}"
+                                   class="btn btn-sm btn-outline-info"
+                                   title="Consulter l'agence"
+                                   aria-label="Consulter l'agence">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                {% if request.user.is_superuser or object.manager == request.user %}
+                                <a href="{% url 'agence_update' object.slug %}"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Modifier l'agence"
+                                   aria-label="Modifier l'agence">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+
+                                {% if request.user.is_superuser %}
+                                <a href="{% url 'agence_delete' object.slug %}"
+                                   class="btn btn-sm btn-outline-danger"
+                                   title="Supprimer l'agence"
+                                   aria-label="Supprimer l'agence">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5 class="fw-bold">Aucune agence bloquée</h5>
+                            <p class="text-muted mb-0">
+                                Toutes les agences sont en règle selon les critères affichés.
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <tr id="noSearchResults" style="display:none;">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            Aucune agence ne correspond à votre recherche.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="card-footer bg-white border-0 py-3">
+            <nav aria-label="Pagination des agences">
+                <ul class="pagination justify-content-center mb-0">
+
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page=1">
+                            Première
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}">
+                            Précédent
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}">
+                            Suivant
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.paginator.num_pages }}">
+                            Dernière
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    .status-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .agency-thumbnail {
+        width: 58px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .placeholder-thumbnail {
+        background: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 1.4rem;
+    }
+
+    #agencyTable th {
+        font-size: .82rem;
+        font-weight: 600;
+        color: #495057;
+        white-space: nowrap;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    #agencyTable td {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    #agencyTable tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: .45em .65em;
+    }
+
+    @media (max-width: 767px) {
+        .agency-thumbnail {
+            width: 44px;
+            height: 40px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('agencySearch');
+    const rows = document.querySelectorAll('.agency-row');
+    const noResults = document.getElementById('noSearchResults');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function () {
+        const query = this.value
+            .trim()
+            .toLocaleLowerCase();
+
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.textContent
+                .toLocaleLowerCase()
+                .includes(query);
+
+            row.style.display = matches ? '' : 'none';
+
+            if (matches) visibleCount++;
+        });
+
+        if (noResults) {
+            noResults.style.display =
+                rows.length > 0 && visibleCount === 0 ? '' : 'none';
+        }
+    });
+});
+</script>
+
+{% endblock %}

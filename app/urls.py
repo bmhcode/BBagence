@@ -29,7 +29,10 @@ urlpatterns = [
 
     # =========================== Agences CRUD =============================
     path('agences/', views.AgenceListView.as_view(), name='agence_list'),
-    
+    path('owner-agences/', views.OwnerAgenceListView.as_view(), name='owner_agence_list'),
+
+    path('agence-bloqués', views.AgenceBloquesListView.as_view(), name='agence_bloqués'),
+
     path('agence/<slug:agence_slug>/promotions/', views.AgenceListPromotionView.as_view(), name='agence_list_promotion'),
 
     
