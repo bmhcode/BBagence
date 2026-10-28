@@ -31,7 +31,7 @@ urlpatterns = [
     path('agences/', views.AgenceListView.as_view(), name='agence_list'),
     path('owner-agences/', views.OwnerAgenceListView.as_view(), name='owner_agence_list'),
 
-    path('agence-bloqués', views.AgenceBloquesListView.as_view(), name='agence_bloqués'),
+    path('agences-list', views.AgenceAdminListView.as_view(), name='agence_admin_list'),
 
     path('agence/<slug:agence_slug>/promotions/', views.AgenceListPromotionView.as_view(), name='agence_list_promotion'),
 
@@ -51,16 +51,11 @@ urlpatterns = [
     path('agence/<slug:agence_slug>/car/<int:car_id>/delete/', views.CarDeleteView.as_view(), name='car_delete'),
 
     # Car images (AJAX / Actions)
-   # Car images
-   path(
-    'agence/<slug:agence_slug>/car/<int:car_id>/images/add/',
-    views.car_images_add,
-    name='car_images_add'
-),
-path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/set-main/',views.car_image_set_main,name='car_image_set_main'),
-path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/edit/',
-    views.car_image_edit, name='car_image_edit'),
-path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/delete/',views.car_image_delete,name='car_image_delete'),
+    # Car images
+    path('agence/<slug:agence_slug>/car/<int:car_id>/images/add/', views.car_images_add, name='car_images_add'),
+    path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/set-main/',views.car_image_set_main,name='car_image_set_main'),
+    path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/edit/', views.car_image_edit, name='car_image_edit'),
+    path('agence/<slug:agence_slug>/car/<int:car_id>/car-image/<int:image_id>/delete/',views.car_image_delete,name='car_image_delete'),
     # =========================== Agence Media Manage ======================
     path('agence/<slug:agence_slug>/cars/', views.AgenceCarListView.as_view(), name='agence_car_list'),
     path('agence/<slug:agence_slug>/presentation/manage/', views.AgencePresentationManageView.as_view(), name='agence_presentation_manage'),

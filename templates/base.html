@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -10,21 +9,28 @@
     <title>{% block title %}BBcar{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
-          rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet"
+    >
 
     <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    >
 
+    <!-- CSS principal de BBcar -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
+    <!-- CSS spécifique à chaque page -->
     {% block extra_css %}{% endblock %}
-
 </head>
 <body>
 
@@ -205,9 +211,9 @@
                             <li>
                                 <a class="dropdown-item"
                                 {% if request.user.is_superuser %}
-                                   href="{% url 'agence_bloqués' %}">
+                                   href="{% url 'agence_admin_list' %}">
                                     <i class="fas fa-list me-2"></i>
-                                    Agences suspendus ou hors delais
+                                    Liste des agences
                                 {% else %}
                                    href="{% url 'owner_agence_list' %}">
                                     <i class="fas fa-car me-2"></i>
@@ -244,7 +250,7 @@
                     </div>
                 {% else %}
 
-                    <a class="nav-link me-2"
+                     <a class="btn btn-light login-btn"
                        href="{% url 'login' %}">
                         <i class="fas fa-sign-in-alt me-1"></i>
                         Connexion

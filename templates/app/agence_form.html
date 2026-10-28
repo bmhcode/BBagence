@@ -440,14 +440,7 @@
                                             {{ form.est_en_service }}
                                         </div>                                     
 
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">
-                                                Est en vedette ? 
-                                            </label>
-                                            {{ form.est_en_vedette }}
-                                        </div>
-
-
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -475,7 +468,7 @@
                                     <div class="row g-3">
 
                                         <!-- Manager -->
-                                        <div class="col-6">
+                                        <div class="col-12">
                                             <label class="form-label fw-semibold">
                                                 Manager <span class="text-danger">*</span>
                                             </label>
@@ -505,12 +498,19 @@
 
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">
+                                                Est en vedette ? 
+                                            </label>
+                                            {{ form.est_en_vedette }}
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">
                                                 Est suspendue ?
                                             </label>
                                             {{ form.est_suspendue }}
                                         </div>
                                         
-                                        <div class="col-md-9">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-semibold">
                                                 Motif de suspension
                                             </label>

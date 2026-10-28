@@ -196,21 +196,16 @@ class Agence(models.Model):
         return f"{self.heure_ouverture.strftime('%H:%M')} - {self.heure_fermeture.strftime('%H:%M')}"    
 
     @property
-    def abonnement_expire(self):
+    def abonnement_valide(self):
+        """Vérifie si l'abonnement de l'agence est valide."""
         if not self.date_debut_abonnement or not self.date_fin_abonnement:
-            return True
+            return False
 
-        today = timezone.localdate()
+        aujourd_hui = timezone.localdate()
 
-        # L'abonnement n'a pas encore commencé
-        if self.date_debut_abonnement > today:
-            return True
+        return self.date_debut_abonnement <= aujourd_hui <= self.date_fin_abonnement
 
-        # L'abonnement est expiré après la date de fin
-        if today > self.date_fin_abonnement:
-            return True
 
-        return False   
      
 class AgenceImages(models.Model):
     agence = models.ForeignKey(Agence, on_delete=models.CASCADE, related_name='images')
@@ -428,26 +423,21 @@ class Car(models.Model):
 
     @property
     def est_en_promotion_valide(self):
-        """Vérifie si la promotion est active"""
+        """Vérifie si la promotion est actuellement valide."""
+        aujourd_hui = timezone.localdate()
+
         return (
             self.est_en_promotion
-            and self.prix_promo
-            and self.date_debut_promo
-            and self.date_fin_promo
-            and self.date_debut_promo <= timezone.now().date() <= self.date_fin_promo
-            and self.date_debut_publication_promo
-            and self.date_debut_publication_promo <= timezone.now().date(),
-        )      
-        # def clean(self):
-        #     super().clean()
-        #     from django.core.exceptions import ValidationError
-        #     if self.agence:
-        #         qs = Promotion.objects.filter(agence=self.agence)
-        #         if self.pk:
-        #             qs = qs.exclude(pk=self.pk)
-        #         if qs.exists():
-        #             raise ValidationError("Cette agence a déjà une promotion active. Une seule promotion est autorisée par agence.")
-    
+            and self.prix_promo is not None
+            and self.prix_promo > 0
+            and self.date_debut_promo is not None
+            and self.date_fin_promo is not None
+            and self.date_debut_publication_promo is not None
+            and self.date_debut_promo <= aujourd_hui
+            and aujourd_hui <= self.date_fin_promo
+            and self.date_debut_publication_promo <= aujourd_hui
+        )   
+        
 
 class CarImages(models.Model):
     car = models.ForeignKey(Car, related_name="images", on_delete=models.CASCADE)

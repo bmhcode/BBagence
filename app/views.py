@@ -198,29 +198,18 @@ class OwnerAgenceListView(ListView):
     def get_queryset(self):
         return super().get_queryset().filter(manager=self.request.user)
 
-class AgenceBloquesListView(ListView):
+class AgenceAdminListView(ListView):
     model = Agence
-    template_name = 'app/agence_bloques_list.html'
+    template_name = 'app/agence_admin_list.html'
     context_object_name = 'agences'
     paginate_by = 12
 
     def get_queryset(self):
         agences = (
-            Agence.objects
-            .filter(
-                Q(est_suspendue=True)
-                | Q(date_fin_abonnement__lt=timezone.localdate())
-                | Q(date_fin_abonnement__isnull=True)
-                | Q(date_debut_abonnement__isnull=True)
-            )
-            .order_by('date_debut_abonnement')
+            Agence.objects.all().order_by('date_debut_abonnement')
         )
 
-        return [
-            agence
-            for agence in agences
-            if agence.est_suspendue or agence.abonnement_expire
-        ]
+        return agences
 
 class AgenceListView(ListView):
     model = Agence
@@ -252,7 +241,7 @@ class AgenceListView(ListView):
         # today = timezone.localdate()
         return [
             agence for agence in queryset
-            if not agence.abonnement_expire
+            if agence.abonnement_valide
         ]
 
 class AgenceListPromotionView(ListView):
@@ -393,6 +382,7 @@ class AgenceVideoView(DetailView):
         context = super().get_context_data(**kwargs)
         context['videos'] = self.object.videos.all()
         return context
+
 @login_required
 def agence_photos(request, agence_slug):
 
@@ -559,6 +549,7 @@ def agence_photos(request, agence_slug):
         "agence",
         agence.slug
     )
+
 class AgenceCarListView(ListView):
     model = Car
     template_name = 'app/agence_car_list.html'
@@ -1128,19 +1119,28 @@ class PromotionListView(ListView):
     template_name = 'app/promotion_list.html'
     context_object_name = 'cars_promotion'
     ordering = ['-cree_le']
+    paginate_by = 12
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Active car promotions
-        context['cars_promotion'] = Car.objects.filter(
-            est_en_promotion=True,
-            date_debut_promo__lte=timezone.now().date(),
-            date_fin_promo__gte=timezone.now().date(),
-            # date_debut_publication_promo__lte=timezone.now().date(),
-            
-        ).select_related('agence').prefetch_related('images')
-        
-        return context
+    def get_queryset(self):
+        aujourd_hui = timezone.localdate()
+
+        return (
+            Car.objects
+            .filter(
+                est_en_promotion=True,
+                est_disponible=True,
+                prix_promo__isnull=False,
+                date_debut_promo__isnull=False,
+                date_fin_promo__isnull=False,
+                date_debut_publication_promo__isnull=False,
+                date_debut_promo__lte=aujourd_hui,
+                date_fin_promo__gte=aujourd_hui,
+                date_debut_publication_promo__lte=aujourd_hui,
+            )
+            .select_related('agence')
+            .prefetch_related('images')
+            .order_by('-cree_le')
+        )
 
 class CarPromotionView(DetailView):
     model = Car

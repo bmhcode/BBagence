@@ -88,94 +88,125 @@
 <!-- Custom Styles for Premium Experience -->
 
 <style>
-    
-    /* Video cards styling */
-    .video-card {
-        background: #fff;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--color-border);
-        transition: transform var(--transition), box-shadow var(--transition);
-    }
-    
-    .video-card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--shadow-md);
-    }
+    /* Conteneur de l'image */
+.car-card__img {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
 
-    .video-container {
-        position: relative;
-        padding-top: 56.25%;
-        background: #000;
-    }
+/* Image de la voiture */
+.car-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
 
-    .video-container video {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
-    }
+.car-card:hover .car-card__img img {
+    transform: scale(1.06);
+}
 
-    .video-body {
-        padding: 20px 24px;
-    }
+/* ❤️ Bouton favoris : EN HAUT À DROITE */
+.wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px; /* À droite */
+    left: auto;  /* Annule l'ancien positionnement à gauche */
+    z-index: 30;
 
-    .video-body h4 {
-        margin: 0;
-        font-family: var(--font-body);
-        font-weight: 600;
-        font-size: 1.05rem;
-        color: var(--color-primary);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .video-body h4 i {
-        color: var(--color-pink);
-    }
+    width: 40px;
+    height: 40px;
 
-    /* Pulse indicator animations */
-    .pulse-indicator {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        position: relative;
-    }
-    
-    .pulse-indicator.green {
-        background: #22c55e;
-    }
-    
-    .pulse-indicator.green::after {
-        content: '';
-        position: absolute;
-        inset: -4px;
-        border-radius: 50%;
-        background: rgba(34, 197, 94, 0.4);
-        animation: pulse-ring 1.5s infinite;
-    }
-    
-    .pulse-indicator.red {
-        background: #ef4444;
-    }
-    
-    .pulse-indicator.red::after {
-        content: '';
-        position: absolute;
-        inset: -4px;
-        border-radius: 50%;
-        background: rgba(239, 68, 68, 0.4);
-        animation: pulse-ring 1.5s infinite;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    @keyframes pulse-ring {
-        0% { transform: scale(0.7); opacity: 1; }
-        100% { transform: scale(1.6); opacity: 0; }
-    }
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+
+    color: #64748b;
+    font-size: 18px;
+
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+
+    transition: transform .2s ease,
+                background .2s ease,
+                color .2s ease;
+}
+
+/* Effet au survol du cœur */
+.wishlist-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+/* Voiture ajoutée aux favoris */
+.wishlist-btn.active,
+.wishlist-btn.active i {
+    color: #ef4444;
+}
+
+/* Pendant le chargement */
+.wishlist-btn.loading {
+    opacity: .7;
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* Spinner masqué par défaut */
+.wishlist-btn .wishlist-loader {
+    display: none;
+    width: 15px;
+    height: 15px;
+    border-width: 2px;
+}
+
+/* Afficher le spinner pendant le chargement */
+.wishlist-btn.loading .wishlist-loader {
+    display: inline-block;
+}
+
+/* Masquer le cœur pendant le chargement */
+.wishlist-btn.loading i {
+    display: none;
+}
+
+/* ✏️ 🗑️ Boutons Modifier / Supprimer : EN HAUT À GAUCHE */
+.car-card__admin-actions {
+    position: absolute;
+    top: 12px;
+    left: 12px;  /* À gauche */
+    right: auto; /* Annule l'ancien positionnement à droite */
+    z-index: 20;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Style des boutons Modifier / Supprimer */
+.car-card__admin-actions a {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+
+    transition: transform 0.2s ease;
+}
+
+.car-card__admin-actions a:hover {
+    transform: scale(1.1);
+}
 </style>
 
 
@@ -209,12 +240,6 @@
             </span>
             - <i class="fa fa-phone"></i> {{agence.telephone}}
         </p>
-        
-        <!-- <div class="card shadow rounded-3 overflow-hidden mb-4">
-            {% if agence.image %}
-            <img src="{{ agence.image.url }}" class="img-fluid" alt="{{ agence.nom }}" style="width: 100%; max-height: 400px; object-fit: cover;">
-            {% endif %}
-        </div> -->
     </div>
 </div>
 
@@ -227,7 +252,6 @@
     </div>
 <!-- end filter by city -->
 <br>
-
 
 <!-- Tous les véhicules -->
 <div id="véhicules-neuves" class="mb-5 pt-4">
@@ -247,82 +271,123 @@
                 {% for object in agence.cars.all|slice:":6" %}
                   
                     <div class="col-sm-6 col-md-4 col-xl-3">
-                        <div class="car-card">
-                            <!-- Wishlist Button -->
-                            {% if request.user.is_authenticated %}  
-                                <button type="button"
-                                        onclick="toggleWishlist(this, {{ object.id }})"
-                                        class="wishlist-btn {% if object.id in user_wishlist_ids %} active {% endif %}"
-                                        aria-label="Ajouter aux favoris"
-                                        title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                        <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-                                        <span class="wishlist-loader spinner-border spinner-border-sm"></span>
-                                </button>
-                            {% endif %}
+                            <div class="car-card">
 
-                            <!-- Image -->
-                            <div class="car-card__img">
-                                <a href="{% url 'car' object.agence.slug object.id %}">
-                                    {% if object.main_image %}
-                                        <div class="position-relative w-100 h-100">
+                                <!-- Image de la voiture -->
+                                <div class="car-card__img position-relative">
+
+                                    <a href="{% url 'car' object.agence.slug object.id %}"
+                                    class="d-block w-100 h-100">
+
+                                        {% if object.main_image %}
                                             <img src="{{ object.main_image.image.url }}"
                                                 class="w-100 h-100"
                                                 alt="{{ object.marque }} {{ object.modele }}"
-                                                loading="lazy" style="object-fit: cover;">
-                                            <!-- PROMO -->
-                                            {% if object.est_en_promotion %}
-                                            <a href="{% url 'car_promotion' object.agence.slug object.id %}">
-                                                <div class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm">
-                                                    PROMO {{ object.prix_promo|intcomma }} <small>Million</small>
-                                                </div>
+                                                loading="lazy"
+                                                style="object-fit: cover;">
+                                        {% else %}
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                                <i class="fas fa-car fa-3x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+
+                                    </a>
+
+                                    <!-- Bouton Favoris : sur l'image -->
+                                    {% if request.user.is_authenticated %}
+                                        <button type="button"
+                                                onclick="toggleWishlist(this, {{ object.id }})"
+                                                class="wishlist-btn {% if object.id in user_wishlist_ids %}active{% endif %}"
+                                                aria-label="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
+                                                title="{% if object.id in user_wishlist_ids %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+
+                                            <i class="{% if object.id in user_wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+
+                                            <span class="wishlist-loader spinner-border spinner-border-sm"></span>
+                                        </button>
+                                    {% endif %}
+
+                                    <!-- Badge Promotion -->
+                                    {% if object.est_en_promotion %}
+                                        <a href="{% url 'car_promotion' object.agence.slug object.id %}"
+                                        class="position-absolute bottom-0 start-0 m-3 px-3 py-1 bg-danger text-white rounded-pill shadow-sm text-decoration-none"
+                                        style="z-index: 2;">
+                                            PROMO {{ object.prix_promo|intcomma }}
+                                            <small>Million</small>
+                                        </a>
+                                    {% endif %}
+
+                                    <!-- Boutons Modifier / Supprimer -->
+                                    {% if request.user.is_superuser or object.agence.manager == request.user %}
+                                        <div class="car-card__admin-actions">
+                                            <a href="{% url 'car_update' object.agence.slug object.id %}"
+                                            class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Modifier">
+                                                <i class="fas fa-edit"></i>
                                             </a>
-                                            {% endif %}
-                                            <!--/ PROMO -->
-                                        </div>
-                                    {% else %}
-                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-                                            <i class="fas fa-car fa-3x text-muted"></i>
+
+                                            <a href="{% url 'car_delete' object.agence.slug object.id %}"
+                                            class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
                                         </div>
                                     {% endif %}
-                                </a>
-                            </div>
 
-                            <!-- Edit/Delete buttons for manager or superuser -->
-                            {% if request.user.is_superuser or object.agence.manager == request.user %}
-                                <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 5px; z-index: 10;">
-                                        <a href="{% url 'car_update' object.agence.slug object.id %}" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{% url 'car_delete' object.agence.slug object.id %}" class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
                                 </div>
-                            {% endif %}
 
+                                <!-- Informations de la voiture -->
+                                <div class="car-card__body">
 
-                            <!-- Body -->
-                            <div class="car-card__body">
-                                <small class="text-uppercase fw-bold text-danger d-block" style="font-size:.7rem; letter-spacing:.06em;">{{ object.marque }}</small>
-                                <div class="car-card__title">{{ object.modele }} {{ object.annee }}</div>
-                                <div class="car-card__meta">
-                                    <span class="car-card__pill"><i class="fas fa-gas-pump me-1"></i>{{ object.get_energie_display }}</span>
-                                    <span class="car-card__pill"><i class="fas fa-cogs me-1"></i>{{ object.get_boite_de_vitesse_display }}</span>
-                                    <span class="car-card__pill"><i class="fas fa-road me-1"></i>{{ object.kilometrage|intcomma }} km</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="car-card__price">{{ object.prix_actuel|intcomma }} Million</span>
-                                        {% if object.prix_ancien %}
-                                            <span class="car-card__price-old">{{ object.prix_ancien|intcomma }}</span>
-                                        {% endif %}
+                                    <small class="text-uppercase fw-bold text-danger d-block"
+                                        style="font-size: .7rem; letter-spacing: .06em;">
+                                        {{ object.marque }}
+                                    </small>
+
+                                    <div class="car-card__title">
+                                        {{ object.modele }} {{ object.annee }}
                                     </div>
-                                    <a href="{% url 'car' object.agence.slug object.id %}"
-                                       class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                                        Voir
-                                    </a>
+
+                                    <div class="car-card__meta">
+                                        <span class="car-card__pill">
+                                            <i class="fas fa-gas-pump me-1"></i>
+                                            {{ object.get_energie_display }}
+                                        </span>
+
+                                        <span class="car-card__pill">
+                                            <i class="fas fa-cogs me-1"></i>
+                                            {{ object.get_boite_de_vitesse_display }}
+                                        </span>
+
+                                        <span class="car-card__pill">
+                                            <i class="fas fa-road me-1"></i>
+                                            {{ object.kilometrage|intcomma }} km
+                                        </span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="car-card__price">
+                                                {{ object.prix_actuel|intcomma }} Million
+                                            </span>
+
+                                            {% if object.prix_ancien %}
+                                                <span class="car-card__price-old">
+                                                    {{ object.prix_ancien|intcomma }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <a href="{% url 'car' object.agence.slug object.id %}"
+                                        class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                                            Voir
+                                        </a>
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
                     </div>
                    
                 {% endfor %}
