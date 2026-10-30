@@ -1,0 +1,384 @@
+/* ============================================================
+   BBCARS — CARS & GALLERY STYLES
+   (static/css/car.css)
+   ============================================================ */
+
+/* ── Car card ── */
+.car-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    transition: transform .25s ease, box-shadow .25s ease;
+    position: relative;
+    height: 100%;
+}
+
+.car-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.12);
+}
+
+.car-card__img {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.car-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.car-card:hover .car-card__img img {
+    transform: scale(1.06);
+}
+
+.car-card__body {
+    padding: 1rem 1.1rem 1.3rem;
+}
+
+.car-card__brand {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--color-pink, #ff4f9a);
+    margin-bottom: .2rem;
+}
+
+.car-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: .5rem;
+}
+
+.car-card__meta {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin-bottom: .8rem;
+}
+
+.car-card__pill {
+    background: #f1f5f9;
+    border-radius: 100px;
+    padding: .15rem .6rem;
+    font-size: .72rem;
+    color: #475569;
+}
+
+.car-card__price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.car-card__price-old {
+    font-size: .8rem;
+    text-decoration: line-through;
+    color: #94a3b8;
+    margin-left: .4rem;
+}
+
+/* ── Promo badge ── */
+.promo-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    padding: .25rem .6rem;
+    border-radius: 100px;
+    z-index: 5;
+}
+
+/* ── Wishlist button (car cards) ── */
+.wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    left: auto;
+    z-index: 30;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    color: #64748b;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    transition: transform .2s ease, background .2s ease, color .2s ease;
+}
+
+.wishlist-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+.wishlist-btn.active,
+.wishlist-btn.active i {
+    color: #ef4444;
+}
+
+.wishlist-btn.loading {
+    opacity: .7;
+    cursor: wait;
+    pointer-events: none;
+}
+
+.wishlist-btn .wishlist-loader {
+    display: none;
+    width: 15px;
+    height: 15px;
+    border-width: 2px;
+}
+
+.wishlist-btn.loading .wishlist-loader {
+    display: inline-block;
+}
+
+.wishlist-btn.loading i {
+    display: none;
+}
+
+/* ── Admin actions (Edit / Delete buttons on car card) ── */
+.car-card__admin-actions {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: auto;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.car-card__admin-actions a {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.car-card__admin-actions a:hover {
+    transform: scale(1.1);
+}
+
+/* ── Agency & Car Gallery Grid ── */
+.agency-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.agency-gallery-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #fff;
+    border: 2px solid transparent;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    transition: all .3s ease;
+}
+
+.agency-gallery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+}
+
+.agency-gallery-card.is-main {
+    border-color: var(--color-pink, #ff4f9a);
+}
+
+.agency-gallery-image {
+    width: 100%;
+    height: 250px;
+    display: block;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform .5s ease;
+}
+
+.agency-gallery-card:hover .agency-gallery-image {
+    transform: scale(1.05);
+}
+
+.agency-main-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 50px;
+    background: var(--color-pink, #ff4f9a);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.agency-view-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 6;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all .25s ease;
+}
+
+.agency-gallery-card:hover .agency-view-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.agency-view-btn:hover {
+    background: rgba(0,0,0,.9);
+    transform: scale(1.1);
+}
+
+.agency-gallery-actions {
+    position: absolute;
+    left: 50%;
+    bottom: 55px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+    transition: all .25s ease;
+}
+
+.agency-gallery-card:hover .agency-gallery-actions {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.agency-gallery-action {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.agency-gallery-action:hover {
+    transform: scale(1.12);
+}
+
+.agency-gallery-action.set-main:hover {
+    background: var(--color-pink, #ff4f9a);
+    color: #fff;
+}
+
+.agency-gallery-action.main-active {
+    background: var(--color-pink, #ff4f9a);
+    color: #fff;
+    cursor: default;
+}
+
+.agency-gallery-action.edit:hover {
+    background: var(--color-primary, #0f172a);
+    color: #fff;
+}
+
+.agency-gallery-action.delete {
+    color: #ff6b6b;
+}
+
+.agency-gallery-action.delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.agency-gallery-caption {
+    padding: 15px;
+    min-height: 55px;
+    color: var(--color-primary, #0f172a);
+    font-weight: 500;
+}
+
+.agency-gallery-caption i {
+    color: var(--color-pink, #ff4f9a);
+}
+
+@media (max-width: 768px) {
+    .agency-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .agency-gallery-image {
+        height: 220px;
+    }
+    .agency-view-btn,
+    .agency-gallery-actions {
+        opacity: 1;
+    }
+    .agency-gallery-actions {
+        left: auto;
+        right: 10px;
+        bottom: 55px;
+        transform: none;
+    }
+    .agency-gallery-card:hover .agency-gallery-actions {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .agency-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+    .agency-gallery-image {
+        height: 280px;
+    }
+}
+
+/* ── Secondary car images (car detail thumbnail strip) ── */
+.secondary-car-image {
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.secondary-car-image:hover {
+    transform: scale(1.05);
+}

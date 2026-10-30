@@ -75,22 +75,15 @@
                                     <div>
                                         <h5 class="fw-bold mb-1 text-dark">{{ msg.sujet }}</h5>
                                         <div class="message-meta">
-                                            <i class="fas fa-user me-1"></i> {{ msg.nom }} &bull; 
-                                            <i class="fas fa-envelope me-1"></i> <a href="mailto:{{ msg.email }}" class="text-decoration-none">{{ msg.email }}</a>
+                                            <i class="fas fa-user me-1"></i> {{ msg.nom }} &bull; {{msg.telephone}}
+                                            <i class="fas fa-envelope me-1"></i> <a href="mailto:{{ msg.email }}" class="text-decoration-none">{{ msg.email }} </a>
                                         </div>
                                     </div>
                                     <div class="text-md-end message-meta">
                                         <span class="badge bg-light text-dark border"><i class="far fa-clock me-1"></i> {{ msg.cree_le|date:"d M Y, H:i" }}</span>
                                     </div>
-
-
-
-
-
                                 </div>
-                                
                                 <hr class="text-muted opacity-25 my-3">
-                                
                                 <div class="text-secondary" style="white-space: pre-line;">
                                     {{ msg.message }}
                                 </div>
@@ -101,15 +94,13 @@
                         <a href="mailto:{{ msg.email }}?subject=RE: {{ msg.sujet|urlencode }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                             <i class="fas fa-reply me-1"></i> Répondre
                         </a>
-
                         <!-- Edit/Delete buttons for superuser -->
-                                 {% if request.user.is_superuser and msg.agence %}
-                        <a href="{% url 'message_delete' msg.agence.slug msg.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                        {% if request.user.is_superuser or msg.agence.manager == request.user %}
+                        <a href="{% url 'message_delete' agence_slug=agence.slug msg_id=msg.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                             <i class="fas fa-trash me-1"></i> Supprimer
                         </a>
-                        
-                     {% endif %}
-                                 <!--  / Edit/Del -->
+                        {% endif %}
+                        <!--  / Edit/Del -->
                     </div>
                 </div>
             </div>

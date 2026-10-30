@@ -1,0 +1,89 @@
+/* ============================================================
+   BBCARS — PROMOTIONS STYLES
+   (static/css/promotion.css)
+   ============================================================ */
+
+.promo-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: .3s;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+}
+
+.promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,.15);
+}
+
+.promo-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+.price-old {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.price-new {
+    color: #dc3545;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.video-box {
+    background: #111;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.video-box video {
+    width: 100%;
+    max-height: 450px;
+    border-radius: 15px;
+}
+
+.no-video {
+    color: #fff;
+    text-align: center;
+}
+
+.no-video i {
+    font-size: 70px;
+    opacity: .4;
+    margin-bottom: 20px;
+}
+
+.badge-promo {
+    background: #dc3545;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.btn-offer {
+    border-radius: 50px;
+    padding: 10px 25px;
+}
+
+.card-info {
+    padding: 30px;
+}
+
+@media (max-width: 991px) {
+    .video-box {
+        min-height: 300px;
+    }
+    .promo-image {
+        height: 220px;
+    }
+}

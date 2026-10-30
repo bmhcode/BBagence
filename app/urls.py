@@ -1,3 +1,4 @@
+from app.views import MessageDeleteView
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
@@ -81,7 +82,9 @@ urlpatterns = [
 
     path('contact/', views.ContactView.as_view(), name='contact'),
 
-    path('agence/<slug:agence_slug>/message/<int:msg_id>/delete/', views.MessageDeleteView.as_view(), name='message_delete'),
+    path("agence/<slug:agence_slug>/message/<int:msg_id>/delete/", MessageDeleteView.as_view(),name="message_delete",),
+
+
 
     path("agence/<slug:agence_slug>/photos/", views.agence_photos, name="agence_photos" ),
 

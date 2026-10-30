@@ -577,8 +577,24 @@ class CarListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Car.objects.all().select_related('agence').prefetch_related('images')
-        
+        aujourd_hui = timezone.localdate()
+        queryset = (
+            Car.objects.filter(
+                agence__est_en_service=True,
+                agence__est_suspendue=False,
+
+                # Vérifier que les dates ne sont pas NULL
+                agence__date_debut_abonnement__isnull=False,
+                agence__date_fin_abonnement__isnull=False,
+
+                # Vérifier la validité de l'abonnement
+                agence__date_debut_abonnement__lte=aujourd_hui,
+                agence__date_fin_abonnement__gte=aujourd_hui,
+            )
+            .select_related('agence')
+            .prefetch_related('images')
+            .order_by('-cree_le')
+        )
         # Search query
         q = self.request.GET.get('q')
         if q:
@@ -1373,18 +1389,15 @@ class AgenceMessagesListView(AgenceManagerRequiredMixin, ListView):
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
     model = ContactMessage
     template_name = "app/message_confirm_delete.html"
-
-    def get_object(self, queryset=None):
-        agence_slug = self.kwargs["agence_slug"]
-        msg_id = self.kwargs["msg_id"]
-
-        return get_object_or_404(
-            ContactMessage,
-            pk=msg_id,
-            agence__slug=agence_slug
+    pk_url_kwarg = "msg_id"
+    context_object_name = "message"
+    
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            "Le message a été supprimé avec succès."
         )
 
-    def get_success_url(self):
         return reverse(
             "agence_messages",
             kwargs={

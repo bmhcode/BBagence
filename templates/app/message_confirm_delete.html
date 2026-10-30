@@ -16,7 +16,15 @@
                 <button type="submit" class="btn btn-danger rounded-pill px-4">
                     <i class="fas fa-trash me-2"></i>Supprimer définitivement
                 </button>
-                <a href="{% url 'agence_messages' agence_slug=object.agence.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+                {% if object.agence %}
+                    <a href="{% url 'agence_messages' object.agence.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+                {% else %}
+                    <a href="" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+
+                {% endif %}
+
+          
+            
             </form>
         </div>
     </div>
